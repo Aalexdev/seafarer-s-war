@@ -1,0 +1,55 @@
+LOG file, init at : 23:36:53
+set max fps to : 60
+load font
+TTF_Init()
+TTF_OpenFont(C:\Users\aalex\programation\cpp\blocks\res/font/bombardier.ttf , 16)
+Sprite_list::read_from_xml
+Sprite_type::Sprite_type()
+Sprite_type::load_from_xml
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/sprites/explosions/1.bmp)
+Sprite_type::reload
+Sprite_type::Sprite_type()
+Sprite_type::load_from_xml
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/sprites/explosions/2.bmp)
+Sprite_type::reload
+Sprite_type::Sprite_type()
+Sprite_type::load_from_xml
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/sprites/explosions/3.bmp)
+Sprite_type::reload
+Sprite_type::Sprite_type()
+Sprite_type::load_from_xml
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/sprites/explosions/4.bmp)
+Sprite_type::reload
+Sprite_type::Sprite_type()
+Sprite_type::load_from_xml
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/sprites/explosions/5.bmp)
+Sprite_type::reload
+Sprite_type::Sprite_type()
+Sprite_type::load_from_xml
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/sprites/explosions/6.bmp)
+Sprite_type::reload
+Sprite_type::Sprite_type()
+Sprite_type::load_from_xml
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/sprites/explosions/7.bmp)
+Sprite_type::reload
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/img/backgrounds/sea.bmp)
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/img/backgrounds/darksea.bmp)
+readXML(C:\Users\aalex\programation\cpp\blocks\data/menus/mainMenu.xml , 0)
+freeWidgets()
+Text::setText('Main menu')
+TextButton::read_from_xml()
+Text::setText('play')
+TextButton::read_from_xml()
+Text::setText('settings')
+TextButton::read_from_xml()
+Text::setText('quit')
+loadTexture(C:\Users\aalex\programation\cpp\blocks\res/img/backgrounds/menu.bmp)
+readXML(C:\Users\aalex\programation\cpp\blocks\data/events.xml , 0)
+ButtonClass::exec()
+readXML(C:\Users\aalex\programation\cpp\blocks\data/functions/quit.xml , 0)
+freeWidgets()
+TTF_CloseFont()
+TTF_Quit()
+SDL_DestroyRenderer()
+SDL_DestroyWindow()
+SDL_Quit()

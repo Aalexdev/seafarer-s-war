@@ -1,0 +1,8 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<clearWidgets/>
+<text text="play" x="100" y="100"/>
+<textButton x="100" y="150" text="new game" command="data/menus/newGame.xml"/>
+<textButton x="100" y="175" text="back" command="data/menus/mainMenu.xml"/>
+
+<image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>

@@ -1,0 +1,20 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<clearWidgets/>
+<text x="100" y="100" text="window settings"/>
+
+<text x="100" y="200" text="size"/>
+<textButton x="125" y="225" text="720x440" command="data/functions/window720x440.xml"/>
+<textButton x="125" y="250" text="1080x720" command="data/functions/window1080x720.xml"/>
+<textButton x="125" y="275" text="1920x1080" command="data/functions/window1920x1080.xml"/>
+
+<text x="100" y="350" text="display mod"/>
+<textButton x="125" y="375" text="fullscreen" command="data/functions/set_fullscreen.xml"/>
+<textButton x="125" y="400" text="fullscreen auto" command="data/functions/set_fullscreen_desktop.xml"/>
+<textButton x="125" y="425" text="windowed" command="data/functions/set_windowed.xml"/>
+
+
+<textButton x="100" y="450" text="back" command="data/menus/settings.xml"/>
+
+
+<image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>

@@ -1,0 +1,7 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<!-- soon -->
+
+<saves>
+    <save name="save1" file="data/saves/save1.xml"/>
+</saves>

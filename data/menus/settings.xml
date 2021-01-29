@@ -1,0 +1,11 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<clearWidgets/>
+<text x="100" y="100" text="options"/>
+
+<textButton x="100" y="150" text="window" command="data/menus/settings/window.xml"/>
+<textButton x="100" y="175" text="general" command="data/menus/settings/general.xml"/>
+
+<textButton x="100" y="300" text="back" command="data/menus/mainMenu.xml"/>
+
+<image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>

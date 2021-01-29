@@ -1,0 +1,10 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<clearWidgets/>
+<text x="100" y="100" text="Main menu"/>
+
+<textButton x="100" y="200" text="play" command="data/menus/play.xml"/>
+<textButton x="100" y="250" text="settings" command="data/menus/settings.xml"/>
+<textButton x="100" y="300" text="quit" command="data/functions/quit.xml"/>
+
+<image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>
