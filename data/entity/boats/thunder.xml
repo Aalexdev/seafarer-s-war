@@ -1,0 +1,41 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<entity name="thunder">
+    <texture w="0" h="0" path="res/img/entity/boats/thunder.bmp"/>
+
+    <perform>
+        <acceleration max="10" pxPerSec="1"/>
+        <turnSpeed max="10" anglePerSec="1"/>
+    </perform>
+
+    <parts>
+		<part health="500">
+			<point x="0" y="0"/>
+			<point x="34" y="0"/>
+			<point x="34" y="48"/>
+			<point x="0" y="48"/>
+		</part>
+		<part health="175">
+			<point x="8" y="47"/>
+			<point x="26" y="47"/>
+			<point x="26" y="129"/>
+			<point x="8" y="129"/>
+		</part>
+		<part health="750">
+			<point x="0" y="48"/>
+			<point x="34" y="48"/>
+			<point x="34" y="172"/>
+			<point x="0" y="172"/>
+		</part>
+		<part health="500">
+			<point x="0" y="172"/>
+			<point x="34" y="172"/>
+			<point x="34" y="230"/>
+			<point x="0" y="230"/>
+		</part>
+	</parts>
+
+    <layer max="0" min="-5"/>
+
+    
+</entity>

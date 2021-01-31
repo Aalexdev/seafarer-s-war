@@ -56,7 +56,11 @@ void Key::setType(KeyType type){
 }
 
 Keypad::Keypad(){
-
+    for (int i=0; i<UINT8_MAX; i++){
+        this->key[i] = false;
+        this->keyDown[i] = false;
+        this->keyUp[i] = false;
+    }
 }
 
 Keypad::~Keypad(){

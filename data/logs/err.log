@@ -1,1 +1,3 @@
-ERROR file, init at : 23:36:53
+ERROR file, init at : 21:44:27
+WARNING :: Entity::load_from_xml, reason : cannot reconize 'parts' summonEntity child
+WARNING :: Entity::load_from_xml, reason : cannot reconize 'parts' summonEntity child

@@ -8,8 +8,6 @@
 <textButton x="125" y="200" text="60 fps" command="data/functions/set_60_fps.xml"/>
 <textButton x="125" y="225" text="120 fps" command="data/functions/set_120_fps.xml"/>
 
-<textButton x="100" y="275" text="reload files" command="data/main.xml"/>
-
 <textButton x="100" y="325" text="back" command="data/menus/settings.xml"/>
 
 <image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>

@@ -20,6 +20,7 @@
     #include "api/event/keypad.hpp"
     #include "api/functions/texture.hpp"
     #include "ui/widgets/textArea.hpp"
+    #include "api/class/entity.hpp"
 
     struct Mods{
         bool debug;
@@ -100,6 +101,14 @@
         Widgets widgets;
         vector<Layer*> layers;
         Camera camera;
+
+        vector<Entity*> entity;
+        vector<Entity_type*> entity_types;
+        
+        float zoom;
+        bool gamePause;
+
+        Entity* player;
     };
 
     void setLog(std::string path);
@@ -126,6 +135,9 @@
     // SDL
     void freeWindow(void);
     void freeWidgets(void);
+
+    void freeEntity_types();
+    void freeEntity();
 
     Point getMousePos(void);
 
@@ -163,5 +175,10 @@
     #define YEAR getMain()->time.ltm->tm_year
     #define CAMERA getMain()->camera
     #define IMAGES getMain()->widgets.images
+    #define ENTITY getMain()->entity
+    #define ENTITY_TYPES getMain()->entity_types
+    #define ZOOM getMain()->zoom
+    #define PAUSE getMain()->gamePause
+    #define PLAYER getMain()->player
 
 #endif

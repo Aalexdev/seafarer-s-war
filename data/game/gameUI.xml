@@ -1,0 +1,5 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<clearWidgets/>
+<game pause="false"/>
+<textButton x="30" y="30" text="pause" command="data/game/gamePause.xml"/>

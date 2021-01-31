@@ -127,8 +127,8 @@ bool Layer::draw(void){
             if (texture->addingPos.x >= texture->rect.w) texture->addingPos.x = 0;
         }
 
-        for (int y=-texture->rect.h; y<windowHeight()+texture->rect.h; y+=texture->rect.h){
-            for (int x=-texture->rect.w; x<windowWidth()+texture->rect.w; x+=texture->rect.w){
+        for (int y= -texture->rect.h - (CAMERA.y % texture->rect.h) / ZOOM + texture->addingPos.y - texture->rect.h; y < windowHeight()+texture->rect.h + (CAMERA.y % texture->rect.h) + texture->addingPos.y; y+=texture->rect.h / ZOOM){
+            for (int x= -texture->rect.w - (CAMERA.x % texture->rect.w) / ZOOM + texture->addingPos.x - texture->rect.w; x < windowWidth()+texture->rect.w + (CAMERA.x % texture->rect.w) + texture->addingPos.x; x+=texture->rect.w / ZOOM){
                 
                 texture->rect.x = x+texture->addingPos.x;
                 texture->rect.y = y+texture->addingPos.y;
@@ -136,9 +136,7 @@ bool Layer::draw(void){
                 texture->draw();
                 
             }
-
         }
-
     }
 
     return true;

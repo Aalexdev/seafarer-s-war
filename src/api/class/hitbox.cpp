@@ -20,11 +20,13 @@ void HitPoint::calculate(Point *center, int &angle){
 }
 
 Hitbox::Hitbox(){
+    if (IS_LOG_OPEN) LOG << "Hitbox::Hitbox()" << endl;
     this->color = (SDL_Color){255,255,255,255};
     this->hitPoints.clear();
 }
 
 Hitbox::~Hitbox(void){
+    if (IS_LOG_OPEN) LOG << "Hitbox::~Hitbox()" << endl;
     for (HitPoint* point : this->hitPoints){
         if (point) delete point;
     }
@@ -33,16 +35,16 @@ Hitbox::~Hitbox(void){
 }
 
 bool Hitbox::read_from_xml(XMLNode* node){
-
+    if (IS_LOG_OPEN) LOG << "Hitbox::read_from_xml()" << endl;
     if (!node){
         cerr << "cannot load a NULL node : " << __FILE__ << ";" << __LINE__ << endl;
         return false;
     }
 
     for (int i=0; i<node->children.size; i++){
-        XMLNode *child = XMLNode_child(node, i);
+        XMLNode* child = XMLNode_child(node, i);
 
-        if (strcmp(child->tag, "point")){
+        if (!strcmp(child->tag, "point")){
             HitPoint *point = new HitPoint;
 
             for (int a=0; a<child->attributes.size; a++){
@@ -53,11 +55,13 @@ bool Hitbox::read_from_xml(XMLNode* node){
                 } else if (!strcmp(attr.key, "y")){
                     sscanf(attr.value, "%d", &point->y);
                 } else {
-                    cout << "cannot reconize '" << attr.key << "' point attribute"<< endl;
+                    if (IS_ERR_OPEN) ERR << "WARNING :: Hitbox::read_from_xml, reason : cannot reconize '" << attr.key << "' point attribute" << endl;
                 }
             }
 
-            this->hitPoints.push_back(point);
+            this->push(point);
+        } else {
+            if (IS_ERR_OPEN) ERR << "WARNING :: Hitbox::read_from_xml, reason : cannot reconize '" << child->tag << "' hitbox child" << endl;
         }
     }
 
@@ -65,10 +69,12 @@ bool Hitbox::read_from_xml(XMLNode* node){
 }
 
 void Hitbox::push(HitPoint *pnt){
+    if (IS_LOG_OPEN) LOG << "Hitbox::push()" << endl;
     this->hitPoints.push_back(pnt);
 }
 
 void Hitbox::pop(void){
+    if (IS_LOG_OPEN) LOG << "Hitbox::pop()" << endl;
     this->hitPoints.pop_back();
 }
 

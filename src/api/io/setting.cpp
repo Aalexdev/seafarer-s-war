@@ -19,7 +19,6 @@ bool readXML(std::string path, bool check){
     XMLDocument doc;
     path = DIR + path;
 
-    
     if (IS_LOG_OPEN) LOG << "readXML(" << path << " , " << check << ")" << endl;
 
     if (XMLDocument_load(&doc, path.c_str())){
@@ -335,8 +334,52 @@ bool readXML(std::string path, bool check){
                 }
             } else if (equal(mainNode->tag, "onKey")){
                 KEYPAD->read_xml(mainNode);
-            } else if (equal(mainNode->tag, "camera"))
-            else {
+            } else if (equal(mainNode->tag, "entity")){
+                Entity_type* type = new Entity_type();
+
+                if (type->load_from_xml(mainNode)){
+                    ENTITY_TYPES.push_back(type);
+                } else {
+                    delete type;
+                }
+            } else if (equal(mainNode->tag, "clearlogs")){
+                loadLog();
+                loadErr();
+            } else if (equal(mainNode->tag, "write")){
+                for (int a=0; a<mainNode->attributes.size; a++){
+                    XMLAttribute attr = mainNode->attributes.data[a];
+
+                    if (!strcmp(attr.key, "log")){
+                        if (IS_LOG_OPEN) LOG << attr.value << endl;
+                    } else if (!strcmp(attr.key, "err")){
+                        if (IS_ERR_OPEN) ERR << attr.value << endl;
+                    } else {
+                        if (IS_ERR_OPEN) ERR << "WARNING :: readXML, cannot reconize '" << attr.key << "' write attribute" << endl;
+                    }
+                }
+            } else if (equal(mainNode->tag, "summonEntity")){
+                Entity* entity = new Entity();
+
+                if (entity->load_from_xml(mainNode)){
+                    ENTITY.push_back(entity);
+                } else {
+                    delete entity;
+                }
+            } else if (equal(mainNode->tag, "setPlayer")){
+                PLAYER->load_from_xml(mainNode);
+            } else if (equal(mainNode->tag, "clearEntitys/") || equal(mainNode->tag, "clearEntitys")){
+                freeEntity();
+            } else if (equal(mainNode->tag, "game")){
+                for (int a=0; a<mainNode->attributes.size; a++){
+                    XMLAttribute attr = mainNode->attributes.data[a];
+
+                    if (!strcmp(attr.key, "pause")){
+                        PAUSE = charToBool(attr.value);
+                    } else {
+                        if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << attr.key << "' game attribute" << endl;
+                    }
+                }
+            } else {
                 if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << mainNode->tag << "' in " << path << endl;
             }
         }

@@ -1,6 +1,6 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
-<logs log="data/logs/log.log" error="data/logs/err.log"/>
+<logs log="data/logs/logs.log" error="data/logs/err.log"/>
 
 <window>
     <size w="1080" h="720"/>
@@ -12,23 +12,25 @@
 <font path="res/font/bombardier.ttf" size="16"/>
 
 <sprites>
-    <sprite name="explosion 1" id="0" width="256" height="256" image="res/sprites/explosions/1.bmp"/>
-    <sprite name="explosion 2" id="1" width="256" height="256" image="res/sprites/explosions/2.bmp"/>
-    <sprite name="explosion 3" id="2" width="256" height="256" image="res/sprites/explosions/3.bmp"/>
-    <sprite name="explosion 4" id="3" width="256" height="256" image="res/sprites/explosions/4.bmp"/>
-    <sprite name="explosion 5" id="4" width="128" height="128" image="res/sprites/explosions/5.bmp"/>
-    <sprite name="explosion 6" id="5" width="100" height="100" image="res/sprites/explosions/6.bmp"/>
-    <sprite name="explosion 7" id="6" width="256" height="256" image="res/sprites/explosions/7.bmp"/>
+    <sprite name="explosion 1" width="128" height="128" image="res/sprites/explosions/1.bmp"/>
+    <sprite name="explosion 2" width="128" height="128" image="res/sprites/explosions/2.bmp"/>
+    <sprite name="explosion 3" width="128" height="128" image="res/sprites/explosions/3.bmp"/>
+    <sprite name="explosion 4" width="128" height="128" image="res/sprites/explosions/4.bmp"/>
+    <sprite name="explosion 5" width="128" height="128" image="res/sprites/explosions/5.bmp"/>
+    <sprite name="explosion 6" width="100" height="100" image="res/sprites/explosions/6.bmp"/>
+    <sprite name="explosion 7" width="128" height="128" image="res/sprites/explosions/7.bmp"/>
 </sprites>
 
 <layers>
-    <layer name="sea" id="0" angle="75" delay="100" speed="2" height="0">
-        <image path="res/img/backgrounds/sea.bmp" alpha="50"/>
+    <layer name="sea" id="0" angle="90" delay="50" speed="2" height="0">
+        <image path="res/img/backgrounds/sea.bmp" alpha="150"/>
     </layer>
-    <layer name="depth sea" id="1" angle="75" delay="250" speed="2" height="-10">
+
+    <layer name="depth sea" id="1" angle="50" delay="75" speed="2" height="-10">
         <image path="res/img/backgrounds/darksea.bmp" alpha="255"/>
     </layer>
 </layers>
 
 <read path="data/menus/mainMenu.xml"/>
 <read path="data/events.xml"/>
+<read path="data/entity/entity.xml"/>

@@ -17,9 +17,13 @@ int main(int argc, char* argv[]){
 
     TIME.now = time(0);
     TIME.ltm = localtime(&TIME.now);
+    ZOOM = 1;
+    PLAYER = new Entity(true);
 
     KEYPAD = new Keypad();
+
     mainVar.launched = readXML("data\\main.xml", false);
+
 
     while (mainVar.launched){
 
@@ -127,6 +131,18 @@ void update(){
     int exec = SDL_GetTicks();
 
     updateWidgets();
+
+    if (!PAUSE){
+        for (Entity* entity : ENTITY){
+            entity->update();
+        }
+
+        if (PLAYER->is_linked()){
+            PLAYER->update();
+            CAMERA.x = PLAYER->getX() - ((windowWidth() - PLAYER->getW()) / 2);
+            CAMERA.y = PLAYER->getY() - ((windowHeight() - PLAYER->getH()) / 2);
+        }
+    }
     
     resetMouse();
     mainVar.time.updateExecT = SDL_GetTicks() - exec;
@@ -156,6 +172,14 @@ void drawLayers(int z){
             lyr->draw();
         }
     }
+
+    for (Entity* entity : ENTITY){
+        if (entity->getZ() == z){
+            entity->draw();
+        }
+    }
+
+    if (PLAYER->getZ() == z && PLAYER->is_linked()) PLAYER->draw();
 }
 
 void drawImages(void){
@@ -256,6 +280,23 @@ void freeWidgets(void){
     IMAGES.clear();
 }
 
+void freeEntity(void){
+
+    for (Entity* entity : ENTITY){
+        delete entity;
+    }
+    ENTITY.clear();
+
+    PLAYER->unlink();
+}
+
+void freeEntity_types(void){
+    for (Entity_type* type : ENTITY_TYPES){
+        delete type;
+    }
+    ENTITY_TYPES.clear();
+}
+
 void destroy(void){
 
     freeWidgets();
@@ -265,8 +306,11 @@ void destroy(void){
     }
     LAYERS.clear();
 
-
+    freeEntity_types();
+    freeEntity();
+    
     delete KEYPAD;
+    delete PLAYER;
 
     freeFont();
     freeWindow();

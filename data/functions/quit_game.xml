@@ -1,0 +1,5 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<clearEntitys/>
+<read path="data/menus/mainMenu.xml"/>
+<game pause="false"/>
