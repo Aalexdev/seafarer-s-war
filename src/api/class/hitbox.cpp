@@ -23,6 +23,8 @@ Hitbox::Hitbox(){
     if (IS_LOG_OPEN) LOG << "Hitbox::Hitbox()" << endl;
     this->color = (SDL_Color){255,255,255,255};
     this->hitPoints.clear();
+
+    this->angle = 0;
 }
 
 Hitbox::~Hitbox(void){
@@ -114,6 +116,8 @@ bool Hitbox::draw(void){
         x = point->x;
         y = point->y;
 
+        cout << point->distFromCenter << endl;
+
         index++;
     }
 
@@ -174,4 +178,23 @@ bool Hitbox::is_collide(Hitbox *hitbox){
 
 void Hitbox::clear(void){
     this->hitPoints.clear();
+}
+
+void Hitbox::setAngle(int new_angle){
+    this->angle = new_angle;
+
+    for (HitPoint* pnt : this->hitPoints){
+        pnt->calculate(&this->center, this->angle);
+    }
+}
+
+void Hitbox::setPos(Point new_pos){
+    this->center = new_pos;
+
+    for (HitPoint* p : this->hitPoints){
+        p->x += new_pos.x;
+        p->y += new_pos.y;
+
+        p->calculate(&this->center, this->angle);
+    }
 }

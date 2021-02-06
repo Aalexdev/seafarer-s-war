@@ -75,6 +75,17 @@
         vector<SpriteButton*> spriteButtons;
         vector<TextButton*> textButtons;
     };
+
+    struct Player_control{
+        SDL_Scancode engineUp;
+        SDL_Scancode engineDown;
+
+        SDL_Scancode turnLeft;
+        SDL_Scancode turnRight;
+
+        SDL_Scancode layerUp;
+        SDL_Scancode layerDown;
+    };
     
     struct MainVar{
         SDL_Window* window;
@@ -109,6 +120,10 @@
         bool gamePause;
 
         Entity* player;
+
+        Part_Type_list* part_list;
+
+        Player_control playerKeys;
     };
 
     void setLog(std::string path);
@@ -143,6 +158,8 @@
 
     int windowWidth(void);
     int windowHeight(void);
+
+    bool setIcon(std::string path);
 
     #define MAINVAR getMain()
     #define WINDOW getMain()->window
@@ -180,5 +197,7 @@
     #define ZOOM getMain()->zoom
     #define PAUSE getMain()->gamePause
     #define PLAYER getMain()->player
+    #define PART_LIST getMain()->part_list
+    #define PLAYER_CONTROL getMain()->playerKeys
 
 #endif

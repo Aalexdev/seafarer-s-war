@@ -32,12 +32,14 @@
             void pop(void);
 
             // set the angle of the hitbox
-            void setAngle(int new_angle){this->angle = new_angle;}
+            void setAngle(int new_angle);
+
             // return the angle of the Hitbox
             int getAngle(void){return this->angle;}
 
             // set the position of the Hitbox
-            void setPos(Point new_pos){this->rect.x = new_pos.x; this->rect.y = new_pos.y;}
+            void setPos(Point new_pos);
+
             // return the rect of the Hitbox
             SDL_Rect getRect(void){return this->rect;}
 
@@ -58,6 +60,9 @@
 
             // clear all points
             void clear(void);
+
+            // get center
+            Point getCenter(void){return this->center;}
 
         private:
 

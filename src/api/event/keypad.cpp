@@ -120,13 +120,58 @@ bool Keypad::read_xml(XMLNode* node){
             for (int a=0; a<child->attributes.size; a++){
                 XMLAttribute attr = child->attributes.data[a];
                 if (!strcmp(attr.key, "tag")){
-                    key->setScancode(SDL_GetScancodeFromName(attr.value));
-
-                    if (used_key(key->getScancode())){
-                        Key* temp = this->getFromScancode(key->getScancode());
-                        delete temp;
-                        temp = key;
-                        push = false;
+                    
+                    if (!strcmp(attr.key, "UP")){
+                        key->setScancode(SDL_SCANCODE_UP);
+                    } else if (!strcmp(attr.key, "DOWN")){
+                        key->setScancode(SDL_SCANCODE_DOWN);
+                    } else if (!strcmp(attr.key, "LEFT")){
+                        key->setScancode(SDL_SCANCODE_LEFT);
+                    } else if (!strcmp(attr.key, "RIGHT")){
+                        key->setScancode(SDL_SCANCODE_RIGHT);
+                    } else if (!strcmp(attr.key, "SPACE")){
+                        key->setScancode(SDL_SCANCODE_SPACE);
+                    } else if (!strcmp(attr.key, "CTR")){
+                        key->setScancode(SDL_SCANCODE_LCTRL);
+                    } else if (!strcmp(attr.key, "TAB")){
+                        key->setScancode(SDL_SCANCODE_TAB);
+                    } else if (!strcmp(attr.key, "MAJ lOCK")){
+                        key->setScancode(SDL_SCANCODE_CAPSLOCK);
+                    } else if (!strcmp(attr.key, "SHIFT LEFT")){
+                        key->setScancode(SDL_SCANCODE_LSHIFT);
+                    } else if (!strcmp(attr.key, "SHIFT RIGHT")){
+                        key->setScancode(SDL_SCANCODE_RSHIFT);
+                    } else if (!strcmp(attr.key, "ALT")){
+                        key->setScancode(SDL_SCANCODE_LALT);
+                    } else if (!strcmp(attr.key, "ENTRY")){
+                        key->setScancode(SDL_SCANCODE_BACKSPACE);
+                    }
+                     else if (!strcmp(attr.key, "F1")){
+                        key->setScancode(SDL_SCANCODE_F1);
+                    } else if (!strcmp(attr.key, "F2")){
+                        key->setScancode(SDL_SCANCODE_F2);
+                    } else if (!strcmp(attr.key, "F3")){
+                        key->setScancode(SDL_SCANCODE_F3);
+                    } else if (!strcmp(attr.key, "F4")){
+                        key->setScancode(SDL_SCANCODE_F4);
+                    } else if (!strcmp(attr.key, "F5")){
+                        key->setScancode(SDL_SCANCODE_F5);
+                    } else if (!strcmp(attr.key, "F6")){
+                        key->setScancode(SDL_SCANCODE_F6);
+                    } else if (!strcmp(attr.key, "F7")){
+                        key->setScancode(SDL_SCANCODE_F7);
+                    } else if (!strcmp(attr.key, "F8")){
+                        key->setScancode(SDL_SCANCODE_F8);
+                    } else if (!strcmp(attr.key, "F9")){
+                        key->setScancode(SDL_SCANCODE_F9);
+                    } else if (!strcmp(attr.key, "F10")){
+                        key->setScancode(SDL_SCANCODE_F10);
+                    } else if (!strcmp(attr.key, "F11")){
+                        key->setScancode(SDL_SCANCODE_F11);
+                    } else if (!strcmp(attr.key, "F12")){
+                        key->setScancode(SDL_SCANCODE_F12);
+                    } else {
+                        key->setScancode(SDL_GetScancodeFromName(attr.value));
                     }
                 } else if (!strcmp(attr.key, "command")){
                     key->setCommand(attr.value);

@@ -1,21 +1,22 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
-<setPlayer type="thunder" x="400" y="400" height="10">
-    <team team="player"/>
+<setPlayer type="thunder" x="0" y="0" height="0" angle="40">
 
     <parts>
-        <part health="100"/>
-        <part health="100"/>
-        <part health="100"/>
     </parts>
+
+    <events>
+        <keypad>
+            <key tag="s" out="engineUp"/>
+            <key tag="w" out="engineDown"/>
+            <key tag="a" out="turnLeft"/>
+            <key tag="d" out="turnRight"/>
+            <key tag="UP" out="layerUp"/>
+            <key tag="DOWN" out="layerDown"/>
+        </keypad>
+    </events>
 </setPlayer>
 
-<summonEntity type="thunder" x="300" y="400" height="-5">
-    <team team="player"/>
+<summonEntity type="thunder" x="200" y="0" height="0" angle="0">
 
-    <parts>
-        <part health="100"/>
-        <part health="100"/>
-        <part health="100"/>
-    </parts>
 </summonEntity>

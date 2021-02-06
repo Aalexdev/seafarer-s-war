@@ -5,7 +5,7 @@
 <window>
     <size w="1080" h="720"/>
     <pos x="centered" y="centered"/>
-    <title title="my test game"/>
+    <title title="seafarers' war"/>
 </window>
 
 <fps limiter="60"/>
@@ -22,14 +22,19 @@
 </sprites>
 
 <layers>
+    <layer name="depth sea" id="1" angle="50" delay="75" speed="2" height="-10">
+        <image path="res/img/backgrounds/darksea.bmp" alpha="255"/>
+    </layer>
+    
     <layer name="sea" id="0" angle="90" delay="50" speed="2" height="0">
         <image path="res/img/backgrounds/sea.bmp" alpha="150"/>
     </layer>
 
-    <layer name="depth sea" id="1" angle="50" delay="75" speed="2" height="-10">
-        <image path="res/img/backgrounds/darksea.bmp" alpha="255"/>
-    </layer>
 </layers>
+
+<window>
+    <icon path="res/img/icon/icon.bmp"/>
+</window>
 
 <read path="data/menus/mainMenu.xml"/>
 <read path="data/events.xml"/>

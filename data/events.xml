@@ -1,5 +1,5 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
 <onKey>
-    <key tag="d" command="data/functions/debug_mod.xml" type="key"/>
+
 </onKey>

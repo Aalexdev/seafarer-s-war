@@ -122,7 +122,8 @@ bool TextButton::read_from_xml(XMLNode* node){
             sscanf(attr.value, "%d", &y);
             this->setY(y);
         } else if (!strcmp(attr.key, "command")){
-            this->cmd = attr.value;
+            if (IS_LOG_OPEN) LOG << "TextButton::cmd ('" << attr.value << "')" << endl;
+            ButtonClass::cmd = attr.value;
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: ImageButton::read_from_xml, reason :: cannot reconize '" << attr.key << "' imageButton attribute" << endl; 
         }

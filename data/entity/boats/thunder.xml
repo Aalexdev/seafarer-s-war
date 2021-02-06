@@ -4,38 +4,35 @@
     <texture w="0" h="0" path="res/img/entity/boats/thunder.bmp"/>
 
     <perform>
-        <acceleration max="10" pxPerSec="1"/>
-        <turnSpeed max="10" anglePerSec="1"/>
+        <acceleration max="10" delay="5"/>
+        <turnSpeed max="10" delay="50"/>
     </perform>
 
     <parts>
-		<part health="500">
+		<hull health="500">
 			<point x="0" y="0"/>
 			<point x="34" y="0"/>
 			<point x="34" y="48"/>
 			<point x="0" y="48"/>
-		</part>
-		<part health="175">
+		</hull>
+		<control health="175">
 			<point x="8" y="47"/>
 			<point x="26" y="47"/>
 			<point x="26" y="129"/>
 			<point x="8" y="129"/>
-		</part>
-		<part health="750">
+		</control>
+		<hull health="750">
 			<point x="0" y="48"/>
 			<point x="34" y="48"/>
 			<point x="34" y="172"/>
 			<point x="0" y="172"/>
-		</part>
-		<part health="500">
+		</hull>
+		<hull health="500">
 			<point x="0" y="172"/>
 			<point x="34" y="172"/>
 			<point x="34" y="230"/>
 			<point x="0" y="230"/>
-		</part>
+		</hull>
 	</parts>
 
-    <layer max="0" min="-5"/>
-
-    
 </entity>

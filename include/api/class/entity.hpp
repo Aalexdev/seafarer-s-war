@@ -30,14 +30,49 @@
             int id;
     };
 
-    class BoatPart : public Hitbox{
+    class Part_type{
         public:
-            ~BoatPart();
-            BoatPart();
+            Part_type();
+            ~Part_type();
 
-            int health;
-            int maxHealth;
+            void setName(std::string new_name){this->name = new_name;}
+            bool read_from_xml(XMLNode* node);
+
+            vector<HitPoint*> getPoints(void){return this->hitPoints;}
+            int getMax_health(void){return this->maxHealth;}
+
+            std::string getName(void){return this->name;}
+        
+        private:
             std::string name;
+            vector<HitPoint*> hitPoints;
+
+            int maxHealth;
+    };
+
+    class Part_Type_list{
+        public:
+            Part_Type_list();
+            ~Part_Type_list();
+
+            Part_type* search(std::string name);
+
+            void push(Part_type* type);
+            void pop(void);
+
+            vector<Part_type*>* getVector(void){return &this->types;}
+        
+        private:
+            vector<Part_type*> types;
+    };
+
+    class Part{
+        public:
+            Part();
+            ~Part();
+
+        private:
+            Part_type* type;
     };
 
     class Entity_type{
@@ -49,13 +84,17 @@
             std::string get_name(void){return this->name;}
 
             SDL_Texture* getTexture(void){return this->texture;}
-            vector<BoatPart*> getParts(void);
             SDL_Rect getRect(void){return this->rect;}
 
             int getMaxSpeed(void){return this->maxSpeed;}
             int getMaxRotationnalSpeed(void){return this->maxRotationnalSpeed;}
             int getSpeedDelay(void){return this->speedDelay;}
             int getRotationalDelay(void){return this->rotationalDelay;}
+            int getSpeedAcceleration(void){return this->speedAcceleration;}
+            int getTrunAcceleration(void){return this->turnAcceleration;}
+
+            int getLayerMin(void){return this->layerMin;}
+            int getLayerMax(void){return this->layerMax;}
 
         private:
             std::string name;
@@ -70,11 +109,13 @@
             int speedDelay;
             int rotationalDelay;
 
-            vector<BoatPart*> parts;
+            int speedAcceleration, turnAcceleration;
 
             // layers
             int layerMax, layerMin;
             bool used_name(std::string name);
+
+            int maxHealth;
     };
 
     class Entity{
@@ -99,6 +140,8 @@
             bool is_linked(void){return this->type;}
             void unlink(void);
 
+            int maxHealth;
+
         private:
 
             Entity_type* type;
@@ -113,10 +156,14 @@
             int turnTicks;
             SDL_Rect rect;
 
-            vector<BoatPart*> parts;
+            int health;
 
             Team* team;
             bool is_player;
+
+            vector<HitPoint*> hitPoints;
+
+            int accelerationTicks;
     };
 
 #endif

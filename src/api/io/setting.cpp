@@ -138,6 +138,16 @@ bool readXML(std::string path, bool check){
                                 return false;
                             }
                         }
+                    } else if (!strcmp(child->tag, "icon")){
+                        for (int a=0; a<child->attributes.size; a++){
+                            XMLAttribute attr = child->attributes.data[a];
+
+                            if (!strcmp(attr.key, "path")){
+                                setIcon(attr.value);
+                            } else {
+                                if (IS_ERR_OPEN) ERR << "WARNING :: radXML, reason : cannot reconize '" << attr.value << "' icon attribute" << endl;
+                            }
+                        }
                     }
                     else{
                         if (IS_ERR_OPEN) ERR << "WARNING :: cannot reconize '" << child->tag << "' window child in '" << path << "' xml file" << endl;
@@ -367,6 +377,7 @@ bool readXML(std::string path, bool check){
                 }
             } else if (equal(mainNode->tag, "setPlayer")){
                 PLAYER->load_from_xml(mainNode);
+
             } else if (equal(mainNode->tag, "clearEntitys/") || equal(mainNode->tag, "clearEntitys")){
                 freeEntity();
             } else if (equal(mainNode->tag, "game")){
@@ -379,6 +390,11 @@ bool readXML(std::string path, bool check){
                         if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << attr.key << "' game attribute" << endl;
                     }
                 }
+            } else if (equal(mainNode->tag, "part")){
+                Part_type* part = new Part_type();
+
+                if (!part->read_from_xml(mainNode)) delete part;
+                else PART_LIST->push(part);
             } else {
                 if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << mainNode->tag << "' in " << path << endl;
             }

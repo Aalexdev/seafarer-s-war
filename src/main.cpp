@@ -139,8 +139,8 @@ void update(){
 
         if (PLAYER->is_linked()){
             PLAYER->update();
-            CAMERA.x = PLAYER->getX() - ((windowWidth() - PLAYER->getW()) / 2);
-            CAMERA.y = PLAYER->getY() - ((windowHeight() - PLAYER->getH()) / 2);
+            CAMERA.x = - PLAYER->getX() + ((windowWidth() - PLAYER->getW()) / 2);
+            CAMERA.y = - PLAYER->getY() + ((windowHeight() - PLAYER->getH()) / 2);
         }
     }
     
@@ -297,6 +297,10 @@ void freeEntity_types(void){
     ENTITY_TYPES.clear();
 }
 
+void freePart(){
+    delete PART_LIST;
+}
+
 void destroy(void){
 
     freeWidgets();
@@ -308,6 +312,7 @@ void destroy(void){
 
     freeEntity_types();
     freeEntity();
+    freePart();
     
     delete KEYPAD;
     delete PLAYER;
@@ -376,4 +381,23 @@ int windowHeight(void){
     int w, h;
     SDL_GetWindowSize(WINDOW, &w, &h);
     return h;
+}
+
+bool setIcon(std::string path){
+    path = DIR + path;
+    cout << "load : " << path << endl;
+    SDL_Surface* surface = SDL_LoadBMP(path.c_str());
+
+    if (!surface){
+        if (IS_ERR_OPEN) ERR << "ERROR :: SDL_LoadBMP('" << path << "')" << ", reason : " << SDL_GetError() << endl;
+        return false;
+    }
+
+    SDL_SetWindowIcon(WINDOW, surface);
+
+    SDL_FreeSurface(surface);
+
+    
+    
+    return true;
 }
