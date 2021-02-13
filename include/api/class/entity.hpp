@@ -86,15 +86,13 @@
             SDL_Texture* getTexture(void){return this->texture;}
             SDL_Rect getRect(void){return this->rect;}
 
-            int getMaxSpeed(void){return this->maxSpeed;}
-            int getMaxRotationnalSpeed(void){return this->maxRotationnalSpeed;}
-            int getSpeedDelay(void){return this->speedDelay;}
-            int getRotationalDelay(void){return this->rotationalDelay;}
-            int getSpeedAcceleration(void){return this->speedAcceleration;}
-            int getTrunAcceleration(void){return this->turnAcceleration;}
+            float getMass(void){return this->mass;}
+            float getStrength(void){return this->strength;}
 
             int getLayerMin(void){return this->layerMin;}
             int getLayerMax(void){return this->layerMax;}
+            int getMaxSpeed(void){return this->maxSpeed;}
+            int getMinSpeed(void){return this->minSpeed;}
 
         private:
             std::string name;
@@ -103,8 +101,6 @@
             SDL_Rect rect;
 
             // perform
-            int maxSpeed;
-            int maxRotationnalSpeed;
 
             int speedDelay;
             int rotationalDelay;
@@ -113,9 +109,13 @@
 
             // layers
             int layerMax, layerMin;
+            int maxSpeed, minSpeed;
             bool used_name(std::string name);
 
             int maxHealth;
+            
+            float mass;
+            float strength;
     };
 
     class Entity{
@@ -146,14 +146,9 @@
 
             Entity_type* type;
 
-            int angle;
-            int speed;
-            int turnSpeed;
-            int z;
+            float angle;
+            float z;
 
-            // ticks
-            int speedTicks;
-            int turnTicks;
             SDL_Rect rect;
 
             int health;
@@ -163,7 +158,18 @@
 
             vector<HitPoint*> hitPoints;
 
-            int accelerationTicks;
+            float acceleration;
+            float speed;
+            float strength;
+
+            float turn_acceleration;
+            float turn_speed;
+            float turn_strength;
+
+            bool is_mouving, is_turn;
+            int mouving_ticks, turn_ticks;
+
+            void reset(void);
     };
 
 #endif

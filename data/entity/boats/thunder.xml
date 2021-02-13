@@ -3,10 +3,7 @@
 <entity name="thunder">
     <texture w="0" h="0" path="res/img/entity/boats/thunder.bmp"/>
 
-    <perform>
-        <acceleration max="10" delay="5"/>
-        <turnSpeed max="10" delay="50"/>
-    </perform>
+    <perform mass="27000000" strength="10000000" maxSpeed="20" minSpeed="-20"/>
 
     <parts>
 		<hull health="500">

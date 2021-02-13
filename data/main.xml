@@ -22,11 +22,11 @@
 </sprites>
 
 <layers>
-    <layer name="depth sea" id="1" angle="50" delay="75" speed="2" height="-10">
+    <layer name="depth sea" id="1" angle="50" delay="75" speed="2" height="-10" friction_coefficient="0.5">
         <image path="res/img/backgrounds/darksea.bmp" alpha="255"/>
     </layer>
     
-    <layer name="sea" id="0" angle="90" delay="50" speed="2" height="0">
+    <layer name="sea" id="0" angle="90" delay="50" speed="2" height="0" friction_coefficient="0.5">
         <image path="res/img/backgrounds/sea.bmp" alpha="150"/>
     </layer>
 

@@ -31,6 +31,7 @@
 
             bool draw(void);
             int getZ(void){return this->z;}
+            float getFrictionCoefficient(void){return this->friction_coefficient;}
         
         private:
             vector<LayerTexture*> textures;
@@ -50,6 +51,7 @@
 
             long timer;
             int delay;
+            float friction_coefficient;
 
     };
 

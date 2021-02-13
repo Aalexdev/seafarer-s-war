@@ -85,6 +85,13 @@
 
         SDL_Scancode layerUp;
         SDL_Scancode layerDown;
+
+        bool engineUP_type;
+        bool engineDown_type;
+        bool turnLeft_type;
+        bool turnRight_type;
+        bool layerUp_type;
+        bool layerDown_type;
     };
     
     struct MainVar{

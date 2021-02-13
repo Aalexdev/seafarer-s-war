@@ -64,6 +64,7 @@ Entity_type::Entity_type(){
     if (IS_LOG_OPEN) LOG << "Entity_type::Entity_type()" << endl;
     this->name = "Uncknow";
     this->rect = (SDL_Rect){0, 0, 0, 0};
+    this->mass = 0;
 }
 
 Entity_type::~Entity_type(){
@@ -115,33 +116,19 @@ bool Entity_type::load_from_xml(XMLNode* node){
                 }
             }
         } else if (!strcmp(child->tag, "perform")){
-            for (int c=0; c<child->children.size; c++){
-                XMLNode* perform = XMLNode_child(child, c);
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
 
-                if (!strcmp(perform->tag, "acceleration")){
-                    for (int a=0; a<perform->attributes.size; a++){
-                        XMLAttribute attr = perform->attributes.data[a];
-
-                        if (!strcmp(attr.key, "max")){
-                            sscanf(attr.value, "%d", &this->maxSpeed);
-                        } else if (!strcmp(attr.key, "delay")){
-                            sscanf(attr.value, "%d", &this->speedDelay);
-                        } else {
-                            if (IS_ERR_OPEN) ERR << "WARNING :: Entity_type::load_from_xml, reason : cannot reconize '" << attr.key << "' acceleration attribute" << endl;
-                        }
-                    }
-                } else if (!strcmp(perform->tag, "turnSpeed")){
-                    for (int a=0; a<perform->attributes.size; a++){
-                        XMLAttribute attr = perform->attributes.data[a];
-
-                        if (!strcmp(attr.key, "max")){
-                            sscanf(attr.value, "%d", &this->maxRotationnalSpeed);
-                        } else if (!strcmp(attr.key, "delay")){
-                            sscanf(attr.value, "%d", &this->rotationalDelay);
-                        } else {
-                            if (IS_ERR_OPEN) ERR << "WARNING :: Entity_type::load_from_xml, reason : cannot reconize '" << attr.key << "' acceleration attribute" << endl;
-                        }
-                    }
+                if (!strcmp(attr.key, "mass")){
+                    sscanf(attr.value, "%f", &this->mass);
+                } else if (!strcmp(attr.key, "strength")){
+                    sscanf(attr.value, "%f", &this->strength);
+                } else if (!strcmp(attr.key, "maxSpeed")){
+                    sscanf(attr.value, "%d", &this->maxSpeed);
+                } else if (!strcmp(attr.key, "minSpeed")){
+                    sscanf(attr.value, "%d", &this->minSpeed);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "ERROR :: Entity_type;;load_from_xml, reason : cannot reconize '" << attr.key << "' perform attribute" << endl;
                 }
             }
         } else if (!strcmp(child->tag, "layer")){
@@ -214,7 +201,7 @@ bool Entity::load_from_xml(XMLNode* node){
         } else if (!strcmp(attr.key, "height")){
             sscanf(attr.value, "%d", &this->z);
         } else if (!strcmp(attr.key, "angle")){
-            sscanf(attr.value, "%d", &this->angle);
+            sscanf(attr.value, "%f", &this->angle);
         } else if (!strcmp(attr.key, "health")){
             sscanf(attr.value, "%d", &this->health);
         } else {
@@ -250,6 +237,7 @@ bool Entity::load_from_xml(XMLNode* node){
                             if (!strcmp(key->tag, "key")){
 
                                 std::string tag, out;
+                                bool type = true;
                                 for (int a=0; a<key->attributes.size; a++){
                                     XMLAttribute attr = key->attributes.data[a];
 
@@ -257,6 +245,14 @@ bool Entity::load_from_xml(XMLNode* node){
                                         tag = attr.value;
                                     } else if (!strcmp(attr.key, "out")){
                                         out = attr.value;
+                                    } else if (!strcmp(attr.key, "type")){
+                                        if (!strcmp(attr.value, "sticky")){
+                                            type = false;
+                                        } else if(!strcmp(attr.value, "push")){
+                                            type = true;
+                                        } else {
+                                            if (IS_ERR_OPEN) ERR << "WARNING :: Entity::load_from_xml, reason : cannot reconize '" << attr.value << "' type value" << endl;
+                                        }
                                     } else {
                                         if (IS_ERR_OPEN) ERR << "WARNING :: Entity::load_from_xml, reason : cannot reconize '" << attr.key << "' key attribute" << endl;
                                     }
@@ -265,16 +261,22 @@ bool Entity::load_from_xml(XMLNode* node){
                                 if (!tag.empty() && !out.empty()){
                                     if (out == "engineUp"){
                                         PLAYER_CONTROL.engineUp = SDL_GetScancodeFromName(tag.c_str());
+                                        PLAYER_CONTROL.engineUP_type = type;
                                     } else if (out == "engineDown"){
                                         PLAYER_CONTROL.engineDown = SDL_GetScancodeFromName(tag.c_str());
+                                        PLAYER_CONTROL.engineDown_type = type;
                                     } else if (out == "turnLeft"){
                                         PLAYER_CONTROL.turnLeft = SDL_GetScancodeFromName(tag.c_str());
+                                        PLAYER_CONTROL.turnLeft_type = type;
                                     } else if (out == "turnRight"){
                                         PLAYER_CONTROL.turnRight = SDL_GetScancodeFromName(tag.c_str());
+                                        PLAYER_CONTROL.turnRight_type = type;
                                     } else if (out == "layerUp"){
                                         PLAYER_CONTROL.layerUp = SDL_GetScancodeFromName(tag.c_str());
+                                        PLAYER_CONTROL.layerUp_type = type;
                                     } else if (out == "layerDown"){
                                         PLAYER_CONTROL.layerDown = SDL_GetScancodeFromName(tag.c_str());
+                                        PLAYER_CONTROL.layerDown_type = type;
                                     } else {
                                         if (IS_ERR_OPEN) ERR << "ERROR :: Entity::load_from_xml, reason : cannot reconize '" << out << "' key out" << endl;
                                     }
@@ -303,32 +305,28 @@ bool Entity::load_from_xml(XMLNode* node){
     return true;
 }
 
-Entity::Entity(){
-    if (IS_LOG_OPEN) LOG << "Entity::Entity()" << endl;
+void Entity::reset(void){
     this->type = nullptr;
     this->z = 0;
     this->angle = 0;
-    this->is_player = false;
 
-    this->speedTicks=0;
-    this->turnTicks=0;
     this->speed=0;
-    this->turnSpeed=0;
-    this->accelerationTicks=0;
+    this->acceleration = 0;
+    this->strength = 0;
+    this->acceleration = 0;
+    this->turn_strength = 0;
+    this->turn_speed = 0;
+}
+
+Entity::Entity(){
+    if (IS_LOG_OPEN) LOG << "Entity::Entity()" << endl;
+    this->reset();
 }
 
 Entity::Entity(bool isPlayer){
     if (IS_LOG_OPEN) LOG << "Entity::Entity()" << endl;
-    this->type = nullptr;
-    this->z = 0;
-    this->angle=0;
+    this->reset();
     this->is_player = isPlayer;
-
-    this->speedTicks=0;
-    this->turnTicks=0;
-    this->turnSpeed=0;
-    this->speed=0;
-    this->accelerationTicks=0;
 }
 
 Entity::~Entity(){
@@ -341,62 +339,65 @@ void Entity::update(){
 
     if (this->is_player){
         
-        if (SDL_GetTicks() - this->speedTicks >= this->type->getSpeedDelay()){
-            this->speedTicks = SDL_GetTicks();
-            if (KEYPAD->getKey(PLAYER_CONTROL.engineUp)){
-                if (this->speed > -this->type->getMaxSpeed()) this->speed ++;
-            } else if (KEYPAD->getKey(PLAYER_CONTROL.engineDown)){
-                if (this->speed < this->type->getMaxSpeed()) this->speed --;
+        if (KEYPAD->getKey(PLAYER_CONTROL.engineUp)){
+            this->strength = this->type->getStrength();
+        } else if (KEYPAD->getKey(PLAYER_CONTROL.engineDown)){
+            this->strength = -this->type->getStrength();
+        } else {
+            if (this->speed > 0){
+                if (PLAYER_CONTROL.engineUP_type) this->strength = -this->type->getStrength();
             } else {
-                if (this->speed > 0){
-                    this->speed --;
-                    
-                } else if(this->speed < 0) {
-                    this->speed ++;
-                    
-                }
+                if (PLAYER_CONTROL.engineDown_type) this->strength = this->type->getStrength();
             }
         }
 
-        if (SDL_GetTicks() - this->turnTicks >= this->type->getRotationalDelay()){
-            this->turnTicks = SDL_GetTicks();
-            if (KEYPAD->getKey(PLAYER_CONTROL.turnLeft)){
-                if (this->turnSpeed > -this->type->getMaxRotationnalSpeed()){
-                    this->turnSpeed --;
-                }
-            } else if (KEYPAD->getKey(PLAYER_CONTROL.turnRight)){
-                if (this->turnSpeed < this->type->getMaxRotationnalSpeed()){
-                    this->turnSpeed ++;
-                }
+        if (KEYPAD->getKey(PLAYER_CONTROL.turnLeft)){
+            this->turn_strength = -this->type->getStrength();
+        } else if (KEYPAD->getKey(PLAYER_CONTROL.turnRight)){
+            this->turn_strength = this->type->getStrength();
+        } else {
+            if (this->turn_speed > 0){
+                if (PLAYER_CONTROL.turnRight_type) this->turn_strength = -this->type->getStrength();
             } else {
-                if (this->turnSpeed > 0){
-                    this->turnSpeed--;
-                } else if (this->turnSpeed < 0){
-                    this->turnSpeed ++;
-                }
+                if (PLAYER_CONTROL.turnLeft_type) this->turn_strength = this->type->getStrength();
             }
         }
 
-        if (KEYPAD->getKey(PLAYER_CONTROL.layerDown)){
-            if (this->z > this->type->getLayerMin()) this->z--;
-        } else if (KEYPAD->getKey(PLAYER_CONTROL.layerUp)){
-            if (this->z < this->type->getLayerMax()) this->z++;
+        if (this->strength != 0 && this->type->getMass() != 0){
+            this->acceleration = this->strength / this->type->getMass();
+        } else {
+            this->acceleration = 0;
         }
+
+        this->speed += this->acceleration * (MAINVAR->time.execTime);
+        
+        if (this->speed > this->type->getMaxSpeed()){
+            this->speed = this->type->getMaxSpeed();
+        } else if (this->speed < this->type->getMinSpeed()){
+            this->speed = this->type->getMinSpeed();
+        }
+
+        if (this->turn_strength != 0 && this->type->getMass() != 0){
+            this->turn_acceleration = this->turn_strength / (this->type->getMass() * this->type->getRect().h) * 2;
+        } else {
+            this->turn_acceleration = 0;
+        }
+
+        this->turn_speed += this->turn_acceleration * (MAINVAR->time.execTime);
     }
 
     if (this->speed!=0){
+        this->is_mouving = true;
         int x, y;
         setAngleM(&x, &y, this->speed, this->angle-90);
         this->rect.x += x;
         this->rect.y += y;
+    } else {
+        this->is_mouving = false;
     }
 
-    if (this->turnSpeed){
-        this->angle += this->turnSpeed;
-
-        while (this->angle >= 360){
-            this->angle -= 360;
-        }
+    if (this->turn_speed != 0){
+        this->angle += this->turn_speed;
     }
 }
 
@@ -435,7 +436,6 @@ bool Entity::draw(){
 
         SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 0);
     }
-
     return true;
 }
 
@@ -449,5 +449,4 @@ void Entity::unlink(void){
 
     this->angle = 0;
     this->speed = 0;
-    this->turnSpeed = 0;
 }

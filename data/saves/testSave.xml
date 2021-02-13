@@ -2,17 +2,14 @@
 
 <setPlayer type="thunder" x="0" y="0" height="0" angle="40">
 
-    <parts>
-    </parts>
-
     <events>
         <keypad>
-            <key tag="s" out="engineUp"/>
-            <key tag="w" out="engineDown"/>
-            <key tag="a" out="turnLeft"/>
-            <key tag="d" out="turnRight"/>
-            <key tag="UP" out="layerUp"/>
-            <key tag="DOWN" out="layerDown"/>
+            <key tag="s" out="engineUp" type="push"/>
+            <key tag="w" out="engineDown" type="push"/>
+            <key tag="a" out="turnLeft" type="push"/>
+            <key tag="d" out="turnRight" type="push"/>
+            <key tag="UP" out="layerUp" type="sticky"/>
+            <key tag="DOWN" out="layerDown" type="sticky"/>
         </keypad>
     </events>
 </setPlayer>

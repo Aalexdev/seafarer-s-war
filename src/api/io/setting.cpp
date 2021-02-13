@@ -368,7 +368,7 @@ bool readXML(std::string path, bool check){
                     }
                 }
             } else if (equal(mainNode->tag, "summonEntity")){
-                Entity* entity = new Entity();
+                Entity* entity = new Entity(false);
 
                 if (entity->load_from_xml(mainNode)){
                     ENTITY.push_back(entity);
