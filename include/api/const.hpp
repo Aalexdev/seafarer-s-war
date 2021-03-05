@@ -3,13 +3,13 @@
 
     #include "main.hpp"
 
-    std::string getAppData(void);
+    string getAppData(void);
     void GetDesktopResolution(int& horizontal, int& vertical);
-    std::string getCurrentDir(void);
-    std::string getMainDir(void);
+    string getCurrentDir(void);
+    string getMainDir(void);
     
     #define APPDATA getAppData()
-    #define VERSION "0.0-1"
+    #define VERSION "0.0-2"
     #define UNDEFINE 092873780
     #define GETDIR getCurrentDir()
 

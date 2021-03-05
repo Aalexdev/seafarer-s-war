@@ -1,0 +1,15 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<entity name="submarine">
+    <texture w="0" h="0" path="res/img/entity/submarine/submarine.bmp"/>
+
+    <perform mass="27000000" strength="100000" maxSpeed="20" minSpeed="-20"/>
+
+	<turn type="mul" value="20" max="0.1"/>
+
+    <part health="500">
+	</part>
+
+	<layer max="0" min="-1"/>
+	
+</entity>

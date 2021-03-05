@@ -21,8 +21,8 @@
             Text();
             ~Text();
 
-            bool setText(std::string new_text);
-            std::string getText(void);
+            bool setText(string new_text);
+            string getText(void);
 
             bool draw(void);
 
@@ -56,7 +56,7 @@
             bool read_from_xml(XMLNode* node);
         
         private:
-            std::string text;
+            string text;
             SDL_Texture* texture;
             SDL_Rect rect;
             SDL_Color color;

@@ -16,7 +16,7 @@
         public:
             TextArea();
             ~TextArea();
-            bool setBackground(std::string path);
+            bool setBackground(string path);
             bool setBackground(Uint8 r, Uint8 g, Uint8 b);
 
             void setPos(int x, int y);
@@ -39,8 +39,8 @@
 
             bool read_from_xml(XMLNode* node);
 
-            std::string getTag(void);
-            std::string getText(void);
+            string getTag(void);
+            string getText(void);
 
         private:
             Image* background;
@@ -51,7 +51,7 @@
             bool write;
             Uint8 alpha;
 
-            std::string tag;
+            string tag;
     };
 
 #endif

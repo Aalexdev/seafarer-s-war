@@ -62,8 +62,6 @@ bool Layer::read_from_xml(XMLNode* node){
             sscanf(attr.value, "%d", &this->z);
         } else if (!strcmp(attr.key, "speed")){
             sscanf(attr.value, "%d", &this->speed);
-        } else if (!strcmp(attr.key, "friction_coefficient")){
-            sscanf(attr.value, "%f", &this->friction_coefficient);
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: Layer::read_from_xml, reason : cannot reconize '" << attr.key << "' layer attribute" << endl;
         }
@@ -87,6 +85,9 @@ bool Layer::read_from_xml(XMLNode* node){
                         delete texture;
                         break;
                     }
+
+                    SDL_SetTextureBlendMode(texture->texture, SDL_BLENDMODE_MOD);
+
                 } else if (!strcmp(attr.key, "alpha")){
                     sscanf(attr.value, "%d", &texture->alpha);
                 } else {

@@ -3,7 +3,6 @@
 
     #include "ui/graphics/sprite.hpp"
     #include "ui/widgets/text.hpp"
-    #include "ui/widgets/widget.hpp"
     #include "api/io/xml.hpp"
     #include "ui/graphics/sprite.hpp"
 
@@ -20,7 +19,7 @@
 
             bool exec(void);
             ButtonState state;
-            std::string cmd;
+            string cmd;
     };
 
     class TextButton : public Text, private ButtonClass{

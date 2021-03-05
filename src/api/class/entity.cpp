@@ -1,63 +1,23 @@
 #include "api/class/entity.hpp"
 #include "main.hpp"
 
-Part_type* Part_Type_list::search(std::string name){
-    for (Part_type* type : this->types){
-        if (type->getName() == name){
-            return type;
-        }
-    }
-    if (IS_ERR_OPEN) ERR << "ERROR :: Part_Type_list::search('" << name << "') cannot reconize '" << name << "'" << endl;
-    return nullptr;
+#include "SDL2/SDL2_gfxPrimitives.h"
+
+Point* getPoint(Entity* e){
+    Point *p;
+    e->getPart(&p);
+    return p;
 }
 
-Part_Type_list::Part_Type_list(){
-    if (IS_LOG_OPEN) LOG << "Part_Type_list::Part_Type_list()" << endl;
-}
+Point* convertPartsIntoPoints(Entity_point* p, int n){
+    Point *pts = new Point[n];
 
-Part_Type_list::~Part_Type_list(){
-    if (IS_LOG_OPEN) LOG << "Part_Type_list::~Part_Type_list()" << endl;
-    for (Part_type* type : this->types){
-        if (type) delete type;
-    }
-    this->types.clear();
-}
-
-void Part_Type_list::push(Part_type* type){
-    if (IS_LOG_OPEN) LOG << "Part_Type_list::push()" << endl;
-    this->types.push_back(type);
-}
-void Part_Type_list::pop(void){
-    if (IS_LOG_OPEN) LOG << "Part_Type_list::pop()" << endl;
-    this->types.pop_back();
-}
-Part_type::Part_type(){
-
-}
-
-Part_type::~Part_type(){
-    name.clear();
-}
-
-bool Part_type::read_from_xml(XMLNode* node){
-    if (IS_LOG_OPEN) LOG << "Part_type::read_from_xml()" << endl;
-
-    if (!node){
-        if (IS_ERR_OPEN) ERR << "ERROR :: Part_type::read_from_xml(), reason : cannot read from a null xml Node" << endl;
-        return false;
+    for (int i=0; i<n; i++){
+       pts[i].x = p[i].x;
+       pts[i].y = p[i].y; 
     }
 
-    for (int a=0; a<node->attributes.size; a++){
-        XMLAttribute attr = node->attributes.data[a];
-
-        if (!strcmp(attr.key, "name")){
-            this->name = attr.value;
-        } else {
-            if (IS_ERR_OPEN) ERR << "WARNING :: Part_type::read_from_xml(), reason : cannot reconize '" << attr.key << "' part attribute" << endl;
-        }
-    }
-
-    return false;
+    return pts;
 }
 
 Entity_type::Entity_type(){
@@ -71,9 +31,13 @@ Entity_type::~Entity_type(){
     if (IS_LOG_OPEN) LOG << "Entity_type::~Entity_type()" << endl;
     if (this->texture) SDL_DestroyTexture(this->texture);
     this->name.clear();
+
+    delete[] part;
+    delete[] equipments;
 }
 
 bool Entity_type::load_from_xml(XMLNode* node){
+
     if (IS_LOG_OPEN) LOG << "Entity_type::load_from_xml" << endl;
     if (!node){
         if (IS_ERR_OPEN) ERR << "ERROR :: Entity_load::load_from_xml, reason : cannot load from a null node" << endl;
@@ -143,15 +107,136 @@ bool Entity_type::load_from_xml(XMLNode* node){
                     if (IS_ERR_OPEN) ERR << "WARNING :: Entity_type::load_from_xml, reason : cannot reconize '" << attr.key << "' layer attribute" << endl;
                 }
             }
+        } else if (!strcmp(child->tag, "turn")){
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "type")){
+                    string type = attr.value;
+
+                    if (type == "free"){
+                        turnType = TurnType::Turnfree;
+                    } else if (type == "mul"){
+                        turnType = TurnType::Turnmul;
+                    } else if (type == "div"){
+                        turnType = TurnType::Turndiv;
+                    } else if (type == "add"){
+                        turnType = TurnType::Turnadd;
+                    } else if (type == "sub"){
+                        turnType = TurnType::Turnsub;
+                    }
+                } else if (!strcmp(attr.key, "value")){
+                    if (turnType == TurnType::Turnfree){
+                        if (IS_ERR_OPEN) ERR << "WARNING :: Entity_type::load_from_xml, reason : cannot set a value to a null trun type, ignored" << endl;
+                        break;
+                    }
+
+                    sscanf(attr.value, "%d", &turnValue);
+
+                    if (turnType == TurnType::Turndiv && turnValue == 0){
+                        if (IS_ERR_OPEN) ERR << "WARNING :: Entity_type::load_from_xml, reason : cannot divid the rotaionnal speed with a nul value, set value to 1" << endl;
+                        turnValue = 1;
+                    }
+                } else if (!strcmp(attr.key, "max")){
+                    sscanf(attr.value, "%f", &maxRotarySpeed);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: Entity_type::load_from_xml, reason : cannot reconize '" << attr.key << "' entity trun attribute" << endl;
+                }
+            }
+        } else if (!strcmp(child->tag, "part")){
+
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "health")){
+                    sscanf(attr.value, "%d", &health);
+                }
+            }
+
+            partSize = child->children.size;
+            part = new Entity_point[child->children.size];
+
+            for (int p=0; p<child->children.size; p++){
+                XMLNode* point = XMLNode_child(child, p);
+
+                if (!strcmp(point->tag, "point")){
+                    int x, y;
+                    for (int a=0; a<point->attributes.size; a++){
+                        XMLAttribute attr = point->attributes.data[a];
+
+                        if (!strcmp(attr.key, "x")){
+                            sscanf(attr.value, "%d", &part[p].x);
+                        } else if (!strcmp(attr.key, "y")){
+                            sscanf(attr.value, "%d", &part[p].y);
+                        } else {
+                            if (IS_ERR_OPEN) ERR << "WARNING :: entity, part, point, reason : cannot reconize '" << attr.key << "' point attribute" << endl;
+                        }
+                    }
+                    part[p].distFromCenter = getDistanceM(rect.w / 2, rect.h / 2, part[p].x, part[p].y);
+                    part[p].additionnalAngle = getAngleM(part[p].x, part[p].y, rect.w / 2, rect.h / 2);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: entity, part, cannot reconize '" << point->tag << "' part child" << endl;
+                }
+            }
+        } else if (!strcmp(child->tag, "equipments")){
+
+            equipments_len = child->children.size;
+            equipments = new Entity_Equipment[equipments_len];
+
+            for (int e=0; e<child->children.size; e++){
+                XMLNode* equip = XMLNode_child(child, e);
+
+                if (!strcmp(equip->tag, "equipment")){
+
+                    for (int a=0; a<equip->attributes.size; a++){
+                        XMLAttribute attr = equip->attributes.data[a];
+
+                        if (!strcmp(attr.key, "x")){
+                            sscanf(attr.value, "%d", &equipments[e].x);
+                        } else if (!strcmp(attr.key, "y")){
+                            sscanf(attr.value, "%d", &equipments[e].y);
+                        } else if (!strcmp(attr.key, "min-angle")){
+                            sscanf(attr.value, "%d", &equipments[e].minAngle);
+                        } else if (!strcmp(attr.key, "max-angle")){
+                            sscanf(attr.value, "%d", &equipments[e].maxAngle);
+                        } else if (!strcmp(attr.key, "id")){
+                            sscanf(attr.value, "%d", &equipments[e].id);
+                        } else {
+                            if (IS_ERR_OPEN) ERR << "WARNING :: entity; equipments; equipment, reason : cannot reconize '" << attr.key << "' equipment attribute" << endl;
+                        }
+                    }
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: entity; equipments, reason : cannot reconize '" << equip->tag << " equipments child" << endl;
+                }
+
+                equipments[e].distFromCenter = getDistanceM(rect.w / 2, rect.h / 2, equipments[e].x, equipments[e].y);
+                equipments[e].additionnalAngle = getAngleM(equipments[e].x, equipments[e].y, rect.w / 2, rect.h / 2);
+            }
+
         } else {
-            if (IS_LOG_OPEN) ERR << "WARNING :: Entity_type::load_from_xml, reason : cannot reconize '" << child->tag << "' entity child" << endl;
+            if (IS_LOG_OPEN) ERR << "WARNING :: entity, reason : cannot reconize '" << child->tag << "' entity child" << endl;
         }
     }
-
     return true;
 }
 
-bool Entity::set(std::string name){
+int Entity_type::getPartSize(void){
+    return partSize;
+}
+
+Entity_point* Entity_type::getPart(void){
+    return part;
+}
+
+Entity_Equipment* Entity_type::getEquipment(void){
+    return equipments;
+}
+
+int Entity_type::getEquipmentSize(void){
+    return equipments_len;
+}
+
+bool Entity::set(string name){
     if (IS_LOG_OPEN) LOG << "Entity::set('" << name << "')" << endl;
     if (name.empty()){
         if (IS_ERR_OPEN) ERR << "ERROR :: Entity::set, reason : cannot load a null type name" << endl;
@@ -165,6 +250,26 @@ bool Entity::set(std::string name){
             this->rect.w = type->getRect().w;
             this->rect.h = type->getRect().h;
 
+            part = new Entity_point[type->getPartSize()];
+
+            for (int i=0; i<type->getPartSize(); i++){
+                part[i].x = type->getPart()[i].x;
+                part[i].y = type->getPart()[i].y;
+                part[i].distFromCenter = type->getPart()[i].distFromCenter;
+                part[i].additionnalAngle = type->getPart()[i].additionnalAngle;
+            }
+
+            equipmentsP = new Entity_point[type->getEquipmentSize()];
+
+            for (int i=0; i<type->getEquipmentSize(); i++){
+                equipmentsP[i].x = type->getEquipment()[i].x;
+                equipmentsP[i].y = type->getEquipment()[i].y;
+                equipmentsP[i].distFromCenter = type->getEquipment()[i].distFromCenter;
+                equipmentsP[i].additionnalAngle = type->getEquipment()[i].additionnalAngle;
+            }
+
+            equipments = new Equipment*[type->getEquipmentSize()];
+
             return true;
         }
     }
@@ -173,7 +278,9 @@ bool Entity::set(std::string name){
     return false;
 }
 
-bool Entity_type::used_name(std::string name){
+
+
+bool Entity_type::used_name(string name){
     for (Entity_type* type : ENTITY_TYPES){
         if (type->get_name() == name){
             return true;
@@ -183,6 +290,7 @@ bool Entity_type::used_name(std::string name){
 }
 
 bool Entity::load_from_xml(XMLNode* node){
+
     if (IS_LOG_OPEN) LOG << "Entity::load_from_xml()" << endl;
     if (!node){
         if (IS_ERR_OPEN) ERR << "ERROR :: Entity::load_from_xml, reason : cannot load from a null node" << endl;
@@ -202,8 +310,6 @@ bool Entity::load_from_xml(XMLNode* node){
             sscanf(attr.value, "%d", &this->z);
         } else if (!strcmp(attr.key, "angle")){
             sscanf(attr.value, "%f", &this->angle);
-        } else if (!strcmp(attr.key, "health")){
-            sscanf(attr.value, "%d", &this->health);
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: Entity::load_from_xml, reason : cannot reconize '" << attr.key  << "' summonEntity attribute" << endl;
         }
@@ -236,7 +342,7 @@ bool Entity::load_from_xml(XMLNode* node){
 
                             if (!strcmp(key->tag, "key")){
 
-                                std::string tag, out;
+                                string tag, out;
                                 bool type = true;
                                 for (int a=0; a<key->attributes.size; a++){
                                     XMLAttribute attr = key->attributes.data[a];
@@ -295,8 +401,49 @@ bool Entity::load_from_xml(XMLNode* node){
                 }
             }
             
-        } else if (!strcmp(child->tag, "parts")){
+        } else if (!strcmp(child->tag, "part")){
 
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "health")){
+                    sscanf(attr.value, "%d", &health);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: summonEntity; parts; part, reason : cannot reconize '" << attr.key << "' part attribute" << endl;
+                }
+            }
+            if (child->children.size > 0){
+                if (IS_ERR_OPEN) ERR << "WARNING :: summonEnity; part, reason : part cannot have child (" << child->children.size << ">0)" << endl; 
+            }
+        } else if (!strcmp(child->tag, "equipment")){
+            for (int e=0; e<child->children.size; e++){
+                XMLNode* node = XMLNode_child(child, e);
+
+                equipments[e] = new Equipment();
+
+                if (!strcmp(node->tag, "equipment")){
+                    for (int a=0; a<node->attributes.size; a++){
+                        XMLAttribute attr = node->attributes.data[a];
+
+                        if (!strcmp(attr.key, "name")){
+                            if (!equipments[e]->setType(attr.value)){
+                                delete equipments[e];
+                                continue;
+                            }
+                        } else if (!strcmp(attr.key, "id")){
+                            sscanf(attr.value, "%d", &equipments[e]->id);
+                        } else if (!strcmp(attr.key, "angle")){
+                            int angle;
+                            sscanf(attr.value, "%d", &angle);
+                            equipments[e]->setAngle(angle);
+                        } else {
+                            if (IS_ERR_OPEN) ERR << "ERROR :: summonEntity; equipments; equipment, reason : cannot reconize '" << attr.key << "' equipment attribute" << endl; 
+                        }
+                    }
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNIGN :: summonEntity; equipments, reason : cannot reconize '" << node->tag << "' equipments child" << endl;
+                }
+            }
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: Entity::load_from_xml, reason : cannot reconize '" << child->tag << "' summonEntity child" << endl;
         }
@@ -316,23 +463,26 @@ void Entity::reset(void){
     this->acceleration = 0;
     this->turn_strength = 0;
     this->turn_speed = 0;
+
+    this->equipments = nullptr;
 }
 
 Entity::Entity(){
     if (IS_LOG_OPEN) LOG << "Entity::Entity()" << endl;
-    this->reset();
+    reset();
 }
 
 Entity::Entity(bool isPlayer){
     if (IS_LOG_OPEN) LOG << "Entity::Entity()" << endl;
-    this->reset();
-    this->is_player = isPlayer;
+    reset();
+    is_player = isPlayer;
 }
 
 Entity::~Entity(){
     if (IS_LOG_OPEN) LOG << "Entity::~Entity()" << endl;
     
-    this->unlink();
+    unlink();
+    reset();
 }
 
 void Entity::update(){
@@ -344,10 +494,12 @@ void Entity::update(){
         } else if (KEYPAD->getKey(PLAYER_CONTROL.engineDown)){
             this->strength = -this->type->getStrength();
         } else {
-            if (this->speed > 0){
+            if (this->speed > 0.5f){
                 if (PLAYER_CONTROL.engineUP_type) this->strength = -this->type->getStrength();
-            } else {
+            } else if (speed < 0.05f) {
                 if (PLAYER_CONTROL.engineDown_type) this->strength = this->type->getStrength();
+            } else {
+                strength = 0;
             }
         }
 
@@ -356,14 +508,17 @@ void Entity::update(){
         } else if (KEYPAD->getKey(PLAYER_CONTROL.turnRight)){
             this->turn_strength = this->type->getStrength();
         } else {
-            if (this->turn_speed > 0){
+            if (this->turn_speed > 0.01){
                 if (PLAYER_CONTROL.turnRight_type) this->turn_strength = -this->type->getStrength();
-            } else {
+            } else if (turn_speed < -0.01){
                 if (PLAYER_CONTROL.turnLeft_type) this->turn_strength = this->type->getStrength();
+            } else {
+                turn_strength = 0;
+                turn_speed = 0;
             }
         }
 
-        if (this->strength != 0 && this->type->getMass() != 0){
+        if (fabs(this->strength) > 1 && this->type->getMass() != 0){
             this->acceleration = this->strength / this->type->getMass();
         } else {
             this->acceleration = 0;
@@ -384,6 +539,19 @@ void Entity::update(){
         }
 
         this->turn_speed += this->turn_acceleration * (MAINVAR->time.execTime);
+
+        if (turn_speed > type->getMaxRotarySpeed()){
+            turn_speed = type->getMaxRotarySpeed();
+        } else if (turn_speed < -type->getMaxRotarySpeed()){
+            turn_speed = -type->getMaxRotarySpeed();
+        }
+
+        if (KEYPAD->getKey(PLAYER_CONTROL.layerDown)){
+            if (this->z > this->type->getLayerMin()) this->z --;
+            
+        } else if (KEYPAD->getKey(PLAYER_CONTROL.layerUp)){
+            if (this->z < this->type->getLayerMax()) this->z ++;
+        }
     }
 
     if (this->speed!=0){
@@ -392,12 +560,36 @@ void Entity::update(){
         setAngleM(&x, &y, this->speed, this->angle-90);
         this->rect.x += x;
         this->rect.y += y;
+        
     } else {
         this->is_mouving = false;
     }
 
     if (this->turn_speed != 0){
-        this->angle += this->turn_speed;
+        switch (type->getTurnType()){
+            case TurnType::Turnfree:
+                this->angle += this->turn_speed;
+                break;
+            
+            case TurnType::Turnmul:
+                this->angle += this->turn_speed * type->getTurnValue();
+                break;
+            
+            case TurnType::Turndiv:
+                this->angle += this->turn_speed / type->getTurnValue();
+                break;
+            
+            case TurnType::Turnadd:
+                this->angle += this->turn_speed + type->getTurnValue();
+                break;
+            
+            case TurnType::Turnsub:
+                this->angle += this->turn_speed - type->getTurnValue();
+                break;
+            
+            default:
+                break;
+        }
     }
 }
 
@@ -414,39 +606,85 @@ bool Entity::draw(){
     }
 
     if (IS_DEBUG){
-        SDL_SetRenderDrawColor(RENDERER, 255, 0, 0, 255);
-        int index = 0, x, y;
-        for (HitPoint *point : this->hitPoints){
-
-            if (index == 0){
-                x = this->hitPoints.back()->x;
-                y = this->hitPoints.back()->y;
-            }
-
-            if (SDL_RenderDrawLine(RENDERER, x, y, point->x, point->y)){
-                cerr << "SDL_RenderDrawLine Error : " << SDL_GetError() << endl;
-                return false;
-            }
-
-            x = point->x;
-            y = point->y;
-
-            index++;
-        }
-
-        SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 0);
+        if (!drawHitbox()) return false;
+        if (!drawEquipmentPoint()) return false;
     }
     return true;
 }
 
 void Entity::unlink(void){
-    this->type = nullptr;
-
-    for (HitPoint* hpnt : this->hitPoints){
-        if (hpnt) delete hpnt;
-    }
-    this->hitPoints.clear();
-
     this->angle = 0;
     this->speed = 0;
+
+    delete[] part;
+    delete[] equipmentsP;
+    delete[] equipments;
+    
+    this->type = nullptr;
+}
+
+void Entity::getPart(Point **p){
+    (*p) = new Point[type->getPartSize()];
+    for (int i=0; i<type->getPartSize(); i++){
+        setAngleM(&(*p)[i].x, &(*p)[i].y, part[i].distFromCenter, part[i].additionnalAngle + angle + 90);
+        (*p)[i].x += rect.x + CAMERA.x + (rect.w / 2);
+        (*p)[i].y += rect.y + CAMERA.y + (rect.h / 2);
+    }
+}
+
+void Entity::getEquipment(Point **p){
+    (*p) = new Point[type->getEquipmentSize()];
+    for (int i=0; i<type->getEquipmentSize(); i++){
+        setAngleM(&(*p)[i].x, &(*p)[i].y, equipmentsP[i].distFromCenter, equipmentsP[i].additionnalAngle + angle + 90);
+        (*p)[i].x += rect.x + CAMERA.x + (rect.w / 2);
+        (*p)[i].y += rect.y + CAMERA.y + (rect.h / 2);
+    }
+}
+
+bool Entity::drawHitbox(void){
+    Sint16* x = new Sint16[type->getPartSize()];
+    Sint16* y = new Sint16[type->getPartSize()];
+
+    Point* p;
+    getPart(&p);
+
+    for (int i=0; i<type->getPartSize(); i++){
+        x[i] = p[i].x;
+        y[i] = p[i].y;
+    }
+
+    if (polygonRGBA(RENDERER, x, y, type->getPartSize(), 255, 0, 0, 255)){
+        if (IS_ERR_OPEN) ERR << "ERROR :: polygonRGBA, reason : " << SDL_GetError() << endl;
+        delete[] x;
+        delete[] y;
+        delete[] p;
+        return false;
+    }
+
+    delete[] x;
+    delete[] y;
+    delete[] p;
+
+    return true;
+}
+
+bool Entity::drawEquipmentPoint(void){
+
+    Point* p;
+    getEquipment(&p);
+
+    for (int i=0; i<type->getEquipmentSize(); i++){
+        if (filledCircleRGBA(RENDERER, p[i].x, p[i].y, 3, 0, 255, 0, 255)){
+            if (IS_ERR_OPEN) ERR << "ERROR :: filledCircleRGBA, reason : " << SDL_GetError() << endl;
+            return false;
+        }
+
+        if (pieRGBA(RENDERER, p[i].x, p[i].y, 30, type->getEquipment()[i].minAngle+angle-90, type->getEquipment()[i].maxAngle+angle-90, 0, 255, 0, 255)){
+            if (IS_ERR_OPEN) ERR << "ERROR :: pieRGBA, reason : " << SDL_GetError() << endl;
+            return false;
+        }
+    }
+
+    delete[] p;
+    return true;
 }

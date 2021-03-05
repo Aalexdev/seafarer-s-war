@@ -23,14 +23,14 @@
             ~DebugText();
             
             bool bind(int *value);
-            bool setPrefix(std::string prefix);
+            bool setPrefix(string prefix);
 
             bool update(void);
         
         private:
             int* value;
             int valueBuf;
-            std::string prefix;
+            string prefix;
     };
 
     class DebugMenu{

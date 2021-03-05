@@ -3,23 +3,29 @@
 
 #include "ui/main_window.hpp"
 
+#include <SDL2/SDL_thread.h>
+
 bool equal(char* a, const char* b){
     if (!strcmp(a, b))
         return true;
     return false;
 }
 
-bool charToBool(std::string str){
+bool charToBool(string str){
     if (str == "true") return true;
     return false;
 }
 
-bool readXML(std::string path, bool check){
+bool readXML(string path){
 
+    bool check = false;
     XMLDocument doc;
+
+    
     path = DIR + path;
 
     if (IS_LOG_OPEN) LOG << "readXML(" << path << " , " << check << ")" << endl;
+
 
     if (XMLDocument_load(&doc, path.c_str())){
 
@@ -29,7 +35,7 @@ bool readXML(std::string path, bool check){
             if (equal(mainNode->tag, "window")){
 
                 int x, y, w, h;
-                std::string title;
+                string title;
 
                 if (MAINVAR->isInit){
                     SDL_GetWindowPosition(WINDOW, &x, &y);
@@ -84,7 +90,7 @@ bool readXML(std::string path, bool check){
                         }
 
                         if (IS_LOG_OPEN){
-                            std::string tempX, tempY;
+                            string tempX, tempY;
 
                             if (x == 805240832){
                                 tempX = "centered";
@@ -162,6 +168,9 @@ bool readXML(std::string path, bool check){
 
                         if (IS_LOG_OPEN) LOG << "SDL_SetWindowSize(" << w << ", " << h << ")" << endl;
                         SDL_SetWindowSize(WINDOW, w, h);
+                        WINDOW_WIDTH = w;
+                        WINDOW_HEIGHT = h;
+                        
 
                         if (!title.empty()){
                             if (IS_LOG_OPEN) LOG << "SDL_SetWindowTitle(" << title << ")" << endl;
@@ -310,7 +319,7 @@ bool readXML(std::string path, bool check){
 
                     if (equal(attr.key, "path")){
                         if (!check){
-                            readXML(attr.value, false);
+                            readXML(attr.value);
                         }
                     } else {
                         if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << attr.key << "' readattribute in " << path << endl;
@@ -385,16 +394,20 @@ bool readXML(std::string path, bool check){
                     XMLAttribute attr = mainNode->attributes.data[a];
 
                     if (!strcmp(attr.key, "pause")){
+                        if (IS_LOG_OPEN) LOG << "pause()" << endl;
                         PAUSE = charToBool(attr.value);
                     } else {
                         if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << attr.key << "' game attribute" << endl;
                     }
                 }
-            } else if (equal(mainNode->tag, "part")){
-                Part_type* part = new Part_type();
+            } else if (equal(mainNode->tag, "equipment")){
+                Equipment_type* e = new Equipment_type();
 
-                if (!part->read_from_xml(mainNode)) delete part;
-                else PART_LIST->push(part);
+                if (e->loadXML(mainNode)){
+                    EQUIPMENTS.push_back(e);
+                } else {
+                    delete e;
+                }
             } else {
                 if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << mainNode->tag << "' in " << path << endl;
             }

@@ -1,5 +1,5 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
 <clearWidgets />
-<textButton x="30" y="30" text="pause" command="data/game/gamePause.xml"/>
+<image path="res/img/forground.bmp" x="0" y="0" h="fullscreen" w="fullscreen"/>
 <game pause="false"/>

@@ -121,6 +121,6 @@ bool isInside(Point polygon[], int n, Point p) {
 
 
 void setAngleM(int *X, int *Y, float distFromCenter, float angle){
-    *X = cos(angle*M_PI/180) * distFromCenter;
-    *Y = sin(angle*M_PI/180) * distFromCenter;
+    *X = cosf(angle*M_PI/180.0f) * distFromCenter;
+    *Y = sinf(angle*M_PI/180.0f) * distFromCenter;
 }

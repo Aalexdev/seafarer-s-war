@@ -128,7 +128,7 @@ bool Sprite_list::read_from_xml(XMLNode* node){
     return true;
 }
 
-Sprite_type* Sprite_list::search(std::string name){
+Sprite_type* Sprite_list::search(string name){
     if (IS_LOG_OPEN) LOG << "Sprite_list::search(" << name << ")" << endl;
     
     
@@ -206,7 +206,7 @@ bool Sprite::set(int id){
     if (!this->type) return false;
     return true;
 }
-bool Sprite::set(std::string name){
+bool Sprite::set(string name){
     if (IS_LOG_OPEN) LOG << "Sprite::set(" << name << ")" << endl;
     if (!this->list){
         if (IS_ERR_OPEN) ERR << "ERROR :: Sprite::set, reason : cannot set a sprite without list" << endl;
@@ -237,7 +237,7 @@ int Sprite::get_id(void){
     return 0;
 }
 
-std::string Sprite::get_name(void){
+string Sprite::get_name(void){
     if (IS_LOG_OPEN) LOG << "sprite::get_name" << endl;
     if (this->type){
         return this->type->getName();

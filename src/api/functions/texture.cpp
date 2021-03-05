@@ -1,7 +1,7 @@
 #include "api/functions/texture.hpp"
 #include "main.hpp"
 
-SDL_Texture* loadTexture(std::string path, SDL_Rect* rect){
+SDL_Texture* loadTexture(string path, SDL_Rect* rect){
     path = DIR + path;
     if (IS_LOG_OPEN) LOG << "loadTexture(" << path << ")" << endl;
     SDL_Surface* surface = SDL_LoadBMP(path.c_str());
@@ -70,7 +70,7 @@ SDL_Texture* createRGBTexture(SDL_Color color, SDL_Rect rect){
     return texture;
 }
 
-Image::Image(std::string path){
+Image::Image(string path){
     this->set(path);
 }
 Image::Image(SDL_Color color){
@@ -86,7 +86,7 @@ Image::~Image(){
     if (this->texture) SDL_DestroyTexture(this->texture);
 }
 
-bool Image::set(std::string path){
+bool Image::set(string path){
     this->texture = loadTexture(path, &this->rect);
 
     if (this->texture) return true;

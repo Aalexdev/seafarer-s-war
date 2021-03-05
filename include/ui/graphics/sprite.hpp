@@ -61,7 +61,7 @@
             bool load_from_xml(XMLNode* node);
             bool reload(void);
 
-            const std::string getName(void) const {return this->name;}
+            const string getName(void) const {return this->name;}
             const int get_id(void) const {return this->id;}
 
             SDL_Rect getIndex(int index);
@@ -86,7 +86,7 @@
             int id;
 
             // the name of the sprite
-            std::string name;
+            string name;
 
             // the lenght if the sprite
             int lenght;
@@ -104,7 +104,7 @@
 
             bool read_from_xml(XMLNode* node);
 
-            Sprite_type* search(std::string name);
+            Sprite_type* search(string name);
             Sprite_type* search(int id);
         
         private:
@@ -121,12 +121,12 @@
             void setList(Sprite_list* list);
             
             bool set(int id);
-            bool set(std::string name);
+            bool set(string name);
             void set(Sprite_type* type);
 
             Sprite_type* get_type(void);
             int get_id(void);
-            std::string get_name(void);
+            string get_name(void);
 
             void setRect(SDL_Rect new_rect){this->rect = new_rect;}
             SDL_Rect getRect(void){return this->rect;}

@@ -4,7 +4,7 @@
 #include <string>
 #include <limits.h>
 
-std::string getAppData(void){
+string getAppData(void){
     return getenv("APPDATA");
 }
 
@@ -17,15 +17,15 @@ void GetDesktopResolution(int& horizontal, int& vertical){
    vertical = desktop.bottom;
 }
 
-std::string getCurrentDir(void){
+string getCurrentDir(void){
     char buff[MAX_PATH];
     GetModuleFileName( NULL, buff, MAX_PATH );
-    string::size_type position = std::string( buff ).find_last_of( "\\/" );
-    return std::string( buff ).substr( 0, position);
+    string::size_type position = string( buff ).find_last_of( "\\/" );
+    return string( buff ).substr( 0, position);
 }
 
-std::string getMainDir(void){
-    std::string buff = getCurrentDir();
+string getMainDir(void){
+    string buff = getCurrentDir();
     std::size_t pos = buff.find("bin");
 
     buff = buff.erase(pos);

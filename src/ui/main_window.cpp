@@ -5,6 +5,9 @@ bool resteWindow(const char* title, int Xpos, int Ypos, int width, int height, i
     if (IS_LOG_OPEN) LOG << "resetWindow(" << title << ", " << Xpos << ", " << Ypos << ", " << width << ", " << height << ", " << flags << ")" << endl;
     clearWindow();
 
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
+
     if(SDL_Init(SDL_INIT_EVERYTHING) == 0){
         MAINVAR->window = SDL_CreateWindow(title, Xpos, Ypos, width, height, flags);
         if (MAINVAR->window){  

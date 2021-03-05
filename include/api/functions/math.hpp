@@ -13,6 +13,11 @@
         int x, y;
     };
 
+    struct Line{
+        Point sp;
+        Point ep;
+    };
+
     //return a the int value if th hexa input
     int hexa_to_int(char value);
 
@@ -29,4 +34,16 @@
 
     // return true if the point is inside the polygon
     bool isInside(Point polygon[], int n, Point p);
+    
+    /**
+     * @brief get if two lines intersect
+     * 
+     * @param p1 starting point of the fisrt line
+     * @param q1 ending point of the fisrt line
+     * @param p2 starting point of the second line
+     * @param q2 ending point of the second line
+     * @return return true if intersect, false if not
+     */
+    bool doIntersect(Point p1, Point q1, Point p2, Point q2);
+
 #endif

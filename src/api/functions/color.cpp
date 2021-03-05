@@ -9,9 +9,9 @@ SDL_Color color(Uint8 r, Uint8 g, Uint8 b, Uint8 a){
     return (SDL_Color){r, g, b, a};
 }
 
-std::vector<std::string> SplitWithCharacters(const std::string& str, int splitLength) {
+std::vector<string> SplitWithCharacters(const string& str, int splitLength) {
   int NumSubstrings = str.length() / splitLength;
-  std::vector<std::string> ret;
+  std::vector<string> ret;
 
   for (int i = 0; i < NumSubstrings; i++) {
      ret.push_back(str.substr(i * splitLength, splitLength));
@@ -26,7 +26,7 @@ std::vector<std::string> SplitWithCharacters(const std::string& str, int splitLe
   return ret;
 }
 
-SDL_Color HEXA_to_color(std::string color) {
+SDL_Color HEXA_to_color(string color) {
   SDL_Color out;
 
   if(color.at(0) == '#') {
@@ -46,7 +46,7 @@ SDL_Color HEXA_to_color(std::string color) {
   return out;
 }
 
-SDL_Color RGB_To_color(std::string color){
+SDL_Color RGB_To_color(string color){
     SDL_Color out = {0, 0, 0, 0};
     return out;
 }

@@ -7,13 +7,13 @@
 
     #include "api/io/xml.hpp"
 
-    SDL_Texture* loadTexture(std::string path, SDL_Rect *rect);
+    SDL_Texture* loadTexture(string path, SDL_Rect *rect);
     SDL_Texture* surfaceToTexture(SDL_Surface *surface, SDL_Rect *rect);
     SDL_Texture* createRGBTexture(SDL_Color color, SDL_Rect rect);
 
     class Image{
         public:
-            Image(std::string path);
+            Image(string path);
             Image(SDL_Color color);
             Image(Uint8 r, Uint8 g, Uint8 b);
             Image(){}
@@ -40,7 +40,7 @@
 
             SDL_Rect* getRect(void) {return &this->rect;}
 
-            bool set(std::string path);
+            bool set(string path);
             bool set(SDL_Color color);
             bool set(Uint8 r, Uint8 g, Uint8 b);
             bool setAlpha(Uint8 alpha);

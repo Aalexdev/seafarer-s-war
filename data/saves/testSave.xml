@@ -1,5 +1,7 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
+<clearEntitys/>
+
 <setPlayer type="thunder" x="0" y="0" height="0" angle="40">
 
     <events>
@@ -12,8 +14,11 @@
             <key tag="DOWN" out="layerDown" type="sticky"/>
         </keypad>
     </events>
+
+    
+    <part health="10"/>
 </setPlayer>
 
 <summonEntity type="thunder" x="200" y="0" height="0" angle="0">
-
+    <part health="10"/>
 </summonEntity>

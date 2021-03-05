@@ -13,7 +13,7 @@ Text::~Text(){
     }
 }
 
-bool Text::setText(std::string new_text){
+bool Text::setText(string new_text){
     if (IS_LOG_OPEN) LOG << "Text::setText('" << new_text << "')" << endl;
     this->text = new_text;
 
@@ -48,7 +48,7 @@ bool Text::setText(std::string new_text){
     return true;
 }
 
-std::string Text::getText(void){
+string Text::getText(void){
     return this->text;
 }
 

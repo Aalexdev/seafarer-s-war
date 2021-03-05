@@ -4,6 +4,8 @@
     #include "main.hpp"
     #include "api/functions/color.hpp"
 
-    bool readXML(std::string path, bool check);
+    bool readXML(string path);
+    bool readXML_loading(string path);
+    bool read(string path);
 
 #endif

@@ -1,5 +1,7 @@
 #include "main.hpp"
 
+#include "api/io/io.hpp"
+
 MainVar mainVar;
 
 MainVar* getMain(){
@@ -19,11 +21,9 @@ int main(int argc, char* argv[]){
     TIME.ltm = localtime(&TIME.now);
     ZOOM = 1;
     PLAYER = new Entity(true);
-
     KEYPAD = new Keypad();
 
-    mainVar.launched = readXML("data\\main.xml", false);
-
+    mainVar.launched = readXML("data\\main.xml");
 
     while (mainVar.launched){
 
@@ -53,6 +53,8 @@ void event(){
             case SDL_MOUSEMOTION:
                 mainVar.event.mouse.x = e.motion.x;
                 mainVar.event.mouse.y = e.motion.y;
+
+
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
@@ -189,6 +191,7 @@ void drawImages(void){
 }
 
 void draw(){
+    SDL_SetRenderDrawColor(RENDERER, 255, 255, 255, 255);
     int exec = SDL_GetTicks();
     if (SDL_RenderClear(RENDERER)){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderClear(), reason : " << SDL_GetError << endl;
@@ -297,8 +300,10 @@ void freeEntity_types(void){
     ENTITY_TYPES.clear();
 }
 
-void freePart(){
-    delete PART_LIST;
+void freeEquipments(){
+    for (Equipment_type* e : EQUIPMENTS){
+        if (e) delete e;
+    }
 }
 
 void destroy(void){
@@ -312,7 +317,7 @@ void destroy(void){
 
     freeEntity_types();
     freeEntity();
-    freePart();
+    freeEquipments();
     
     delete KEYPAD;
     delete PLAYER;
@@ -324,10 +329,10 @@ void destroy(void){
     if (IS_ERR_OPEN) ERR.close();
 }
 
-void setLog(std::string path){
+void setLog(string path){
     mainVar.log_file = path;
 }
-void setErr(std::string path){
+void setErr(string path){
     mainVar.err_file = path;
 }
 
@@ -383,9 +388,8 @@ int windowHeight(void){
     return h;
 }
 
-bool setIcon(std::string path){
+bool setIcon(string path){
     path = DIR + path;
-    cout << "load : " << path << endl;
     SDL_Surface* surface = SDL_LoadBMP(path.c_str());
 
     if (!surface){
@@ -394,10 +398,7 @@ bool setIcon(std::string path){
     }
 
     SDL_SetWindowIcon(WINDOW, surface);
-
     SDL_FreeSurface(surface);
-
-    
     
     return true;
 }

@@ -31,7 +31,6 @@
 
             bool draw(void);
             int getZ(void){return this->z;}
-            float getFrictionCoefficient(void){return this->friction_coefficient;}
         
         private:
             vector<LayerTexture*> textures;
@@ -43,7 +42,7 @@
             int addX, addY;
             SDL_Point startingPos;
 
-            std::string name;
+            string name;
             int id;
 
             // the height of the layer
@@ -51,7 +50,6 @@
 
             long timer;
             int delay;
-            float friction_coefficient;
 
     };
 

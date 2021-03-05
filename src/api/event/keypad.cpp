@@ -14,10 +14,10 @@ Key::~Key(){
 void Key::setScancode(SDL_Scancode scancode){
     this->code = scancode;
 }
-void Key::setTag(std::string tag){
+void Key::setTag(string tag){
     this->tag = tag;
 }
-void Key::setCommand(std::string cmd){
+void Key::setCommand(string cmd){
     this->cmd = cmd;
 }
 SDL_Scancode Key::getScancode(void){
@@ -26,15 +26,15 @@ SDL_Scancode Key::getScancode(void){
 void Key::update(void){
     switch (this->type){
         case Tkey:
-            if (KEYPAD->getKey(this->code)) readXML(this->cmd, false);
+            if (KEYPAD->getKey(this->code)) readXML(this->cmd);
             break;
         
         case TkeyUp:
-            if (KEYPAD->getKeyUp(this->code)) readXML(this->cmd, false);
+            if (KEYPAD->getKeyUp(this->code)) readXML(this->cmd);
             break;
         
         case TkeyDown:
-            if (KEYPAD->getKeyDown(this->code)) readXML(this->cmd, false);
+            if (KEYPAD->getKeyDown(this->code)) readXML(this->cmd);
             break;
         
         default:

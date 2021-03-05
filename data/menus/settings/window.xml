@@ -16,5 +16,5 @@
 
 <textButton x="100" y="450" text="back" command="data/menus/settings.xml"/>
 
-
+<image path="res/img/forground.bmp" x="0" y="0" h="fullscreen" w="fullscreen"/>
 <image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>

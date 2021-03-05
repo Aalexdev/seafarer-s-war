@@ -12,7 +12,7 @@ TextArea::~TextArea(){
     delete this->background;
 }
 
-bool TextArea::setBackground(std::string path){
+bool TextArea::setBackground(string path){
     return this->background->set(path);
 }
 bool TextArea::setBackground(Uint8 r, Uint8 g, Uint8 b){
@@ -148,10 +148,10 @@ bool TextArea::read_from_xml(XMLNode* node){
     return true;
 }
 
-std::string TextArea::getTag(void){
+string TextArea::getTag(void){
     return this->tag;
 }
 
-std::string TextArea::getText(void){
+string TextArea::getText(void){
     return this->text->getText();
 }

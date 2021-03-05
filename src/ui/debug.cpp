@@ -9,7 +9,7 @@ bool DebugText::bind(int *value){
     this->value = value;
 }
 
-bool DebugText::setPrefix(std::string prefix){
+bool DebugText::setPrefix(string prefix){
     this->prefix = prefix;
 }
 

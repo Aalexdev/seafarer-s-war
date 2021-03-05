@@ -7,7 +7,7 @@ bool ButtonClass::exec(void){
         if (IS_ERR_OPEN) ERR << "ERROR :: ButtonClass::exec, reason : cannot execute a empty file path" << endl;
         return false;
     }
-    return readXML(this->cmd, false);
+    return readXML(this->cmd);
 }
 
 void TextButton::update(void){

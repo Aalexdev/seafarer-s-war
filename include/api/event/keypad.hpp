@@ -22,20 +22,20 @@
             ~Key();
 
             void setScancode(SDL_Scancode scancode);
-            void setTag(std::string tag);
-            void setCommand(std::string cmd);
+            void setTag(string tag);
+            void setCommand(string cmd);
             SDL_Scancode getScancode(void);
             void setType(KeyType type);
 
             void update(void);
             bool is_empty(void);
 
-            bool get_message(std::string message);
+            bool get_message(string message);
 
         private:
-            std::string cmd;
-            std::string tag;
-            std::string message;
+            string cmd;
+            string tag;
+            string message;
             SDL_Scancode code;
             KeyType type;
             bool state;
