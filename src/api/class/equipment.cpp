@@ -70,6 +70,18 @@ bool Equipment_type::loadXML(XMLNode* node){
                     if (IS_ERR_OPEN) ERR << "WARNING :: equipment; texture, reason : cannot reconize '" << attr.key << " texture attribute" << endl;
                 }
             }
+        } else if (!strcmp(child->tag, "center")){
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "x")){
+                    sscanf(attr.value, "%d", &center.x);
+                } else if (!strcmp(attr.key, "y")){
+                    sscanf(attr.value, "%d", &center.y);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: equipment; center, reason : cannot reconize '" << attr.key << "' center attribute" << endl;
+                }
+            }
         } else if (!strcmp(child->tag, "light")){
             light = new Light;
             for (int a=0; a<child->attributes.size; a++){
@@ -152,16 +164,29 @@ Equipment::~Equipment(){
 
 bool Equipment::drawLight(void){
     if (!type->getLight()) return true;
+    if (light){
     
-    if (filledPieRGBA(RENDERER, type->getCenter()->x + rect.x, type->getCenter()->y + rect.y, type->getLight()->power, angle - (light->range / 2), angle + (light->range / 2), 255, 255, 255, 255)){
-        if (IS_ERR_OPEN) ERR << "ERROR :: filledPieRGBA, reason : " << SDL_GetError() << endl;
-        return false;
+        if (light->range == 0) light->range = 1;
+
+        
+        if (filledPieRGBA(RENDERER, type->getCenter()->x + rect.x, type->getCenter()->y + rect.y, type->getLight()->power, angle - (light->range / 2) - 90, angle + (light->range / 2) - 90, 255, 255, 255, 100)){
+            if (IS_ERR_OPEN) ERR << "ERROR :: filledPieRGBA, reason : " << SDL_GetError() << endl;
+            return false;
+        }
+    
     }
+
     return true;
 }
 
 bool Equipment::draw(void){
-    
+
+    if (angleTarget > angle){
+        angle++;
+    } else if (angleTarget < angle){
+        angle--;
+    }
+
     if (SDL_RenderCopyEx(RENDERER, type->getTexture(), NULL, &rect, angle, type->getCenter(), SDL_FLIP_NONE)){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderCopyEx, reason : " << SDL_GetError() << endl;
         return false;
@@ -173,6 +198,15 @@ bool Equipment::draw(void){
 bool Equipment::setType(string name){
     unlink();
     type = search(name);
+
+    if (type){
+        rect = type->getRect();
+    }
+
+    if (type->getLight()){
+        light = new Light;
+    }
+    
     return type;
 }
 
@@ -189,4 +223,13 @@ void Equipment::setAngle(int angle){
 
 void Equipment::setAngleTarget(int angle){
     this->angleTarget = angle;
+}
+
+void Equipment::setPos(int x, int y){
+    rect.x = x - type->getCenter()->x;
+    rect.y = y - type->getCenter()->y;
+}
+
+void Equipment::setTarget(int x, int y){
+    angleTarget = -getAngleM(rect.x + type->getCenter()->x, rect.y + type->getCenter()->y, x, y);
 }

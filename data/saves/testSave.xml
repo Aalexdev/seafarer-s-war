@@ -15,10 +15,35 @@
         </keypad>
     </events>
 
-    
     <part health="10"/>
+
+    <equipments>
+        <equipment name="projector" id="0" angle="30"/>
+        <equipment name="projector" id="1" angle="30"/>
+        <equipment name="projector" id="2" angle="30"/>
+        <equipment name="projector" id="3" angle="30"/>
+        <equipment name="projector" id="4" angle="30"/>
+        <equipment name="projector" id="5" angle="30"/>
+        <equipment name="projector" id="6" angle="30"/>
+        <equipment name="projector" id="7" angle="30"/>
+        <equipment name="projector" id="8" angle="30"/>
+        <equipment name="projector" id="9" angle="30"/>
+    </equipments>
 </setPlayer>
 
 <summonEntity type="thunder" x="200" y="0" height="0" angle="0">
     <part health="10"/>
+
+    <equipments>
+        <equipment name="projector" id="0" angle="30"/>
+        <equipment name="projector" id="1" angle="30"/>
+        <equipment name="projector" id="2" angle="30"/>
+        <equipment name="projector" id="3" angle="30"/>
+        <equipment name="projector" id="4" angle="30"/>
+        <equipment name="projector" id="5" angle="30"/>
+        <equipment name="projector" id="6" angle="30"/>
+        <equipment name="projector" id="7" angle="30"/>
+        <equipment name="projector" id="8" angle="30"/>
+        <equipment name="projector" id="9" angle="30"/>
+    </equipments>
 </summonEntity>

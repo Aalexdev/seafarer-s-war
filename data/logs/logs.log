@@ -1,4 +1,4 @@
-LOG file, init at : 14:33:52
+LOG file, init at : 14:53:20
 set max fps to : 60
 load font
 TTF_Init()
@@ -50,6 +50,7 @@ readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/equipment.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/equipment/projector.xml , 0)
 Equipment_type::Equipment_type()
 Equipment_type::loadXML()
+loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/equipment/projector.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/menus/mainMenu.xml , 0)
 freeWidgets()
 Text::setText('Main menu')

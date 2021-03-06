@@ -443,6 +443,14 @@
              */
             void calculateLights(void);
 
+            /**
+             * @brief draw light from the 
+             * 
+             * @return true 
+             * @return false 
+             */
+            bool drawLight(void);
+
         private:
 
             /**
@@ -563,6 +571,8 @@
 
             bool drawHitbox(void);
             bool drawEquipmentPoint(void);
+
+            void updateEquipmentPos(void);
     };
 
 #endif

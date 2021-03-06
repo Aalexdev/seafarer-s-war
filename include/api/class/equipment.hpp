@@ -199,7 +199,7 @@
                  * @brief the actual range
                  * 
                  */
-                int range;
+                int range = 30;
 
                 // soon
             };
@@ -229,6 +229,22 @@
              * @param angle the angle target
              */
             void setAngleTarget(int angle);
+
+            /**
+             * @brief Set the Target position (from teh screen)
+             * 
+             * @param x 
+             * @param y 
+             */
+            void setTarget(int x, int y);
+
+            /**
+             * @brief Set the position (from the center) of the equipment
+             * 
+             * @param x the x axis
+             * @param y the y axis
+             */
+            void setPos(int x, int y);
         
         private:
             /**

@@ -71,6 +71,7 @@ bool Entity_type::load_from_xml(XMLNode* node){
                 if (!strcmp(attr.key, "path")){
                     int w=this->rect.w, h=this->rect.h;
                     this->texture = loadTexture(attr.value, &this->rect);
+                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MUL);
                 } else if (!strcmp(attr.key, "w")){
                     sscanf(attr.value, "%d", &this->rect.w);
                 } else if (!strcmp(attr.key, "h")){
@@ -270,6 +271,10 @@ bool Entity::set(string name){
 
             equipments = new Equipment*[type->getEquipmentSize()];
 
+            for (int i=0; i<type->getEquipmentSize() && equipments; i++){
+                equipments[i] = NULL;
+            }
+
             return true;
         }
     }
@@ -415,7 +420,7 @@ bool Entity::load_from_xml(XMLNode* node){
             if (child->children.size > 0){
                 if (IS_ERR_OPEN) ERR << "WARNING :: summonEnity; part, reason : part cannot have child (" << child->children.size << ">0)" << endl; 
             }
-        } else if (!strcmp(child->tag, "equipment")){
+        } else if (!strcmp(child->tag, "equipments")){
             for (int e=0; e<child->children.size; e++){
                 XMLNode* node = XMLNode_child(child, e);
 
@@ -449,6 +454,7 @@ bool Entity::load_from_xml(XMLNode* node){
         }
     }
 
+    updateEquipmentPos();
     return true;
 }
 
@@ -486,6 +492,7 @@ Entity::~Entity(){
 }
 
 void Entity::update(){
+
 
     if (this->is_player){
         
@@ -552,8 +559,11 @@ void Entity::update(){
         } else if (KEYPAD->getKey(PLAYER_CONTROL.layerUp)){
             if (this->z < this->type->getLayerMax()) this->z ++;
         }
-    }
 
+        for (int i=0; i<type->getEquipmentSize(); i++){
+            equipments[i]->setTarget(MOUSEPOS.x, MOUSEPOS.y);
+        }
+    }
     if (this->speed!=0){
         this->is_mouving = true;
         int x, y;
@@ -591,6 +601,8 @@ void Entity::update(){
                 break;
         }
     }
+
+    updateEquipmentPos();
 }
 
 bool Entity::draw(){
@@ -609,6 +621,13 @@ bool Entity::draw(){
         if (!drawHitbox()) return false;
         if (!drawEquipmentPoint()) return false;
     }
+
+    for (int i=0; i<type->getEquipmentSize(); i++){
+        if (equipments[i]){
+            equipments[i]->draw();
+        }
+    }
+
     return true;
 }
 
@@ -686,5 +705,27 @@ bool Entity::drawEquipmentPoint(void){
     }
 
     delete[] p;
+    return true;
+}
+
+void Entity::updateEquipmentPos(void){
+    Point *p;
+    getEquipment(&p);
+
+    for (int i=0; i<type->getEquipmentSize(); i++){
+        if (equipments[i]){
+            equipments[i]->setPos(p[equipments[i]->id].x, p[equipments[i]->id].y);
+        }
+    }
+
+    delete[] p;
+}
+
+bool Entity::drawLight(void){
+    for (int i=0; i<type->getEquipmentSize() && equipments; i++){
+        if (equipments[i]){
+            equipments[i]->drawLight();
+        }
+    }
     return true;
 }

@@ -1,0 +1,19 @@
+# executables
+
+*.exe
+
+# object files
+
+*.o
+
+#library
+
+*.dll
+*.a
+*.la
+
+# folders
+
+.vscode/
+bin/
+lib/

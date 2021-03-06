@@ -169,8 +169,17 @@ void drawWidgets(void){
 }
 
 void drawLayers(int z){
+
+    
+
+    
+
     for (Layer* lyr : LAYERS){
         if (lyr->getZ() == z){
+            for (Entity* entity : ENTITY){
+                entity->drawLight();
+            }
+            if (PLAYER->is_linked()) PLAYER->drawLight();
             lyr->draw();
         }
     }
@@ -191,7 +200,7 @@ void drawImages(void){
 }
 
 void draw(){
-    SDL_SetRenderDrawColor(RENDERER, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(RENDERER, 255, 255, 255, 0);
     int exec = SDL_GetTicks();
     if (SDL_RenderClear(RENDERER)){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderClear(), reason : " << SDL_GetError << endl;
@@ -200,6 +209,7 @@ void draw(){
     }
 
     for (int i=-256; i<256; i++){
+        
         drawLayers(i);
     }
 

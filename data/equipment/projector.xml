@@ -1,5 +1,7 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
 <equipment name="projector">
-    <light power="125" max-range="45"/>
+    <texture path="res/img/equipment/projector.bmp"/>
+    <center x="4" y="4"/>
+    <light power="500" max-range="45"/>
 </equipment>
