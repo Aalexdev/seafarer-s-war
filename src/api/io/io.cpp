@@ -2,7 +2,7 @@
 
 #include <dirent.h>
 
-vector<string> directory_contents(string directory_path){  
+vector<string> directory_contents(string directory_path){
     DIR *dh;
     struct dirent * contents;
     vector<string> content;
@@ -20,6 +20,5 @@ vector<string> directory_contents(string directory_path){
         content.push_back(name);
     }
     closedir ( dh );
-
     return content;
 }

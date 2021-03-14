@@ -3,7 +3,12 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/include/",
+                "C:/MinGW/include/",
+                "C:/MinGW/lib/gcc/mingw32/9.2.0/include/c++/",
+                "C:/MinGW/lib/gcc/mingw32/9.2.0/include/c++/mingw32/",
+                "C:/MinGW/lib/gcc/mingw32/9.2.0/include/",
+                "C:/MinGW/lib/gcc/mingw32/9.2.0/include/c++/tr1/"
             ],
             "defines": [
                 "_DEBUG",
@@ -15,7 +20,8 @@
             "cppStandard": "gnu++17",
             "intelliSenseMode": "windows-gcc-x86",
             "compilerArgs": [
-                "-std=c++17"
+                "-std=c++17",
+                "-l mingw32"
             ]
         }
     ],

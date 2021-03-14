@@ -1,5 +1,8 @@
 #include "api/io/xml.hpp"
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream>
+#include <strings.h>
 
 int ends_with(const char* haystack, const char* needle)
 {

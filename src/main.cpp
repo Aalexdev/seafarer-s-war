@@ -2,6 +2,8 @@
 
 #include "api/io/io.hpp"
 
+#include <SDL2/SDL2_gfxPrimitives.h>
+
 MainVar mainVar;
 
 MainVar* getMain(){
@@ -33,6 +35,8 @@ int main(int argc, char* argv[]){
         update();
         draw();
         time();
+
+        DELTA_TIME = SDL_GetTicks() - TIME.startTick;
     }
 
     destroy();
@@ -53,8 +57,6 @@ void event(){
             case SDL_MOUSEMOTION:
                 mainVar.event.mouse.x = e.motion.x;
                 mainVar.event.mouse.y = e.motion.y;
-
-
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
@@ -99,6 +101,9 @@ void event(){
                     default:
                         break;
                 }
+                break;
+            
+            default:
                 break;
         }
         KEYPAD->event(e);
@@ -169,17 +174,20 @@ void drawWidgets(void){
 }
 
 void drawLayers(int z){
-
     
-
     
+    SDL_Rect rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
     for (Layer* lyr : LAYERS){
         if (lyr->getZ() == z){
+
+            SDL_SetRenderDrawColor(RENDERER, WINDOW_R, WINDOW_G, WINDOW_B, WINDOW_A);
+            SDL_RenderFillRect(RENDERER, &rect);
+
             for (Entity* entity : ENTITY){
-                entity->drawLight();
+                entity->drawLight(z);
             }
-            if (PLAYER->is_linked()) PLAYER->drawLight();
+            if (PLAYER->is_linked()) PLAYER->drawLight(z);
             lyr->draw();
         }
     }
@@ -200,7 +208,6 @@ void drawImages(void){
 }
 
 void draw(){
-    SDL_SetRenderDrawColor(RENDERER, 255, 255, 255, 0);
     int exec = SDL_GetTicks();
     if (SDL_RenderClear(RENDERER)){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderClear(), reason : " << SDL_GetError << endl;
@@ -208,6 +215,8 @@ void draw(){
         return;
     }
 
+    //updateLightPoints();
+    
     for (int i=-256; i<256; i++){
         
         drawLayers(i);
@@ -216,6 +225,12 @@ void draw(){
     drawImages();
     drawWidgets();
 
+    if (IS_DEBUG){
+        for (Light_Edge &e : LIGHT_POINTS){
+            lineRGBA(RENDERER, e.sx, e.sy, e.ex, e.ey, 255, 100, 0, 255);
+        }
+    }
+    
     SDL_RenderPresent(RENDERER);
     mainVar.time.drawExecT = SDL_GetTicks() - exec;
 }
@@ -239,6 +254,13 @@ void time(){
 
     mainVar.time.execTime = (finnalTick - mainVar.time.startTick) > mainVar.time.maxDelay ? mainVar.time.maxDelay : (finnalTick - mainVar.time.startTick);
     SDL_Delay(mainVar.time.maxDelay-mainVar.time.execTime);
+}
+
+void freeAmmunitions_type(void){
+    for (Ammunition_type* a : AMMUNITION_TYPE){
+        if (a) delete a;
+    }
+    AMMUNITION_TYPE.clear();
 }
 
 void freeFont(void){
@@ -328,6 +350,7 @@ void destroy(void){
     freeEntity_types();
     freeEntity();
     freeEquipments();
+    freeAmmunitions_type();
     
     delete KEYPAD;
     delete PLAYER;
@@ -411,4 +434,44 @@ bool setIcon(string path){
     SDL_FreeSurface(surface);
     
     return true;
+}
+
+void SetColor(int r, int g, int b){
+    WINDOW_R = r;
+    WINDOW_G = g;
+    WINDOW_B = b;
+}
+
+void SetColor(int r, int g, int b, int a){
+    WINDOW_R = r;
+    WINDOW_G = g;
+    WINDOW_B = b;
+    WINDOW_A = a;
+}
+
+void updateLightPoints(void){
+
+    LIGHT_POINTS.clear();
+
+    LIGHT_POINTS.push_back(NORTH);
+    LIGHT_POINTS.push_back(EAST);
+    LIGHT_POINTS.push_back(WEST);
+    LIGHT_POINTS.push_back(SOUTH);
+
+    for (Entity *e : ENTITY){
+        if (e->in_screen()){
+            Point* p;
+            e->getPart(&p);
+
+
+            for (int i=0; i<e->getType()->getPartSize()-1; i++){
+                
+                LIGHT_POINTS.push_back({p[i].x, p[i].y, p[i+1].x, p[i+1].y});
+            }
+
+            LIGHT_POINTS.push_back({p[e->getType()->getPartSize()-1].x, p[e->getType()->getPartSize()-1].y, p[0].x, p[0].y});
+
+            delete[] p;
+        }
+    }
 }

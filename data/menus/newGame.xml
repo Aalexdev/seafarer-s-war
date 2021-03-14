@@ -4,5 +4,5 @@
 <text text="new game" x="100" y="100"/>
 <textButton x="100" y="150" text="back to play Menu" command="data/menus/play.xml"/>
 
-<image path="res/img/forground.bmp" x="0" y="0" h="fullscreen" w="fullscreen"/>
+ 
 <image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>

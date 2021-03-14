@@ -36,7 +36,7 @@
     <icon path="res/img/icon/icon.bmp"/>
 </window>
 
-
+<read path="data/ammunitions.xml"/>
 <read path="data/events.xml"/>
 <read path="data/entity.xml"/>
 <read path="data/equipment.xml"/>

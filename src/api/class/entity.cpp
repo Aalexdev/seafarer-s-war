@@ -271,10 +271,11 @@ bool Entity::set(string name){
 
             equipments = new Equipment*[type->getEquipmentSize()];
 
-            for (int i=0; i<type->getEquipmentSize() && equipments; i++){
+            for (int i=0; i<type->getEquipmentSize(); i++){
                 equipments[i] = NULL;
             }
 
+            if (IS_ERR_OPEN) LOG << "Entity::set() : type found '" << name << "'" << endl;
             return true;
         }
     }
@@ -282,8 +283,6 @@ bool Entity::set(string name){
     if (IS_ERR_OPEN) ERR << "ERROR :: Entity::set, reason : cannot load '" << name << "' entity name" << endl;
     return false;
 }
-
-
 
 bool Entity_type::used_name(string name){
     for (Entity_type* type : ENTITY_TYPES){
@@ -388,6 +387,9 @@ bool Entity::load_from_xml(XMLNode* node){
                                     } else if (out == "layerDown"){
                                         PLAYER_CONTROL.layerDown = SDL_GetScancodeFromName(tag.c_str());
                                         PLAYER_CONTROL.layerDown_type = type;
+                                    } else if (out == "lights"){
+                                        PLAYER_CONTROL.lights = SDL_GetScancodeFromName(tag.c_str());
+                                        PLAYER_CONTROL.light_type = type;
                                     } else {
                                         if (IS_ERR_OPEN) ERR << "ERROR :: Entity::load_from_xml, reason : cannot reconize '" << out << "' key out" << endl;
                                     }
@@ -424,29 +426,40 @@ bool Entity::load_from_xml(XMLNode* node){
             for (int e=0; e<child->children.size; e++){
                 XMLNode* node = XMLNode_child(child, e);
 
-                equipments[e] = new Equipment();
+                if (e < type->getEquipmentSize()){
+                    if (!strcmp(node->tag, "equipment")){
+                        equipments[e] = new Equipment();
 
-                if (!strcmp(node->tag, "equipment")){
-                    for (int a=0; a<node->attributes.size; a++){
-                        XMLAttribute attr = node->attributes.data[a];
-
-                        if (!strcmp(attr.key, "name")){
-                            if (!equipments[e]->setType(attr.value)){
-                                delete equipments[e];
-                                continue;
-                            }
-                        } else if (!strcmp(attr.key, "id")){
-                            sscanf(attr.value, "%d", &equipments[e]->id);
-                        } else if (!strcmp(attr.key, "angle")){
-                            int angle;
-                            sscanf(attr.value, "%d", &angle);
-                            equipments[e]->setAngle(angle);
-                        } else {
-                            if (IS_ERR_OPEN) ERR << "ERROR :: summonEntity; equipments; equipment, reason : cannot reconize '" << attr.key << "' equipment attribute" << endl; 
+                        if (!equipments[e]){
+                            if (IS_ERR_OPEN) ERR << "ERROR :: ALLOC error" << endl;
+                            return false;
                         }
+
+                        for (int a=0; a<node->attributes.size; a++){
+                            XMLAttribute attr = node->attributes.data[a];
+
+                            if (!strcmp(attr.key, "name")){
+                                if (!equipments[e]->setType(attr.value)){
+                                    delete equipments[e];
+                                    equipments[e] = nullptr;
+                                    break;
+                                }
+                            } else if (!strcmp(attr.key, "id")){
+                                sscanf(attr.value, "%d", &equipments[e]->id);
+                            } else if (!strcmp(attr.key, "angle")){
+                                int angle;
+                                sscanf(attr.value, "%d", &angle);
+                                equipments[e]->setAngle(angle);
+                            } else {
+                                if (IS_ERR_OPEN) ERR << "ERROR :: summonEntity; equipments; equipment, reason : cannot reconize '" << attr.key << "' equipment attribute" << endl; 
+                            }
+                        }
+                    } else {
+                        equipments[e] = NULL;
+                        if (IS_ERR_OPEN) ERR << "WARNIGN :: summonEntity; equipments, reason : cannot reconize '" << node->tag << "' equipments child" << endl;
                     }
                 } else {
-                    if (IS_ERR_OPEN) ERR << "WARNIGN :: summonEntity; equipments, reason : cannot reconize '" << node->tag << "' equipments child" << endl;
+                    if (IS_ERR_OPEN) ERR << "WARNIGN :: summonEntity; equipments, reason : cannot set more equipment than the type has (" << e << ">" << type->getEquipmentSize() << endl;
                 }
             }
         } else {
@@ -459,6 +472,7 @@ bool Entity::load_from_xml(XMLNode* node){
 }
 
 void Entity::reset(void){
+    if (IS_LOG_OPEN) LOG << "Entity::reset()" << endl;
     this->type = nullptr;
     this->z = 0;
     this->angle = 0;
@@ -493,9 +507,7 @@ Entity::~Entity(){
 
 void Entity::update(){
 
-
     if (this->is_player){
-        
         if (KEYPAD->getKey(PLAYER_CONTROL.engineUp)){
             this->strength = this->type->getStrength();
         } else if (KEYPAD->getKey(PLAYER_CONTROL.engineDown)){
@@ -561,9 +573,11 @@ void Entity::update(){
         }
 
         for (int i=0; i<type->getEquipmentSize(); i++){
-            equipments[i]->setTarget(MOUSEPOS.x, MOUSEPOS.y);
+            if (equipments[i]) equipments[i]->setTarget(MOUSEPOS.x, MOUSEPOS.y);
         }
     }
+
+
     if (this->speed!=0){
         this->is_mouving = true;
         int x, y;
@@ -602,7 +616,7 @@ void Entity::update(){
         }
     }
 
-    updateEquipmentPos();
+    updateEquipments();
 }
 
 bool Entity::draw(){
@@ -610,6 +624,7 @@ bool Entity::draw(){
         if (IS_ERR_OPEN) ERR << "ERROR :: Entity::draw, reason : cannot draw a entity who is not linked to a type" << endl;
         return false;
     }
+
 
     SDL_Rect temp = {this->rect.x + CAMERA.x, this->rect.y + CAMERA.y, (int)(this->rect.w / ZOOM), (int)(this->rect.h / ZOOM)};
     if (SDL_RenderCopyEx(RENDERER, this->type->getTexture(), NULL, &temp, this->angle, 0, SDL_FLIP_NONE)){
@@ -622,6 +637,7 @@ bool Entity::draw(){
         if (!drawEquipmentPoint()) return false;
     }
 
+    
     for (int i=0; i<type->getEquipmentSize(); i++){
         if (equipments[i]){
             equipments[i]->draw();
@@ -680,6 +696,16 @@ bool Entity::drawHitbox(void){
         return false;
     }
 
+    for (int i=0; i<type->getPartSize(); i++){
+        if (filledCircleRGBA(RENDERER, x[i], y[i], 3, 255, 0, 0, 255)){
+            if (IS_ERR_OPEN) ERR << "ERROR :: filledCircleRGBA, reason : " << SDL_GetError() << endl;
+            delete[] x;
+            delete[] y;
+            delete[] p;
+            return false;
+        }
+    }
+
     delete[] x;
     delete[] y;
     delete[] p;
@@ -717,15 +743,39 @@ void Entity::updateEquipmentPos(void){
             equipments[i]->setPos(p[equipments[i]->id].x, p[equipments[i]->id].y);
         }
     }
-
     delete[] p;
 }
 
-bool Entity::drawLight(void){
-    for (int i=0; i<type->getEquipmentSize() && equipments; i++){
-        if (equipments[i]){
-            equipments[i]->drawLight();
+bool Entity::drawLight(int i){
+
+    if (i >= z-1 && i<=z){
+        for (int e=0; e<type->getEquipmentSize() && equipments; e++){
+            if (equipments[e]){
+                equipments[e]->drawLight();
+            }
         }
     }
     return true;
+}
+
+Entity_type* Entity::getType(void){
+    return type;
+}
+
+bool Entity::in_screen(void){
+    if (rect.x + CAMERA.x < WINDOW_WIDTH && rect.y + CAMERA.y < WINDOW_HEIGHT){
+        if (rect.x + rect.w + CAMERA.x > 0 && rect.y + rect.h + CAMERA.y > 0){
+            return true;
+        }
+    }
+    return false;
+}
+
+void Entity::updateEquipments(void){
+    updateEquipmentPos();
+    for (int i=0; i<type->getEquipmentSize(); i++){
+        if (equipments[i]){
+            equipments[i]->update();
+        }
+    }
 }

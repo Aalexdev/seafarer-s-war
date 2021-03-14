@@ -3,5 +3,5 @@
 <equipment name="projector">
     <texture path="res/img/equipment/projector.bmp"/>
     <center x="4" y="4"/>
-    <light power="500" max-range="45"/>
+    <light power="500" range="25" r="255" g="255" b="255" a="100"/>
 </equipment>

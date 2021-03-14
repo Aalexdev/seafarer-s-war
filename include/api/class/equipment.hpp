@@ -12,6 +12,9 @@
 
     #include "api/functions/texture.hpp"
     #include "api/class/entity.hpp"
+    #include "api/class/ammunition.hpp"
+
+    #define UNKNOWN_AMMUNITION "unknown"
     
     class Equipment_type{
         public:
@@ -50,8 +53,32 @@
                  * @brief the maximal range
                  * 
                  */
-                int maxRange;
-            };
+                int range;
+
+                /**
+                 * @brief the initial color of the light
+                 * 
+                 */
+                int r, g, b, a;
+                
+                /**
+                 * @brief the texture of the light (obtionnal)
+                 * 
+                 */
+                SDL_Texture* ligthTexture = nullptr;
+
+                /**
+                 * @brief the rectangle of the lightTexture
+                 * 
+                 */
+                SDL_Rect* rect = nullptr;
+
+                /**
+                 * @brief rotationnal center of the lightTexture
+                 * 
+                 */
+                SDL_Point* lightCenter = nullptr;
+            };  
 
             /**
              * @brief Get the Light object
@@ -65,7 +92,17 @@
              * 
              */
             struct Cannon{
-                // soon
+                /**
+                 * @brief the couldown beetween every shot
+                 * 
+                 */
+                int couldown;
+
+                /**
+                 * @brief the type of ammunition used, unknown to use every types
+                 * 
+                 */
+                string ammunition_type;
             };
 
             /**
@@ -191,6 +228,12 @@
             bool draw(void);
 
             /**
+             * @brief update the equipment
+             * 
+             */
+            void update(void);
+
+            /**
              * @brief the equipment struct, used  by equipment
              * 
              */
@@ -201,13 +244,39 @@
                  */
                 int range = 30;
 
-                // soon
+                /**
+                 * @brief the color of the light
+                 * 
+                 */
+                int r, g, b, a;
+
+
             };
 
+            /**
+             * @brief the cannon struct, store all cannons data
+             * 
+             */
             struct Cannon{
-                // soon
+                /**
+                 * @brief ammunitions of the cannon
+                 * 
+                 */
+                vector<Ammunition*> ammunitions;
+
+                /**
+                 * @brief ticks used by the couldown 
+                 * 
+                 */
+                int tick;
             };
 
+            /**
+             * @brief set the type of the quipment from a name
+             * 
+             * @param name the type's name
+             * @return return true if type found, false on error
+             */
             bool setType(string name);
 
             /**
@@ -215,6 +284,59 @@
              * 
              */
             int id;
+
+            /**
+             * @brief the target structure where a stored targeting types
+             * 
+             */
+            struct Targets{
+                /**
+                 * @brief set the equipment on a targeting angle, the equipment will automaticly turn at the rotary speed
+                 * 
+                 */
+                struct SpeedTarget{
+                    int rotarySpeed;
+                };
+
+                /**
+                 * @brief set the equipment on a targeting position, the equipment will automaticly lock at the position
+                 * 
+                 */
+                struct PosTarget{
+                    /**
+                     * @brief x axis
+                     * 
+                     */
+                    int x;
+
+                    /**
+                     * @brief y axis
+                     * 
+                     */
+                    int y;
+                };
+
+                /**
+                 * @brief the target union, used by the equipment
+                 * 
+                 */
+                union Target{
+                    SpeedTarget speed;
+                    PosTarget pos;
+                };
+
+                enum TargetType{
+                    target_speed,
+                    target_pos
+                };
+            };
+
+            /**
+             * @brief Set the targeting angle
+             * 
+             * @param angle targeting angle
+             */
+            void setTarget(int angle);
 
             /**
              * @brief Set the Angle of the equipment
@@ -245,6 +367,21 @@
              * @param y the y axis
              */
             void setPos(int x, int y);
+
+            /**
+             * @brief Set the limit of the angle
+             * 
+             * @param min the minimal angle
+             * @param max the maximal angle
+             */
+            void setAngleLimit(int min, int max);
+
+            /**
+             * @brief launch an ammunition, only of the equipment is a cannon
+             * 
+             */
+            void shot(void);
+            
         
         private:
             /**
@@ -277,11 +414,57 @@
              */
             int angle;
 
+            /**
+             * @brief the targeting angle
+             * 
+             */
             int angleTarget;
 
-
+            /**
+             * @brief unlink the equipment to his type and destroy the allocated memory
+             * 
+             */
             void unlink(void);
 
+            /**
+             * @brief the maximal angle
+             * 
+             */
+            int angleMax;
+
+            /**
+             * @brief the minimal angle
+             * 
+             */
+            int angleMin;
+
+            /**
+             * @brief the target of the equipment
+             * 
+             */
+            Targets::Target target;
+
+            /**
+             * @brief the type of the actal targeting type
+             * 
+             */
+            Targets::TargetType targetType;
+
+            /**
+             * @brief get the centered x of the equipment
+             * 
+             * @return return the centered x
+             */
+            int getX(void);
+
+            /**
+             * @brief get the centered y of the equipment
+             * 
+             * @return return the centered y
+             */
+            int getY(void);
+
+            
     };
 
 #endif

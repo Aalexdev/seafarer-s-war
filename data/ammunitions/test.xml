@@ -1,0 +1,6 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<ammunition name="test" type="standar">
+    <texture texture="res/img/projectiles/test.bmp"/>
+    <perform damages="100" initial-speed="20"/>
+</ammunition>

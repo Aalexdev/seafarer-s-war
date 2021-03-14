@@ -61,6 +61,7 @@
     #include "api/class/entity.hpp"
     #include "api/class/island.hpp"
     #include "api/class/equipment.hpp"
+    #include "api/class/ammunition.hpp"
 
     /**
      * @brief Struct of 
@@ -202,6 +203,7 @@
          */
         time_t now;
         tm *ltm;
+        
     };
 
     /**
@@ -314,6 +316,18 @@
          * 
          */
         bool layerDown_type;
+
+        /**
+         * @brief lights key event
+         * 
+         */
+        SDL_Scancode lights;
+
+        /**
+         * @brief the light key types
+         * 
+         */
+        bool light_type;
     };
 
     struct Files{
@@ -328,6 +342,20 @@
          * 
          */
         string last_filePath;
+    };
+
+    struct Light_Edge{
+        /**
+         * @brief starting x and starting y
+         * 
+         */
+        int sx, sy;
+
+        /**
+         * @brief ending x and ending y
+         * 
+         */
+        int ex, ey;
     };
     
     struct MainVar{
@@ -498,6 +526,30 @@
          * 
          */
         vector<Equipment_type*> equipments;
+
+        /**
+         * @brief colors of the screen refresh
+         * 
+         */
+        int r, g, b, a;
+
+        /**
+         * @brief every point used for dynamique light
+         * 
+         */
+        vector<Light_Edge> lightPoints;
+
+        /**
+         * @brief the ammunition type vector
+         * 
+         */
+        vector<Ammunition_type*> ammunitions; 
+        
+        /**
+         * @brief the total time beetween two frame
+         * 
+         */
+        int timeDelta;
     };
 
     /**
@@ -637,6 +689,31 @@
      * @return * return true if loaded, false otherwise 
      */
     bool setIcon(string path);
+
+    /**
+     * @brief set the window refresh color
+     * 
+     * @param r the red color
+     * @param g the green color
+     * @param b the blue color
+     */
+    void SetColor(int r, int g, int b);
+
+    /**
+     * @brief set the window refresh color
+     * 
+     * @param r the red color
+     * @param g the green color
+     * @param b the blue color
+     * @param a the alpha canal
+     */
+    void setColor(int r, int g, int b, int a);
+    
+    /**
+     * @brief clear and rebuild the LIGHT_POINTS vector with all collision points on the screen
+     * 
+     */
+    void updateLightPoints(void);
     
     /**
      * @brief mainVar constant
@@ -681,6 +758,13 @@
     #define WINDOW_HEIGHT   getMain()->windowHeight
     #define WINDOW_AIR      getMain()->windowWidth * getMain()->windowHeight
     #define EQUIPMENTS      getMain()->equipments
+    #define WINDOW_R        getMain()->r
+    #define WINDOW_G        getMain()->g
+    #define WINDOW_B        getMain()->b
+    #define WINDOW_A        getMain()->a
+    #define LIGHT_POINTS    getMain()->lightPoints
+    #define AMMUNITION_TYPE getMain()->ammunitions
+    #define DELTA_TIME      getMain()->timeDelta
 
     /**
      * @brief other
@@ -694,14 +778,13 @@
      * @brief window Lines
      * 
      */
-    #define NORTH           {{0, 0}, {WINDOW_WIDTH, 0}}
+    #define NORTH           {0, 0, WINDOW_WIDTH, 0}
     #define NORTH_EAST      {WINDOW_WIDTH, 0}
-    #define EAST            {{WINDOW_WIDTH, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT}}
+    #define EAST            {WINDOW_WIDTH-1, 0, WINDOW_WIDTH-1, WINDOW_HEIGHT}
     #define SOUTH_EAST      {WINDOW_WIDTH, WINDOW_HEIGHT}
-    #define SOUTH           {{0, WINDOW_HEIGHT}, {WINDOW_WIDTH, WINDOW_HEIGHT}}
+    #define SOUTH           {0, WINDOW_HEIGHT-1, WINDOW_WIDTH, WINDOW_HEIGHT-1}
     #define SOUTH_WEST      {0, WINDOW_HEIGHT}
-    #define WEST            {{0, 0}, {0, WINDOW_HEIGHT}}
+    #define WEST            {0, 0, 0, WINDOW_HEIGHT}
     #define NORTH_WEST      {0, 0}
     
-
 #endif

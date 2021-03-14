@@ -446,10 +446,24 @@
             /**
              * @brief draw light from the 
              * 
-             * @return true 
-             * @return false 
+             * @param i the actual layer height of the drawing
+             * 
+             * @return retrun true if drawn or ignore, false on error
              */
-            bool drawLight(void);
+            bool drawLight(int i);
+
+            /**
+             * @brief get the type of the entity
+             * 
+             * @return return the type
+             */
+            Entity_type* getType(void);
+
+            /**
+             * @brief retrun true if the entity is in the screen
+             * 
+             */
+            bool in_screen(void);
 
         private:
 
@@ -569,10 +583,31 @@
              */
             Equipment** equipments;
 
+            /**
+             * @brief draw the hitbox of the entity
+             * 
+             * @return return true if drawn, false on error
+             */
             bool drawHitbox(void);
+
+            /**
+             * @brief draw points where equipments can be
+             * 
+             * @return return true if drawn, false on error
+             */
             bool drawEquipmentPoint(void);
 
+            /**
+             * @brief update equipments position
+             * 
+             */
             void updateEquipmentPos(void);
+
+            /**
+             * @brief update equipments (position and ammunitions)
+             * 
+             */
+            void updateEquipments(void);
     };
 
 #endif

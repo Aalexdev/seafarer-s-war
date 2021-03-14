@@ -90,9 +90,6 @@ void Keypad::event(SDL_Event e){
         case SDL_KEYDOWN:
             this->keyDown[e.key.keysym.scancode] = true;
             this->key[e.key.keysym.scancode] = true;
-            for (Key* key : this->keys){
-                key->update();
-            }
             break;
         
         case SDL_KEYUP:

@@ -8,22 +8,11 @@
     <turn type="mul" value="20" max="0.1"/>
 
     <part health="500">
-        <point x="17" y="0"/>
-        <point x="24" y="10"/>
-        <point x="29" y="26"/>
-        <point x="32" y="47"/>
-        <point x="32" y="171"/>
-        <point x="28" y="214"/>
-        <point x="26" y="224"/>
-        <point x="21" y="229"/>
-        <point x="12" y="229"/>
-        <point x="7" y="224"/>
-        <point x="5" y="214"/>
-        <point x="1" y="171"/>
-        <point x="1" y="47"/>
-        <point x="9" y="10"/>
-        <point x="17" y="0"/>
-	</part>
+        <point x="0" y="0"/>
+        <point x="32" y="0"/>
+        <point x="32" y="229"/>
+        <point x="0" y="229"/>
+    </part>
 
     <equipments>
         <equipment x="16" y="32" max-angle="150" min-angle="-150" id="0"/>

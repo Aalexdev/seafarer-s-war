@@ -8,5 +8,5 @@
 
 <textButton x="100" y="300" text="back" command="data/menus/mainMenu.xml"/>
 
-<image path="res/img/forground.bmp" x="0" y="0" h="fullscreen" w="fullscreen"/>
+ 
 <image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>

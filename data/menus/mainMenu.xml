@@ -7,9 +7,16 @@
 <textButton x="100" y="250" text="settings" command="data/menus/settings.xml"/>
 <textButton x="100" y="300" text="quit" command="data/functions/quit.xml"/>
 
-<image path="res/img/forground.bmp" x="0" y="0" h="fullscreen" w="fullscreen"/>
+
 <image path="res/img/backgrounds/menu.bmp" x="0" y="0" h="fullscreen"/>
 
-<summonEntity type="thunder" x="550" y="200" height="0" angle="55">
+<clearEntitys/>
 
+<summonEntity type="thunder" x="550" y="200" height="0" angle="55">
+    <part health="10"/>
+
+    <equipments>
+        <equipment name="projector" id="0" angle="30"/>
+        <equipment name="projector" id="1" angle="30"/>
+    </equipments>
 </summonEntity>

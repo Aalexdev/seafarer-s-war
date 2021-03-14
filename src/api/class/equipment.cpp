@@ -3,6 +3,10 @@
 
 #include "SDL2/SDL2_gfxPrimitives.h"
 
+#include <cmath>
+#include <algorithm>
+#include <array>
+
 Equipment_type::Equipment_type(){
     if (IS_LOG_OPEN) LOG << "Equipment_type::Equipment_type()" << endl;
 
@@ -17,7 +21,12 @@ Equipment_type::~Equipment_type(){
     if (IS_LOG_OPEN) LOG << "Equipment_type::~Equipment_type()" << endl;
 
     freeTexture();
-    if (light) delete light;
+    if (light){
+        if (light->rect) delete light->rect;
+        if (light->lightCenter) delete light->lightCenter;
+        if (light->ligthTexture) SDL_DestroyTexture(light->ligthTexture);
+        delete light;
+    }
     if (cannon) delete cannon;
 }
 
@@ -27,16 +36,6 @@ bool Equipment_type::loadXML(XMLNode* node){
         if (IS_ERR_OPEN) ERR << "ERROR :: Equipment_type::loadXML, reason : cannot load an quipment type from a NULL xml Node" << endl;
         return false;
     }
-
-    /*
-    key* : obtionnal
-
-    <equipment name="name">
-        <texture path="" w*="rect.w" h*="rect.h"/>
-        <light power="power" max-range="maxRange"/>
-        <cannon />
-    </equipment> 
-    */
 
    for (int a=0; a<node->attributes.size; a++){
        XMLAttribute attr = node->attributes.data[a];
@@ -62,6 +61,7 @@ bool Equipment_type::loadXML(XMLNode* node){
 
                 if (!strcmp(attr.key, "path")){
                     texture = loadTexture(attr.value, &rect);
+                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MUL);
                 } else if (!strcmp(attr.key, "w")){
                     sscanf(attr.value, "%d", &rect.w);
                 } else if (!strcmp(attr.key, "h")){
@@ -89,8 +89,39 @@ bool Equipment_type::loadXML(XMLNode* node){
 
                 if (!strcmp(attr.key, "power")){
                     sscanf(attr.value, "%d", &light->power);
-                } else if (!strcmp(attr.key, "max-range")){
-                    sscanf(attr.value, "%d", &light->maxRange);
+                } else if (!strcmp(attr.key, "range")){
+                    sscanf(attr.value, "%d", &light->range);
+                } else if (!strcmp(attr.key, "r")){
+                    sscanf(attr.value, "%d", &light->r);
+                } else if (!strcmp(attr.key, "g")){
+                    sscanf(attr.value, "%d", &light->g);
+                } else if (!strcmp(attr.key, "b")){
+                    sscanf(attr.value, "%d", &light->b);
+                } else if (!strcmp(attr.key, "a")){
+                    sscanf(attr.value, "%d", &light->a);
+                } else if (!strcmp(attr.key, "image")){
+                    light->rect = new SDL_Rect;
+                    light->lightCenter = new SDL_Point;
+                    light->ligthTexture = loadTexture(attr.value, light->rect);
+
+                    if (!light->ligthTexture){
+                        delete light->rect;
+                        delete light->lightCenter;
+                        light->rect = nullptr;
+                        light->lightCenter = nullptr;
+                    }
+                } else if (!strcmp(attr.key, "width")){
+                    if (!light->rect) if (IS_ERR_OPEN) ERR << "ERROR :: equipment; light, width, reason : cannot set the width of a the light image without load it, use image=\"path\"" << endl;
+                    sscanf(attr.value, "%d", &light->rect->w);
+                } else if (!strcmp(attr.key, "height")){
+                    if (!light->rect) if (IS_ERR_OPEN) ERR << "ERROR :: equipment; light, height, reason : cannot set the height of a the light image without load it, use image=\"path\"" << endl;
+                    sscanf(attr.value, "%d", &light->rect->h);
+                } else if (!strcmp(attr.key, "center-x")){
+                    if (!light->lightCenter) if (IS_ERR_OPEN) ERR << "ERROR :: equipment; light, height, reason : cannot set the rotationnal center of a the light image without load it, use image=\"path\"" << endl;
+                    sscanf(attr.value, "%d", &light->lightCenter->x);
+                } else if (!strcmp(attr.key, "center-y")){
+                    if (!light->lightCenter) if (IS_ERR_OPEN) ERR << "ERROR :: equipment; light, height, reason : cannot set the rotationnal center of  a the light image without load it, use image=\"path\"" << endl;
+                    sscanf(attr.value, "%d", &light->lightCenter->y);
                 } else {
                     if (IS_ERR_OPEN) ERR << "WARNING :: equipment; light, reason : cannot reconize '" << attr.key << " light attribute" << endl;
                 }
@@ -101,8 +132,17 @@ bool Equipment_type::loadXML(XMLNode* node){
             for (int a=0; a<child->attributes.size; a++){
                 XMLAttribute attr = child->attributes.data[a];
 
-                if (false){
+                if (!strcmp(attr.key, "couldown")){
+                    sscanf(attr.value, "%d", &cannon->couldown);
+                } else if (!strcmp(attr.key, "ammunition-type")){
+                    cannon->ammunition_type = attr.value;
 
+                    if (cannon->ammunition_type != UNKNOWN_AMMUNITION){
+                        if (!existingType(cannon->ammunition_type)){
+                            if (IS_ERR_OPEN) ERR << "WARNING :: equipment; cannon; ammunition-type, reason : cannot reconize '" << attr.value << "' type of ammunition, use unknown to use they all" << endl;
+                            cannon->ammunition_type.clear();
+                        }
+                    }
                 } else {
                     if (IS_ERR_OPEN) ERR << "WARNING :: equipment; cannon, reason : cannot reconize '" << attr.key << " cannon attribute" << endl;
                 }
@@ -155,25 +195,25 @@ Equipment_type* search(string name){
 }
 
 Equipment::Equipment(){
-
+    if (IS_LOG_OPEN) LOG << "Equipment::Equipment()" << endl;
+    type = nullptr;
+    light = nullptr;
+    cannon = nullptr;
+    angleMin = -360;
+    angleMax = 360;
 }
 
 Equipment::~Equipment(){
+    if (IS_LOG_OPEN) LOG << "Equipment::~Equipment()" << endl;
     unlink();
 }
 
 bool Equipment::drawLight(void){
-    if (!type->getLight()) return true;
-    if (light){
-    
-        if (light->range == 0) light->range = 1;
+    if (!light) return true;
 
-        
-        if (filledPieRGBA(RENDERER, type->getCenter()->x + rect.x, type->getCenter()->y + rect.y, type->getLight()->power, angle - (light->range / 2) - 90, angle + (light->range / 2) - 90, 255, 255, 255, 100)){
-            if (IS_ERR_OPEN) ERR << "ERROR :: filledPieRGBA, reason : " << SDL_GetError() << endl;
-            return false;
-        }
-    
+    if (filledPieRGBA(RENDERER, getX(), getY(), type->getLight()->power, angle - (type->getLight()->range / 2) - 90, angle + (type->getLight()->range / 2) - 90, light->r, light->g, light->b, light->a)){
+        if (IS_ERR_OPEN) ERR << "ERROR :: filledPieRGBA, reason : " << SDL_GetError() << endl;
+        return false;
     }
 
     return true;
@@ -191,12 +231,26 @@ bool Equipment::draw(void){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderCopyEx, reason : " << SDL_GetError() << endl;
         return false;
     }
+    
+    if (cannon){
+        int i=0;
+        for (Ammunition* amm : cannon->ammunitions){
+            if (amm){
+                if (!amm->draw()) return false;
+            } else {
+                cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
+                i--;
+            }
+            i++;
+        }
+    }
 
     return true;
 }
 
 bool Equipment::setType(string name){
-    unlink();
+    if (IS_LOG_OPEN) LOG << "Equipment::setType('" << name << "')" << endl;
+    if (type)unlink();
     type = search(name);
 
     if (type){
@@ -205,12 +259,23 @@ bool Equipment::setType(string name){
 
     if (type->getLight()){
         light = new Light;
+
+        light->r = type->getLight()->r;
+        light->g = type->getLight()->g;
+        light->b = type->getLight()->b;
+        light->a = type->getLight()->a;
+    }
+    if (type->getCannon()){
+        cannon = new Cannon;
+        cannon->tick = SDL_GetTicks();
     }
     
+    if (IS_LOG_OPEN) LOG << "Equipment::setType() : found '" << name << "'" << endl;
     return type;
 }
 
 void Equipment::unlink(void){
+    if (IS_LOG_OPEN) LOG << "Equipment::unlink()" << endl;
     this->rect = {0, 0, 0, 0};
     if (light) delete light;
     if (cannon) delete cannon;
@@ -231,5 +296,72 @@ void Equipment::setPos(int x, int y){
 }
 
 void Equipment::setTarget(int x, int y){
-    angleTarget = -getAngleM(rect.x + type->getCenter()->x, rect.y + type->getCenter()->y, x, y);
+    target.pos.x = x;
+    target.pos.y = y;
+
+    angle = -getAngleM(rect.x + type->getCenter()->x, rect.y + type->getCenter()->y, x, y);
+
+    if (angle > angleMax){
+        angle = angleMax;
+    } else if (angle < angleMin){
+        angle = angleMin;
+    }
+    
+    targetType = Targets::target_pos;
+}
+
+void Equipment::setAngleLimit(int min, int max){
+    angleMin = min;
+    angleMax = max;
+}
+
+void Equipment::setTarget(int angle){
+    target.speed.rotarySpeed = angle;
+    targetType = Targets::target_speed;
+}
+
+int Equipment::getX(void){
+    return rect.x + type->getCenter()->x;
+}
+
+int Equipment::getY(void){
+    return rect.y + type->getCenter()->y;
+}
+
+void Equipment::shot(void){
+    if (!cannon) return;
+    if (type->getCannon()->ammunition_type.empty()) return;
+
+    if (SDL_GetTicks() - type->getCannon()->couldown > cannon->tick){
+        cannon->tick = SDL_GetTicks();
+        Ammunition* amm = new Ammunition(angle, getX(), getY());
+
+        if (amm->load(type->getCannon()->ammunition_type)){
+            cannon->ammunitions.push_back(amm);
+        } else {
+            delete amm;
+        }
+    }
+}
+
+void Equipment::update(void){
+    if (cannon){
+        int i=0;
+        for (Ammunition* amm : cannon->ammunitions){
+            if (amm){
+                if (!amm->update()){
+                    cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
+                    i--;
+                }
+            } else {
+                cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
+                i--;
+            }
+            i++;
+        }
+
+        if (MOUSEDOWN.left){
+            shot();
+        }
+    }
 }

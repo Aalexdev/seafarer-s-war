@@ -1,5 +1,4 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
 <clearWidgets />
-<image path="res/img/forground.bmp" x="0" y="0" h="fullscreen" w="fullscreen"/>
 <game pause="false"/>

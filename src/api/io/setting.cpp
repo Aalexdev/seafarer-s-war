@@ -2,8 +2,7 @@
 #include "api/io/xml.hpp"
 
 #include "ui/main_window.hpp"
-
-#include <SDL2/SDL_thread.h>
+#include "api/io/io.hpp"
 
 bool equal(char* a, const char* b){
     if (!strcmp(a, b))
@@ -407,6 +406,49 @@ bool readXML(string path){
                     EQUIPMENTS.push_back(e);
                 } else {
                     delete e;
+                }
+            } else if (equal(mainNode->tag, "color")){
+                for (int a=0; a<mainNode->attributes.size; a++){
+                    XMLAttribute attr = mainNode->attributes.data[a];
+
+                    if (!strcmp(attr.key, "r")){
+                        sscanf(attr.value, "%d", &WINDOW_R);
+                    } else if (!strcmp(attr.key, "g")){
+                        sscanf(attr.value, "%d", &WINDOW_G);
+                    } else if (!strcmp(attr.key, "b")){
+                        sscanf(attr.value, "%d", &WINDOW_B);
+                    } else if (!strcmp(attr.key, "a")){
+                        sscanf(attr.value, "%d", &WINDOW_A);
+                    } else {
+                        if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << attr.key << "' color attribute" << endl;
+                    }
+                }
+            } else if (equal(mainNode->tag, "read-dir")){
+                for (int a=0; a<mainNode->attributes.size; a++){
+                    XMLAttribute attr = mainNode->attributes.data[a];
+
+                    if (!strcmp(attr.key, "path")){
+                        vector<string> files = directory_contents(DIR + attr.value);
+
+                        for (string filePath : files){
+                            if (filePath != ".." && filePath != "."){
+                                string value = attr.value;
+                                readXML(value + filePath);
+                            }
+                            filePath.clear();
+                        }
+                        files.clear();
+                    } else {
+                        if (IS_ERR_OPEN) ERR << "WARNING :: read-dir, reason : cannot reconize '" << attr.key << "' read-dir attribute" << endl;
+                    }
+                }
+            } else if (equal(mainNode->tag, "ammunition")){
+                Ammunition_type* a = new Ammunition_type();
+
+                if (a->loadFrom_XML(mainNode)){
+                    AMMUNITION_TYPE.push_back(a);
+                } else {
+                    delete a;
                 }
             } else {
                 if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << mainNode->tag << "' in " << path << endl;
