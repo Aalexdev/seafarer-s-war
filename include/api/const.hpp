@@ -48,7 +48,7 @@
      * @brief the undefined value
      * 
      */
-    #define UNDEFINE 092873780
+    #define UNDEFINE 71673
 
     /**
      * @brief the exectuable path

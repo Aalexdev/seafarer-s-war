@@ -28,14 +28,6 @@ int main(int argc, char* argv[]){
     cout << "files : " << filesToLoad("data\\main.xml") << endl;
     mainVar.launched = readXML("data\\main.xml");
 
-    Particles* test = new Particles();
-
-    test->set("fire");
-    test->setPos(500, 500);
-    test->setRange(180);
-    test->setZ(0);
-
-    PARTICLES.push_back(test);
 
     while (mainVar.launched){
 
@@ -46,12 +38,9 @@ int main(int argc, char* argv[]){
         draw();
         time();
 
-        test->setAngle(rand() % 360);
-
         DELTA_TIME = SDL_GetTicks() - TIME.startTick;
     }
 
-    delete test;
     destroy();
 
     return EXIT_SUCCESS;
@@ -191,26 +180,44 @@ void drawWidgets(void){
     }
 }
 
+
 void drawLayers(int z){
     for (Layer* lyr : LAYERS){
         if (lyr->getZ() == z){
             for (Particles* p : PARTICLES){
                 p->drawLight(z);
             }
+
             for (Entity* entity : ENTITY){
                 entity->drawLight(z);
             }
             if (PLAYER->is_linked()) PLAYER->drawLight(z);
+            
             lyr->draw();
         }
     }
 
+    int i=0;
     for (Particles* p : PARTICLES){
-        if (!p->draw(z)) cout << "null" << endl;
+        if (p->should_delete()){
+            PARTICLES.erase(PARTICLES.begin() + i);
+            if (p) delete p;
+            i--;
+        } else {
+            p->draw(z);
+        }
+        i++;
     }
+
+    i=0;
     for (Entity* entity : ENTITY){
         if (entity->getZ() == z){
-            entity->draw();
+            if (!entity->draw()){
+                ENTITY.erase(ENTITY.begin() + i);
+                delete entity;
+                continue;
+            }
+            i++;
         }
     }
 
@@ -227,6 +234,7 @@ void draw(){
     int exec = SDL_GetTicks();
     SDL_SetRenderDrawColor(RENDERER, WINDOW_R, WINDOW_G, WINDOW_B, WINDOW_A);
     SDL_SetRenderDrawBlendMode(RENDERER, SDL_BLENDMODE_NONE);
+
     if (SDL_RenderClear(RENDERER)){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderClear(), reason : " << SDL_GetError << endl;
         mainVar.launched = false;
@@ -264,7 +272,6 @@ void time(){
         mainVar.time._fps=0;
     }
 
-    //fps limter
     int finnalTick = SDL_GetTicks();
 
     mainVar.time.execTime = (finnalTick - mainVar.time.startTick) > mainVar.time.maxDelay ? mainVar.time.maxDelay : (finnalTick - mainVar.time.startTick);
@@ -359,15 +366,23 @@ void freeEntity_types(void){
     ENTITY_TYPES.clear();
 }
 
-void freeEquipments(){
+void freeEquipments(void){
     for (Equipment_type* e : EQUIPMENTS){
         if (e) delete e;
     }
 }
 
+void freeParticles(void){
+    for (Particles*p : PARTICLES){
+        if (p) delete p;
+    }
+    PARTICLES.clear();
+}
+
 void destroy(void){
 
     freeWidgets();
+    freeParticles();
 
     for (Layer* lyr : LAYERS){
         delete lyr;

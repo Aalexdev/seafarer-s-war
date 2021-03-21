@@ -12,6 +12,7 @@ Ammunition_type::Ammunition_type(){
 
     type = "unknown";
     name = "unknown";
+    particle_type = NULL;
 }
 
 Ammunition_type::~Ammunition_type(){
@@ -20,6 +21,9 @@ Ammunition_type::~Ammunition_type(){
 
     name.clear();
     type.clear();
+
+    if (particle_type) delete particle_type;
+    particle_type = NULL;
 }
 
 bool Ammunition_type::loadFrom_XML(XMLNode* node){
@@ -50,7 +54,6 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
 
                 if (!strcmp(attr.key, "texture")){
                     texture = loadTexture(attr.value, &rect);
-
                     if (texture) SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MUL);
                 } else if (!strcmp(attr.key, "w")){
                     sscanf(attr.value, "%d", &rect.w);
@@ -90,6 +93,24 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
                     if (IS_ERR_OPEN) ERR << "WARNING :: ammunition; light, reason : cannot reconize '" << attr.key << "' light attribute" << endl;
                 }
             }
+        }  else if (!strcmp(child->tag, "particle")){
+            particle_type = new Particle;
+
+
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "type")){
+                    particle_type->name = attr.value;
+                } else if (!strcmp(attr.key, "angle")){
+                    sscanf(attr.value, "%d", &particle_type->angle);
+                } else if (!strcmp(attr.key, "range")){
+                    sscanf(attr.value, "%d", &particle_type->range);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "ERROR :: ammunition; particle, reason : cannot reconize '"<< attr.key << "' particle attribute" << endl;
+                }
+            }
+            cout << "post" << endl;
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: ammunition, reason : cannot reconize '" << child->tag << "' ammunition child" << endl;
         }
@@ -126,13 +147,15 @@ Ammunition_type::Light* Ammunition_type::getLight(void){
     return light;
 }
 
+Ammunition_type::Particle* Ammunition_type::getParticleType(void){
+    return particle_type;
+}
+
 Ammunition::Ammunition(Entity* parent) : parent(parent){
-    if (IS_LOG_OPEN) LOG << "Ammunition::Ammunition()" << endl;
     unlink();
 }
 
 Ammunition::Ammunition(Entity* parent, int angle, int x, int y) : parent(parent){
-   if (IS_LOG_OPEN) LOG << "Ammunition::Ammunition()" << endl;
     unlink();
     this->angle = angle;
     rect.x = x;
@@ -143,16 +166,16 @@ Ammunition::Ammunition(Entity* parent, int angle, int x, int y) : parent(parent)
 }
 
 Ammunition::~Ammunition(){
-    if (IS_LOG_OPEN) LOG << "Ammunition::~Ammunition()" << endl;
+    particles->setDuration(0);
     unlink();
 }
 
 void Ammunition::unlink(void){
-    if (IS_LOG_OPEN) LOG << "Ammunition::unlink()" << endl;
     type = nullptr;
     rect = {0, 0, 0, 0};
     speed = 0;
     angle = 0;
+    particles = NULL;
 }
 
 bool Ammunition::draw(void){
@@ -198,6 +221,11 @@ bool Ammunition::update(void){
         }
     }
 
+    if (particles){
+        particles->setPos(rect.x, rect.y);
+        particles->setAngle(angle + type->getParticleType()->angle);
+    }
+
     return is_delete();
 }
 
@@ -209,6 +237,25 @@ bool Ammunition::load(string type_name){
     rect.w = type->getSize().w; 
     rect.h = type->getSize().h; 
     speed = type->getInitialSpeed();
+
+    if (type->getParticleType()){
+        particles = new Particles();
+
+        if (particles->set(type->getParticleType()->name)){
+            PARTICLES.push_back(particles);
+        
+            particles->setAngle(type->getParticleType()->angle);
+            particles->setRange(type->getParticleType()->range);
+            particles->setDuration(UNDEFINE);
+
+            particles->setZ(parent->getZ());
+            particles->setPos(rect.x, rect.y);
+        } else {
+            delete particles;
+            particles = NULL;
+        }
+    }
+
     return true;
 }
 
@@ -218,10 +265,8 @@ bool Ammunition::linked(void){
 
 Ammunition_type* find(string name){
     
-    if (IS_LOG_OPEN) LOG << "find('" << name << "')" << endl;
     for (Ammunition_type* a : AMMUNITION_TYPE){
         if (a->getName() == name){
-            if (IS_LOG_OPEN) LOG << "find('" << name << "') : found" << endl;
             return a;
         }
     }

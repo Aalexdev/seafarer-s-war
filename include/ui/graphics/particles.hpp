@@ -422,6 +422,20 @@
              */
             void setAngle(int angle);
 
+            /**
+             * @brief set the duration of the particle
+             * 
+             * @param duration the duration
+             */
+            void setDuration(int duration);
+
+            /**
+             * @brief get if the paricle should be delete
+             * 
+             * @return return true if should be delete, false if not
+             */
+            bool should_delete(void);
+
         private:
             /**
              * @brief the linked type of the particles
@@ -472,10 +486,33 @@
              */
             int getRandAngle(void);
 
+            /**
+             * @brief get a rabdom color canal
+             * 
+             * @return return an int between 0 and 255 
+             */
             int getR(void);
             int getG(void);
             int getB(void);
             int getA(void);
+
+            /**
+             * @brief colors used to get a degraded
+             * 
+             */
+            SDL_Color colorIndex;
+
+            /**
+             * @brief the tick of the particle, will be destroyed whene SDL_GetTicks() is greater or equal to tick
+             * 
+             */
+            int tick;
+
+            /**
+             * @brief push particles inn the vector
+             * 
+             */
+            void pushParticles(void);
     };
 
     /**

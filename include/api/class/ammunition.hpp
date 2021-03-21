@@ -12,6 +12,7 @@
     #include "api/io/xml.hpp"
     #include "api/class/entity.hpp"
     #include "ui/graphics/sprite.hpp"
+    #include "ui/graphics/particles.hpp"
 
     class Ammunition_type{
         public:
@@ -95,6 +96,33 @@
              */
             int getDamages(void);
 
+            struct Particle{
+                /**
+                 * @brief the name if the particle
+                 * 
+                 */
+                string name;
+
+                /**
+                 * @brief teh angle, in degres
+                 * 
+                 */
+                int angle;
+
+                /**
+                 * @brief the range of the animation
+                 * 
+                 */
+                int range;
+            };
+
+            /**
+             * @brief get the name of the partcile type
+             * 
+             * @return return a string, empty if the type has no particle 
+             */
+            Particle* getParticleType(void);
+
         private:
             string name;
 
@@ -133,6 +161,12 @@
              * 
              */
             Light* light;
+
+            /**
+             * @brief the particle type name, empty if none
+             * 
+             */
+            Particle* particle_type;
     };
 
     class Ammunition{
@@ -251,6 +285,8 @@
              * 
              */
             bool should_delete;
+
+            Particles* particles;
 
     };
     

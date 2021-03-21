@@ -1,10 +1,10 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
-<particle name="fire" strength="0.2" density="25" time="1000">
+<particle name="fire 1" strength="0.2" density="1" time="100">
     <color>
-        <start r="255" g="255" b="0" a="0"/>
-        <end r="255" g="0" b="255" a="0"/>
+        <start r="255" g="0" b="30" a="255"/>
+        <end r="0" g="0" b="0" a="0"/>
     </color>
 
-    <circle radius="3" filled="true"/>
+    <circle radius="2" filled="true"/>
 </particle>

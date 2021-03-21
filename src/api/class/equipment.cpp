@@ -356,6 +356,7 @@ void Equipment::update(void){
             if (amm){
                 if (!amm->update()){
                     cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
+                    delete amm;
                     i--;
                 }
             } else {

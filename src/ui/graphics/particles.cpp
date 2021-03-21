@@ -334,13 +334,13 @@ void Particles::pushParticle(void){
     p->vector.x = cosf(getRandAngle() * (M_PI / 180.0f)) * type->getStrength();
     p->vector.y = sinf(getRandAngle() * (M_PI / 180.0f)) * type->getStrength();
 
-    p->pos.x = pos.x + CAMERA.x;
-    p->pos.y = pos.y + CAMERA.y;
+    p->pos.x = pos.x;
+    p->pos.y = pos.y;
 
     p->r = getR();
     p->g = getG();
     p->b = getB();
-    p->a = 255;
+    p->a = getA();
 
     int temp = (rand() % 2);
 
@@ -391,9 +391,7 @@ bool Particles::draw(int z){
                 continue;
             }
 
-            if (!type->getLight()){
-                SDL_SetRenderDrawBlendMode(RENDERER, SDL_BLENDMODE_MOD);
-            }
+            SDL_SetRenderDrawBlendMode(RENDERER, SDL_BLENDMODE_MOD);
 
             switch (type->getStyle()){
                 
@@ -463,9 +461,7 @@ bool Particles::draw(int z){
         i++;
     }
 
-    for (int i=0; i<type->getDensity(); i++){
-        pushParticle();
-    }
+    pushParticles();
 
     return true;
 }
@@ -475,22 +471,26 @@ int Particles::getRandAngle(void){
 }
 
 int Particles::getR(void){
-    if (type->getEndColor().r) return rand() % type->getEndColor().r;
+    int def = max(type->getEndColor().r, type->getStartColor().r) - min(type->getEndColor().r, type->getStartColor().r);
+    if (def) return rand() % def + min(type->getEndColor().r, type->getStartColor().r);
     return 0;
 }
 
 int Particles::getG(void){
-    if (type->getEndColor().g) return rand() % type->getEndColor().g;
+    int def = max(type->getEndColor().g, type->getStartColor().g) - min(type->getEndColor().g, type->getStartColor().g);
+    if (def) return rand() % def + min(type->getEndColor().g, type->getStartColor().g);
     return 0;
 }
 
 int Particles::getB(void){
-    if (type->getEndColor().b) return rand() % type->getEndColor().b;
+    int def = max(type->getEndColor().b, type->getStartColor().b) - min(type->getEndColor().b, type->getStartColor().b);
+    if (def) return rand() % def + min(type->getEndColor().b, type->getStartColor().b);
     return 0;
 }
 
 int Particles::getA(void){
-    if (type->getEndColor().a) return rand() % type->getEndColor().a;
+    int def = max(type->getEndColor().a, type->getStartColor().a) - min(type->getEndColor().a, type->getStartColor().a);
+    if (def) return rand() % def + min(type->getEndColor().a, type->getStartColor().a);
     return 0;
 }
 
@@ -500,4 +500,20 @@ void Particles::setRange(int range){
 
 void Particles::setAngle(int angle){
     this->angle = angle;
+}
+
+void Particles::setDuration(int duration){
+    if (duration != UNDEFINE) tick = SDL_GetTicks() + duration;
+    else tick = UNDEFINE;
+}
+
+bool Particles::should_delete(void){
+    if (tick != UNDEFINE) return (SDL_GetTicks() >= tick);
+    return false;
+}
+
+void Particles::pushParticles(void){
+    for (int i=0; i<type->getDensity(); i++){
+        pushParticle();
+    }
 }
