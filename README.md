@@ -1,7 +1,7 @@
 # seafarer-s-war
 a 2D sandbox/strategy game
 
-seafarer's war is a 2D game in development
+seafarer's war is a 2D game in development, you can join us on discord : https://discord.gg/wjuczzx764
 
 # languages:
   c++,
