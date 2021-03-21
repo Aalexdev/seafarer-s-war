@@ -1,7 +1,7 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
 <equipment name="MR-Elpis">
-    <texture path="res/img/equipment/cannons/MR-Elpis.bmp"/>
+    <texture path="res/img/equipment/cannons/MR-Elpis.bmp" />
     <center x="2" y="11"/>
-    <cannon couldown="2500" ammunition-type="test"/>
+    <cannon couldown="0" ammunition-type="test"/>
 </equipment>

@@ -62,6 +62,7 @@
     #include "api/class/island.hpp"
     #include "api/class/equipment.hpp"
     #include "api/class/ammunition.hpp"
+    #include "ui/graphics/particles.hpp"
 
     /**
      * @brief Struct of 
@@ -550,6 +551,18 @@
          * 
          */
         int timeDelta;
+
+        /**
+         * @brief particles types
+         * 
+         */
+        vector<Particles_type*> particles_type;
+
+        /**
+         * @brief particles
+         * 
+         */
+        vector<Particles*> particles;
     };
 
     /**
@@ -765,6 +778,8 @@
     #define LIGHT_POINTS    getMain()->lightPoints
     #define AMMUNITION_TYPE getMain()->ammunitions
     #define DELTA_TIME      getMain()->timeDelta
+    #define PARTICLES_TYPE  getMain()->particles_type
+    #define PARTICLES       getMain()->particles
 
     /**
      * @brief other

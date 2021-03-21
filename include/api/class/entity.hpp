@@ -48,6 +48,8 @@
 
     using namespace std;
 
+    class Entity;
+
     #include "api/io/xml.hpp"
     #include "api/functions/texture.hpp"
     #include "api/functions/math.hpp"
@@ -211,6 +213,26 @@
              */
             int getEquipmentSize(void);
 
+            /**
+             * @brief actions when the health is nul or negative
+             * 
+             */
+            struct OnDeath{
+                /**
+                 * @brief the targeting layer
+                 * 
+                 */
+                int z;
+
+                /**
+                 * @brief time before the entity is delete, in ms
+                 * 
+                 */
+                int time;
+            };
+
+            OnDeath* getDeath(void);
+
         private:
             /**
              * @brief the name of the type
@@ -308,6 +330,12 @@
              * 
              */
             int equipments_len;
+
+            /**
+             * @brief actions to do
+             * 
+             */
+            OnDeath* onDeath;
     };
 
     class Entity{
@@ -332,7 +360,7 @@
             void update(void);
 
             /**
-             * @brief drow the entity on the renderer
+             * @brief draw the entity on the renderer
              * 
              * @return return true if everything is working, false otherwise
              */
@@ -464,6 +492,34 @@
              * 
              */
             bool in_screen(void);
+
+            /**
+             * @brief retur true if the input point is inside the entity' hitbox
+             * 
+             * @param x the x axis
+             * @param y the y axis
+             * @return return true if inside, false otherwise 
+             */
+            bool PointInside(int x, int y);
+
+            /**
+             * @brief Set the Health object
+             * 
+             * @param health 
+             */
+            void setHealth(int health);
+
+            /**
+             * @brief kill the entity
+             * 
+             */
+            void kill(void);
+
+            /**
+             * @brief retunr true if the entity should be deleted
+             * 
+             */
+            bool should_delete(void);
 
         private:
 
@@ -608,6 +664,30 @@
              * 
              */
             void updateEquipments(void);
+
+            /**
+             * @brief set whene the entity's health if less or equal to zero
+             * 
+             */
+            struct OnDeath{
+                /**
+                 * @brief ticks used for the animation
+                 * 
+                 */
+                int tick;
+            };
+
+            /**
+             * @brief the death struct, NULL if alive
+             * 
+             */
+            OnDeath* onDeath;
+
+            /**
+             * @brief 
+             * 
+             */
+            bool should_del;
     };
 
 #endif

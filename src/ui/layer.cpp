@@ -52,8 +52,6 @@ bool Layer::read_from_xml(XMLNode* node){
 
         if (!strcmp(attr.key, "name")){
             this->name = attr.value;
-        } else if (!strcmp(attr.key, "id")){
-            sscanf(attr.value, "%d", &this->id);
         } else if (!strcmp(attr.key, "angle")){
             sscanf(attr.value, "%d", &this->angle);
         } else if (!strcmp(attr.key, "delay")){

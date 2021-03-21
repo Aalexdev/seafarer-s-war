@@ -207,7 +207,7 @@
              * @brief Construct a new Equipment object
              * 
              */
-            Equipment();
+            Equipment(Entity* parent);
 
             /**
              * @brief Destroy the Equipment object
@@ -384,6 +384,12 @@
             
         
         private:
+            /**
+             * @brief the parent if the equipment
+             * 
+             */
+            Entity* parent;
+
             /**
              * @brief the linked type
              * 

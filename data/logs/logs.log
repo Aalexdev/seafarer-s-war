@@ -1,4 +1,6 @@
-LOG file, init at : 11:35:59
+LOG file, init at : 9:46:43
+resetWindow(seafarers' war, 805240832, 805240832, 1080, 720, 4)
+clearWindow
 set max fps to : 60
 load font
 TTF_Init()
@@ -36,6 +38,8 @@ loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/backgrounds/d
 loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/backgrounds/sea.bmp)
 SDL_SetWindowPosition(420, 180)
 SDL_SetWindowSize(1080, 720)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations.xml , 0)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations/fire.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/ammunitions.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/ammunitions/test.xml , 0)
 Ammunition_type::Ammunition_type()
@@ -93,8 +97,32 @@ Equipment::Equipment()
 Equipment::setType('MR-Elpis')
 Equipment::setType() : found 'MR-Elpis'
 Equipment::Equipment()
-Equipment::setType('projector')
-Equipment::setType() : found 'projector'
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
 Entity::Entity()
 Entity::reset()
 Entity::load_from_xml()

@@ -25,7 +25,17 @@ int main(int argc, char* argv[]){
     PLAYER = new Entity(true);
     KEYPAD = new Keypad();
 
+    cout << "files : " << filesToLoad("data\\main.xml") << endl;
     mainVar.launched = readXML("data\\main.xml");
+
+    Particles* test = new Particles();
+
+    test->set("fire");
+    test->setPos(500, 500);
+    test->setRange(180);
+    test->setZ(0);
+
+    PARTICLES.push_back(test);
 
     while (mainVar.launched){
 
@@ -36,9 +46,12 @@ int main(int argc, char* argv[]){
         draw();
         time();
 
+        test->setAngle(rand() % 360);
+
         DELTA_TIME = SDL_GetTicks() - TIME.startTick;
     }
 
+    delete test;
     destroy();
 
     return EXIT_SUCCESS;
@@ -104,9 +117,9 @@ void event(){
                 break;
             
             default:
+                KEYPAD->event(e);
                 break;
         }
-        KEYPAD->event(e);
     }
 }
 
@@ -140,8 +153,16 @@ void update(){
     updateWidgets();
 
     if (!PAUSE){
+        int i = 0;
         for (Entity* entity : ENTITY){
-            entity->update();
+            if (entity->should_delete()){
+                ENTITY.erase(ENTITY.begin() + i);
+                delete entity;
+                i--;
+            } else {
+                entity->update();
+            }
+            i++;
         }
 
         if (PLAYER->is_linked()){
@@ -159,31 +180,23 @@ void drawWidgets(void){
     for (Text* text : WIDGETS.texts){
         if (text) text->draw();
     }
-
     for (TextButton* btn : WIDGETS.textButtons){
         if (btn) btn->draw();
     }
-
     for (ImageButton* btn : WIDGETS.imageButtons){
         if (btn) btn->draw();
     }
-
     for (SpriteButton* btn : WIDGETS.spriteButtons){
         if (btn) btn->drawButton();
     }
 }
 
 void drawLayers(int z){
-    
-    
-    SDL_Rect rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-
     for (Layer* lyr : LAYERS){
         if (lyr->getZ() == z){
-
-            SDL_SetRenderDrawColor(RENDERER, WINDOW_R, WINDOW_G, WINDOW_B, WINDOW_A);
-            SDL_RenderFillRect(RENDERER, &rect);
-
+            for (Particles* p : PARTICLES){
+                p->drawLight(z);
+            }
             for (Entity* entity : ENTITY){
                 entity->drawLight(z);
             }
@@ -192,6 +205,9 @@ void drawLayers(int z){
         }
     }
 
+    for (Particles* p : PARTICLES){
+        if (!p->draw(z)) cout << "null" << endl;
+    }
     for (Entity* entity : ENTITY){
         if (entity->getZ() == z){
             entity->draw();
@@ -209,16 +225,15 @@ void drawImages(void){
 
 void draw(){
     int exec = SDL_GetTicks();
+    SDL_SetRenderDrawColor(RENDERER, WINDOW_R, WINDOW_G, WINDOW_B, WINDOW_A);
+    SDL_SetRenderDrawBlendMode(RENDERER, SDL_BLENDMODE_NONE);
     if (SDL_RenderClear(RENDERER)){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderClear(), reason : " << SDL_GetError << endl;
         mainVar.launched = false;
         return;
     }
-
-    //updateLightPoints();
     
-    for (int i=-256; i<256; i++){
-        
+    for (int i=-256; i<256; i++){ 
         drawLayers(i);
     }
 
@@ -313,6 +328,18 @@ void freeWidgets(void){
         delete image;
     }
     IMAGES.clear();
+}
+
+void freeParticle(void){
+    for (Particles_type* p : PARTICLES_TYPE){
+        if (p) delete p;
+    }
+    PARTICLES_TYPE.clear();
+
+    for (Particles* p : PARTICLES){
+        if (p) delete p;
+    }
+    PARTICLES.clear();
 }
 
 void freeEntity(void){
@@ -463,14 +490,11 @@ void updateLightPoints(void){
             Point* p;
             e->getPart(&p);
 
-
             for (int i=0; i<e->getType()->getPartSize()-1; i++){
-                
                 LIGHT_POINTS.push_back({p[i].x, p[i].y, p[i+1].x, p[i+1].y});
             }
 
             LIGHT_POINTS.push_back({p[e->getType()->getPartSize()-1].x, p[e->getType()->getPartSize()-1].y, p[0].x, p[0].y});
-
             delete[] p;
         }
     }

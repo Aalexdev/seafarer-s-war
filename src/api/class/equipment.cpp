@@ -2,6 +2,7 @@
 #include "main.hpp"
 
 #include "SDL2/SDL2_gfxPrimitives.h"
+#include "ui/graphics/light.hpp"
 
 #include <cmath>
 #include <algorithm>
@@ -194,7 +195,7 @@ Equipment_type* search(string name){
     return NULL;
 }
 
-Equipment::Equipment(){
+Equipment::Equipment(Entity* parent) : parent(parent){
     if (IS_LOG_OPEN) LOG << "Equipment::Equipment()" << endl;
     type = nullptr;
     light = nullptr;
@@ -209,12 +210,16 @@ Equipment::~Equipment(){
 }
 
 bool Equipment::drawLight(void){
+
+    if (cannon){
+        for (Ammunition *a : cannon->ammunitions){
+            a->drawLight();
+        }
+    }
+
     if (!light) return true;
 
-    if (filledPieRGBA(RENDERER, getX(), getY(), type->getLight()->power, angle - (type->getLight()->range / 2) - 90, angle + (type->getLight()->range / 2) - 90, light->r, light->g, light->b, light->a)){
-        if (IS_ERR_OPEN) ERR << "ERROR :: filledPieRGBA, reason : " << SDL_GetError() << endl;
-        return false;
-    }
+    projectedLight(angle-90, type->getLight()->range, getX(), getY(), light->r, light->g, light->b, light->a, 1000);
 
     return true;
 }
@@ -334,7 +339,7 @@ void Equipment::shot(void){
 
     if (SDL_GetTicks() - type->getCannon()->couldown > cannon->tick){
         cannon->tick = SDL_GetTicks();
-        Ammunition* amm = new Ammunition(angle, getX(), getY());
+        Ammunition* amm = new Ammunition(parent, angle, getX(), getY());
 
         if (amm->load(type->getCannon()->ammunition_type)){
             cannon->ammunitions.push_back(amm);

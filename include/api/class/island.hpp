@@ -97,23 +97,59 @@
             
 
         private:
+            /**
+             * @brief the texture of the island
+             * 
+             */
             SDL_Texture* texture;
 
+            /**
+             * @brief the rectangle of the island
+             * 
+             */
             SDL_Rect rect;
 
+            /**
+             * @brief the name of the island type
+             * 
+             */
             string name;
     };
 
     class Island_type_list{
         public:
+            /**
+             * @brief Construct a new Island_type_list object
+             * 
+             */
             Island_type_list();
+
+            /**
+             * @brief Destroy the Island_type_list object
+             * 
+             */
             ~Island_type_list();
 
+            /**
+             * @brief search an island type from a name
+             * 
+             * @param name the search name
+             * @return return the type if found, NULL otherwise
+             */
             Island_type* search(string name);
 
+            /**
+             * @brief push a ne island in the vector
+             * 
+             * @param type the new type
+             */
             void push(Island_type* type);
         
         private:
+            /**
+             * @brief the type of the island
+             * 
+             */
             vector<Island_type*> types;
     };
 
@@ -121,7 +157,16 @@
 
     class Island{
         public:
+            /**
+             * @brief Construct a new Island object
+             * 
+             */
             Island();
+
+            /**
+             * @brief Destroy the Island object
+             * 
+             */
             ~Island();
 
             /**
@@ -157,7 +202,16 @@
 
     class Island_list{
         public:
+            /**
+             * @brief Construct a new Island_list object
+             * 
+             */
             Island_list();
+
+            /**
+             * @brief Destroy the Island_list object
+             * 
+             */
             ~Island_list();
 
             /**

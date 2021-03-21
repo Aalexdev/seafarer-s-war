@@ -450,6 +450,8 @@ bool readXML(string path){
                 } else {
                     delete a;
                 }
+            } else if (equal(mainNode->tag, "particle")){
+                pushParticle_type(mainNode);
             } else {
                 if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << mainNode->tag << "' in " << path << endl;
             }
@@ -463,4 +465,62 @@ bool readXML(string path){
 
     XMLDocument_free(&doc);
     return true;
+}
+
+int getRead(XMLNode* node){
+    int i = 0;
+
+    for (int c=0; c<node->children.size; c++){
+        XMLNode* child = XMLNode_child(node, c);
+
+        if (!strcmp(child->tag, "read") || !strcmp(child->tag, "read-dir")){
+            i++;
+        }
+    }
+    return i;
+}
+
+int filesToLoad(string path){
+    XMLDocument doc;
+    path = DIR + path;
+
+    int i=0;
+
+    if (XMLDocument_load(&doc, path.c_str())){
+        i += getRead(doc.root);
+
+        for (int c=0; c<doc.root->children.size; c++){
+            XMLNode* child = XMLNode_child(doc.root, c);
+
+            if (!strcmp(child->tag, "read")){
+                for (int a=0; a<child->attributes.size; a++){
+                    XMLAttribute attr = child->attributes.data[a];
+
+                    if (!strcmp(attr.key, "path")){
+                        i += filesToLoad(attr.value);
+                    }
+                }
+            } else if (!strcmp(child->tag, "read-dir")){
+                for (int a=0; a<child->attributes.size; a++){
+                    XMLAttribute attr = child->attributes.data[a];
+
+                    if (!strcmp(attr.key, "path")){
+                        vector<string> files = directory_contents(DIR + attr.value);
+
+                        for (string filePath : files){
+                            if (filePath != ".." && filePath != "."){
+                                string value = attr.value;
+                                i += filesToLoad(value + filePath);
+                            }
+                            filePath.clear();
+                        }
+                        files.clear();
+                    }
+                }
+            }
+        }
+    } else {
+        return 0;
+    }
+    return i;
 }

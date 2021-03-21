@@ -41,16 +41,16 @@
             struct Light{
                 
                 /**
-                 * @brief the range of the light effect
+                 * @brief the strength of the light effect
                  * 
                  */
-                int range;
+                int strength;
 
                 /**
-                 * @brief the starting stre,gth of the light effect
+                 * @brief color of the light
                  * 
                  */
-                int startStrength;
+                int r, g, b;
             };
 
             /**
@@ -80,6 +80,20 @@
              * @return int 
              */
             int getInitialSpeed(void);
+
+            /**
+             * @brief get the light of the amunition
+             * 
+             * @return Light* 
+             */
+            Light* getLight(void);
+
+            /**
+             * @brief Get the Damages object
+             * 
+             * @return int 
+             */
+            int getDamages(void);
 
         private:
             string name;
@@ -113,6 +127,12 @@
              * 
              */
             int initialSpeed;
+
+            /**
+             * @brief the light emmeted by the ammunition
+             * 
+             */
+            Light* light;
     };
 
     class Ammunition{
@@ -121,14 +141,14 @@
              * @brief Construct a new Ammunition object
              * 
              */
-            Ammunition();
+            Ammunition(Entity* parent);
 
             /**
              * @brief Construct a new Ammunition object
              * 
              * @param angle the angle of the ammunition
              */
-            Ammunition(int angle, int x, int y);
+            Ammunition(Entity* parent, int angle, int x, int y);
 
             /**
              * @brief Destroy the Ammunition object
@@ -163,8 +183,28 @@
              * @return return true if linked, false otherwise 
              */
             bool linked(void);
+
+            /**
+             * @brief draw the light effect (if activ)
+             * 
+             */
+            void drawLight(void);
+
+            /**
+             * @brief return true if the ammunition should be deleted
+             * 
+             * @return true 
+             * @return false 
+             */
+            bool is_delete(void);   
         
         private:
+            /**
+             * @brief the ârent of the ammunition
+             * 
+             */
+            Entity* parent;
+
             /**
              * @brief the type of the ammunition
              * 
@@ -200,6 +240,17 @@
              * 
              */
             SDL_Point spoint;
+
+
+            int getX(void);
+
+            int getY(void);
+
+            /**
+             * @brief 
+             * 
+             */
+            bool should_delete;
 
     };
     

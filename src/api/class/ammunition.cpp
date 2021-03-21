@@ -1,5 +1,6 @@
 #include "api/class/ammunition.hpp"
 #include "main.hpp"
+#include "ui/graphics/light.hpp"
 
 #include <string.h>
 
@@ -49,6 +50,8 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
 
                 if (!strcmp(attr.key, "texture")){
                     texture = loadTexture(attr.value, &rect);
+
+                    if (texture) SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MUL);
                 } else if (!strcmp(attr.key, "w")){
                     sscanf(attr.value, "%d", &rect.w);
                 } else if (!strcmp(attr.key, "h")){
@@ -67,6 +70,24 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
                     sscanf(attr.value, "%d", &initialSpeed);
                 } else {
                     if (IS_ERR_OPEN) ERR << "WARNING :: ammunition; perform, reason :  cannot reconize '" << attr.key << "' perform attribute" << endl;
+                }
+            }
+        } else if (!strcmp(child->tag, "light")){
+            light = new Light;
+            if (texture) SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "r")){
+                    sscanf(attr.value, "%d", &light->r);
+                } else if (!strcmp(attr.key, "g")){
+                    sscanf(attr.value, "%d", &light->g);
+                } else if (!strcmp(attr.key, "b")){
+                    sscanf(attr.value, "%d", &light->b);
+                } else if (!strcmp(attr.key, "strength")){
+                    sscanf(attr.value, "%d", &light->strength);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: ammunition; light, reason : cannot reconize '" << attr.key << "' light attribute" << endl;
                 }
             }
         } else {
@@ -97,12 +118,20 @@ int Ammunition_type::getInitialSpeed(void){
     return initialSpeed;
 }
 
-Ammunition::Ammunition(){
+int Ammunition_type::getDamages(void){
+    return damages;
+}
+
+Ammunition_type::Light* Ammunition_type::getLight(void){
+    return light;
+}
+
+Ammunition::Ammunition(Entity* parent) : parent(parent){
     if (IS_LOG_OPEN) LOG << "Ammunition::Ammunition()" << endl;
     unlink();
 }
 
-Ammunition::Ammunition(int angle, int x, int y){
+Ammunition::Ammunition(Entity* parent, int angle, int x, int y) : parent(parent){
    if (IS_LOG_OPEN) LOG << "Ammunition::Ammunition()" << endl;
     unlink();
     this->angle = angle;
@@ -110,6 +139,7 @@ Ammunition::Ammunition(int angle, int x, int y){
     rect.y = y;
     spoint.x = x;
     spoint.y = y;
+    should_delete = true;
 }
 
 Ammunition::~Ammunition(){
@@ -136,7 +166,7 @@ bool Ammunition::draw(void){
         return false;
     }
 
-    return true;
+    return is_delete();
 }
 
 bool Ammunition::update(void){
@@ -153,8 +183,22 @@ bool Ammunition::update(void){
     if (getDistanceM(rect.x, rect.y, spoint.x, spoint.y) > 1000){
         return false;
     }
+    
+    for (Entity* e : ENTITY){
+        if (e != parent && e->in_screen() && e->PointInside(getX(), getY())){
+            e->setHealth(type->getDamages());
+            should_delete = false;
+        }
+    }
 
-    return true;
+    if (parent != PLAYER){
+        if (PLAYER->PointInside(getX(), getY())){
+            PLAYER->setHealth(type->getDamages());
+            should_delete = false;
+        }
+    }
+
+    return is_delete();
 }
 
 bool Ammunition::load(string type_name){
@@ -173,6 +217,7 @@ bool Ammunition::linked(void){
 }
 
 Ammunition_type* find(string name){
+    
     if (IS_LOG_OPEN) LOG << "find('" << name << "')" << endl;
     for (Ammunition_type* a : AMMUNITION_TYPE){
         if (a->getName() == name){
@@ -204,4 +249,22 @@ bool existingType(string type){
         }
     }
     return false;
+}
+
+void Ammunition::drawLight(void){
+    if (!type->getLight()) return;
+
+    light(type->getLight()->strength, rect.x, rect.y, type->getLight()->r, type->getLight()->g, type->getLight()->b);
+}
+
+int Ammunition::getX(void){
+    return rect.x + (rect.w / 2);
+}
+
+int Ammunition::getY(void){
+    return rect.y + (rect.h / 2);
+}
+
+bool Ammunition::is_delete(void){
+    return should_delete;
 }

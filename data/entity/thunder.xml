@@ -26,4 +26,6 @@
         <equipment x="4" y="157" min-angle="50" max-angle="140" id="8"/>
         <equipment x="29" y="157" max-angle="310" min-angle="220" id="9"/>
     </equipments>
+
+    <OnDeath layer="-3" time="5000"/>
 </entity>

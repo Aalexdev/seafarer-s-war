@@ -1,5 +1,6 @@
 #include "api/class/entity.hpp"
 #include "main.hpp"
+#include "api/functions/math.hpp"
 
 #include "SDL2/SDL2_gfxPrimitives.h"
 
@@ -25,6 +26,7 @@ Entity_type::Entity_type(){
     this->name = "Uncknow";
     this->rect = (SDL_Rect){0, 0, 0, 0};
     this->mass = 0;
+    onDeath = NULL;
 }
 
 Entity_type::~Entity_type(){
@@ -34,6 +36,8 @@ Entity_type::~Entity_type(){
 
     delete[] part;
     delete[] equipments;
+
+    if (onDeath) delete onDeath;
 }
 
 bool Entity_type::load_from_xml(XMLNode* node){
@@ -213,7 +217,20 @@ bool Entity_type::load_from_xml(XMLNode* node){
                 equipments[e].distFromCenter = getDistanceM(rect.w / 2, rect.h / 2, equipments[e].x, equipments[e].y);
                 equipments[e].additionnalAngle = getAngleM(equipments[e].x, equipments[e].y, rect.w / 2, rect.h / 2);
             }
+        } else if (!strcmp(child->tag, "OnDeath")){
+            onDeath = new OnDeath;
 
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "layer")){
+                    sscanf(attr.value, "%d", &onDeath->z);
+                } else if (!strcmp(attr.key, "time")){
+                    sscanf(attr.value, "%d", &onDeath->time);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: entity; OnDeath, reason : cannot rconize '" << attr.key << "' onDeath child" << endl;
+                }
+            }
         } else {
             if (IS_LOG_OPEN) ERR << "WARNING :: entity, reason : cannot reconize '" << child->tag << "' entity child" << endl;
         }
@@ -235,6 +252,10 @@ Entity_Equipment* Entity_type::getEquipment(void){
 
 int Entity_type::getEquipmentSize(void){
     return equipments_len;
+}
+
+Entity_type::OnDeath* Entity_type::getDeath(void){
+    return onDeath;
 }
 
 bool Entity::set(string name){
@@ -428,7 +449,7 @@ bool Entity::load_from_xml(XMLNode* node){
 
                 if (e < type->getEquipmentSize()){
                     if (!strcmp(node->tag, "equipment")){
-                        equipments[e] = new Equipment();
+                        equipments[e] = new Equipment(this);
 
                         if (!equipments[e]){
                             if (IS_ERR_OPEN) ERR << "ERROR :: ALLOC error" << endl;
@@ -484,7 +505,8 @@ void Entity::reset(void){
     this->turn_strength = 0;
     this->turn_speed = 0;
 
-    this->equipments = nullptr;
+    equipments = NULL;
+    onDeath = NULL;
 }
 
 Entity::Entity(){
@@ -507,116 +529,120 @@ Entity::~Entity(){
 
 void Entity::update(){
 
-    if (this->is_player){
-        if (KEYPAD->getKey(PLAYER_CONTROL.engineUp)){
-            this->strength = this->type->getStrength();
-        } else if (KEYPAD->getKey(PLAYER_CONTROL.engineDown)){
-            this->strength = -this->type->getStrength();
-        } else {
-            if (this->speed > 0.5f){
-                if (PLAYER_CONTROL.engineUP_type) this->strength = -this->type->getStrength();
-            } else if (speed < 0.05f) {
-                if (PLAYER_CONTROL.engineDown_type) this->strength = this->type->getStrength();
+    if (!onDeath){
+        if (this->is_player){
+            if (KEYPAD->getKey(PLAYER_CONTROL.engineUp)){
+                this->strength = this->type->getStrength();
+            } else if (KEYPAD->getKey(PLAYER_CONTROL.engineDown)){
+                this->strength = -this->type->getStrength();
             } else {
-                strength = 0;
+                if (this->speed > 0.5f){
+                    if (PLAYER_CONTROL.engineUP_type) this->strength = -this->type->getStrength();
+                } else if (speed < 0.05f) {
+                    if (PLAYER_CONTROL.engineDown_type) this->strength = this->type->getStrength();
+                } else {
+                    strength = 0;
+                }
             }
-        }
 
-        if (KEYPAD->getKey(PLAYER_CONTROL.turnLeft)){
-            this->turn_strength = -this->type->getStrength();
-        } else if (KEYPAD->getKey(PLAYER_CONTROL.turnRight)){
-            this->turn_strength = this->type->getStrength();
-        } else {
-            if (this->turn_speed > 0.01){
-                if (PLAYER_CONTROL.turnRight_type) this->turn_strength = -this->type->getStrength();
-            } else if (turn_speed < -0.01){
-                if (PLAYER_CONTROL.turnLeft_type) this->turn_strength = this->type->getStrength();
+            if (KEYPAD->getKey(PLAYER_CONTROL.turnLeft)){
+                this->turn_strength = -this->type->getStrength();
+            } else if (KEYPAD->getKey(PLAYER_CONTROL.turnRight)){
+                this->turn_strength = this->type->getStrength();
             } else {
-                turn_strength = 0;
-                turn_speed = 0;
+                if (this->turn_speed > 0.01){
+                    if (PLAYER_CONTROL.turnRight_type) this->turn_strength = -this->type->getStrength();
+                } else if (turn_speed < -0.01){
+                    if (PLAYER_CONTROL.turnLeft_type) this->turn_strength = this->type->getStrength();
+                } else {
+                    turn_strength = 0;
+                    turn_speed = 0;
+                }
             }
-        }
 
-        if (fabs(this->strength) > 1 && this->type->getMass() != 0){
-            this->acceleration = this->strength / this->type->getMass();
-        } else {
-            this->acceleration = 0;
-        }
+            if (fabs(this->strength) > 1 && this->type->getMass() != 0){
+                this->acceleration = this->strength / this->type->getMass();
+            } else {
+                this->acceleration = 0;
+            }
 
-        this->speed += this->acceleration * (MAINVAR->time.execTime);
-        
-        if (this->speed > this->type->getMaxSpeed()){
-            this->speed = this->type->getMaxSpeed();
-        } else if (this->speed < this->type->getMinSpeed()){
-            this->speed = this->type->getMinSpeed();
-        }
-
-        if (this->turn_strength != 0 && this->type->getMass() != 0){
-            this->turn_acceleration = this->turn_strength / (this->type->getMass() * this->type->getRect().h) * 2;
-        } else {
-            this->turn_acceleration = 0;
-        }
-
-        this->turn_speed += this->turn_acceleration * (MAINVAR->time.execTime);
-
-        if (turn_speed > type->getMaxRotarySpeed()){
-            turn_speed = type->getMaxRotarySpeed();
-        } else if (turn_speed < -type->getMaxRotarySpeed()){
-            turn_speed = -type->getMaxRotarySpeed();
-        }
-
-        if (KEYPAD->getKey(PLAYER_CONTROL.layerDown)){
-            if (this->z > this->type->getLayerMin()) this->z --;
+            this->speed += this->acceleration * (MAINVAR->time.execTime);
             
-        } else if (KEYPAD->getKey(PLAYER_CONTROL.layerUp)){
-            if (this->z < this->type->getLayerMax()) this->z ++;
+            if (this->speed > this->type->getMaxSpeed()){
+                this->speed = this->type->getMaxSpeed();
+            } else if (this->speed < this->type->getMinSpeed()){
+                this->speed = this->type->getMinSpeed();
+            }
+
+            if (this->turn_strength != 0 && this->type->getMass() != 0){
+                this->turn_acceleration = this->turn_strength / (this->type->getMass() * this->type->getRect().h) * 2;
+            } else {
+                this->turn_acceleration = 0;
+            }
+
+            this->turn_speed += this->turn_acceleration * (MAINVAR->time.execTime);
+
+            if (turn_speed > type->getMaxRotarySpeed()){
+                turn_speed = type->getMaxRotarySpeed();
+            } else if (turn_speed < -type->getMaxRotarySpeed()){
+                turn_speed = -type->getMaxRotarySpeed();
+            }
+
+            if (KEYPAD->getKey(PLAYER_CONTROL.layerDown)){
+                if (this->z > this->type->getLayerMin()) this->z --;
+                
+            } else if (KEYPAD->getKey(PLAYER_CONTROL.layerUp)){
+                if (this->z < this->type->getLayerMax()) this->z ++;
+            }
+
+            for (int i=0; i<type->getEquipmentSize(); i++){
+                if (equipments[i]) equipments[i]->setTarget(MOUSEPOS.x, MOUSEPOS.y);
+            }
         }
 
-        for (int i=0; i<type->getEquipmentSize(); i++){
-            if (equipments[i]) equipments[i]->setTarget(MOUSEPOS.x, MOUSEPOS.y);
+
+        if (this->speed!=0){
+            this->is_mouving = true;
+            int x, y;
+            setAngleM(&x, &y, this->speed, this->angle-90);
+            this->rect.x += x;
+            this->rect.y += y;
+            
+        } else {
+            this->is_mouving = false;
         }
-    }
 
+        if (this->turn_speed != 0){
+            switch (type->getTurnType()){
+                case TurnType::Turnfree:
+                    this->angle += this->turn_speed;
+                    break;
+                
+                case TurnType::Turnmul:
+                    this->angle += this->turn_speed * type->getTurnValue();
+                    break;
+                
+                case TurnType::Turndiv:
+                    this->angle += this->turn_speed / type->getTurnValue();
+                    break;
+                
+                case TurnType::Turnadd:
+                    this->angle += this->turn_speed + type->getTurnValue();
+                    break;
+                
+                case TurnType::Turnsub:
+                    this->angle += this->turn_speed - type->getTurnValue();
+                    break;
+                
+                default:
+                    break;
+            }
+        }
 
-    if (this->speed!=0){
-        this->is_mouving = true;
-        int x, y;
-        setAngleM(&x, &y, this->speed, this->angle-90);
-        this->rect.x += x;
-        this->rect.y += y;
-        
+        updateEquipments();
     } else {
-        this->is_mouving = false;
+        z = (float)((SDL_GetTicks() - onDeath->tick) * (float)type->getDeath()->z) / (float)type->getDeath()->time;
     }
-
-    if (this->turn_speed != 0){
-        switch (type->getTurnType()){
-            case TurnType::Turnfree:
-                this->angle += this->turn_speed;
-                break;
-            
-            case TurnType::Turnmul:
-                this->angle += this->turn_speed * type->getTurnValue();
-                break;
-            
-            case TurnType::Turndiv:
-                this->angle += this->turn_speed / type->getTurnValue();
-                break;
-            
-            case TurnType::Turnadd:
-                this->angle += this->turn_speed + type->getTurnValue();
-                break;
-            
-            case TurnType::Turnsub:
-                this->angle += this->turn_speed - type->getTurnValue();
-                break;
-            
-            default:
-                break;
-        }
-    }
-
-    updateEquipments();
 }
 
 bool Entity::draw(){
@@ -747,8 +773,7 @@ void Entity::updateEquipmentPos(void){
 }
 
 bool Entity::drawLight(int i){
-
-    if (i >= z-1 && i<=z){
+    if (i >= z-1 && i <= z+1){
         for (int e=0; e<type->getEquipmentSize() && equipments; e++){
             if (equipments[e]){
                 equipments[e]->drawLight();
@@ -778,4 +803,36 @@ void Entity::updateEquipments(void){
             equipments[i]->update();
         }
     }
+}
+
+bool Entity::PointInside(int x, int y){
+    Point* p;
+    getPart(&p);
+
+    if (isInside(p, type->getPartSize(), {x, y})){
+        delete[] p;
+        return true;
+    }
+
+    delete[] p;
+    return false;
+}
+
+void Entity::setHealth(int health){
+    this->health -= health;
+
+    if (this->health <= 0){
+        kill();
+    }
+}
+
+void Entity::kill(void){
+    if (!onDeath){
+        onDeath = new OnDeath;
+        onDeath->tick = SDL_GetTicks();
+    }
+}
+
+bool Entity::should_delete(void){
+    return (health <= 0 && (int)z == type->getDeath()->z);
 }
