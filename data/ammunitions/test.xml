@@ -1,8 +1,8 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
 <ammunition name="test" type="standar">
-    <texture texture="res/img/projectiles/test.bmp"/>
+    <texture texture="res/img/projectiles/test.bmp" w="1" h="5"/>
     <perform damages="100" initial-speed="20"/>
     <light r="255" g="255" b="255" strength="0"/>
-    <particle type="fire 1" angle="30" range="90"/>
+    <particle type="red fire 1" angle="90" range="25"/>
 </ammunition>

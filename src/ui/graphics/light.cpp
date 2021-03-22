@@ -19,6 +19,160 @@ void projectedLight(int angle, int range, int x, int y, int r, int g, int b, int
         setAngleM(&lx, &ly, radius, i+angle-(range));
         
         filledTrigonRGBA(RENDERER, x, y, rx+x, ry+y, lx+x, ly+y, r, g, b, a);
+    }   
+}
+
+Light_type::Light_type(){
+    texture = NULL;
+}
+
+Light_type::~Light_type(){
+    if (texture) SDL_DestroyTexture(texture);
+}
+
+bool Light_type::load(XMLNode* node){
+    if (!node){
+        if (IS_ERR_OPEN) ERR << "ERROR :: Light_type::load, reason : cannot load a light type from a null xml node" << endl;
+        return false;
     }
-    
+
+    for (int a=0; a<node->attributes.size; a++){
+        XMLAttribute attr = node->attributes.data[a];
+
+        if (!strcmp(attr.key, "name")){
+            name = attr.value;
+        } else {
+            if (IS_ERR_OPEN) ERR << "WARNING :: light, reason : cannot reconize '" << attr.value << " light attribute" << endl;
+        }
+    }
+
+    for (int c=0; c<node->children.size; c++){
+        XMLNode* child = XMLNode_child(node, c);
+
+        if (!strcmp(child->tag, "texture")){
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "path")){
+                    texture = loadTexture(attr.value, &size);
+                } else if (!strcmp(attr.key, "w")){
+                    sscanf(attr.value, "%d", &size.w);
+                } else if (!strcmp(attr.key, "h")){
+                    sscanf(attr.value, "%d", &size.h);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: light, texture, reason : cannot reconize '" << attr.key << "' texture attribute" << endl;
+                }
+            }
+
+            center.x = size.w / 2;
+            center.y = size.h / 2;
+
+        } else if (!strcmp(child->tag, "center")){
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "x")){
+                    sscanf(attr.value, "%d", &center.x);
+                } else if (!strcmp(attr.key, "y")){
+                    sscanf(attr.value, "%d", &center.y);
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: light, center, reason : cannot reconize '" << attr.key << "' center attribute" << endl;
+                }
+            }
+        } else {
+            if (IS_ERR_OPEN) ERR << "WARNING :: light, reason : cannot reconize '" << child->tag << "' light attribute" << endl;
+        }
+    }
+
+    return true;
+}
+
+string Light_type::getName(void){
+    return name;
+}
+
+SDL_Rect Light_type::getSize(void){
+    return size;
+}
+
+SDL_Texture* Light_type::getTexture(void){
+    return texture;
+}
+
+SDL_Point* Light_type::getCenter(void){
+    return &center;
+}
+
+Light::Light(){
+    type = nullptr;
+    angle = 0;
+}
+
+Light::~Light(){
+    type = nullptr;
+}
+
+bool Light::set(string name){
+    type = searchLight(name);
+    if (!type) return false;
+
+    resetSize();
+    return true;
+}
+
+bool Light::draw(void){
+    if (!type) return false;
+
+    if (SDL_RenderCopyEx(RENDERER, type->getTexture(), NULL, &rect, angle, type->getCenter(), SDL_FLIP_NONE)){
+        if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderCopyEX, reason : " << SDL_GetError() << endl;
+        return false;
+    }
+    return true;
+}
+
+void Light::setPos(int x, int y){
+    rect.x = x;
+    rect.y = y;
+}
+
+void Light::setSize(int w, int h){
+    rect.w = w;
+    rect.h = h;
+}
+
+void Light::resetSize(void){
+    if (!type) return;
+
+    rect.w = type->getSize().w;
+    rect.h = type->getSize().h;
+}
+
+void Light::setAngle(int angle){
+    this->angle = angle;
+}
+
+Light_type* searchLight(string name){
+    for (Light_type* t : LIGHT_TYPES){
+        if (t->getName() == name){
+            return t;
+        }
+    }
+    return nullptr;
+}
+
+void pushLight(XMLNode* node){
+    Light_type* type = new Light_type();
+
+    if (type->load(node)){
+        LIGHT_TYPES.push_back(type);
+    } else {
+        delete type;
+    }
+}
+
+void clearLights(void){
+    for (Light_type* type : LIGHT_TYPES){
+        delete type;
+    }
+    LIGHT_TYPES.clear();
 }

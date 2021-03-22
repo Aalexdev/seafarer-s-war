@@ -165,7 +165,6 @@ bool Particles_type::load(XMLNode* node){
         }
     }
 
-    print();
     return true;
 }
 
@@ -314,6 +313,7 @@ void Particles::unlink(void){
 
 bool Particles::set(string type_name){
     type = searchParticle(type_name);
+    pushing = true;
     return type;
 }
 
@@ -388,10 +388,11 @@ bool Particles::draw(int z){
         if (p){
             if (tick - p->tick >= type->getTime()){
                 particles.erase(particles.begin() + i);
+                delete p;
                 continue;
             }
 
-            SDL_SetRenderDrawBlendMode(RENDERER, SDL_BLENDMODE_MOD);
+            SDL_SetRenderDrawBlendMode(RENDERER, SDL_BLENDMODE_NONE);
 
             switch (type->getStyle()){
                 
@@ -513,7 +514,13 @@ bool Particles::should_delete(void){
 }
 
 void Particles::pushParticles(void){
-    for (int i=0; i<type->getDensity(); i++){
-        pushParticle();
+    if (pushing){
+        for (int i=0; i<type->getDensity(); i++){
+            pushParticle();
+        }
     }
+}
+
+void Particles::push(bool push){
+    pushing = push;
 }

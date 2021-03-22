@@ -26,7 +26,7 @@
         <image path="res/img/backgrounds/darksea.bmp" alpha="255"/>
     </layer>
     <layer name="sea" angle="90" delay="50" speed="2" height="0">
-        <image path="res/img/backgrounds/sea.bmp" alpha="200"/>
+        <image path="res/img/backgrounds/sea.bmp" alpha="150"/>
     </layer>
 
 </layers>
@@ -35,6 +35,7 @@
     <icon path="res/img/icon/icon.bmp"/>
 </window>
 
+<read path="data/lights.xml"/>
 <read path="data/animations.xml"/>
 <read path="data/ammunitions.xml"/>
 <read path="data/events.xml"/>

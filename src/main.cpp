@@ -247,12 +247,6 @@ void draw(){
 
     drawImages();
     drawWidgets();
-
-    if (IS_DEBUG){
-        for (Light_Edge &e : LIGHT_POINTS){
-            lineRGBA(RENDERER, e.sx, e.sy, e.ex, e.ey, 255, 100, 0, 255);
-        }
-    }
     
     SDL_RenderPresent(RENDERER);
     mainVar.time.drawExecT = SDL_GetTicks() - exec;
@@ -389,6 +383,7 @@ void destroy(void){
     }
     LAYERS.clear();
 
+    clearLights();
     freeEntity_types();
     freeEntity();
     freeEquipments();
@@ -489,28 +484,4 @@ void SetColor(int r, int g, int b, int a){
     WINDOW_G = g;
     WINDOW_B = b;
     WINDOW_A = a;
-}
-
-void updateLightPoints(void){
-
-    LIGHT_POINTS.clear();
-
-    LIGHT_POINTS.push_back(NORTH);
-    LIGHT_POINTS.push_back(EAST);
-    LIGHT_POINTS.push_back(WEST);
-    LIGHT_POINTS.push_back(SOUTH);
-
-    for (Entity *e : ENTITY){
-        if (e->in_screen()){
-            Point* p;
-            e->getPart(&p);
-
-            for (int i=0; i<e->getType()->getPartSize()-1; i++){
-                LIGHT_POINTS.push_back({p[i].x, p[i].y, p[i+1].x, p[i+1].y});
-            }
-
-            LIGHT_POINTS.push_back({p[e->getType()->getPartSize()-1].x, p[e->getType()->getPartSize()-1].y, p[0].x, p[0].y});
-            delete[] p;
-        }
-    }
 }

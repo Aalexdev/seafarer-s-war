@@ -436,6 +436,13 @@
              */
             bool should_delete(void);
 
+            /**
+             * @brief set the push member, push particles only if it's true
+             * 
+             * @param push 
+             */
+            void push(bool push);
+
         private:
             /**
              * @brief the linked type of the particles
@@ -513,6 +520,12 @@
              * 
              */
             void pushParticles(void);
+
+            /**
+             * @brief push particles only if it's true
+             * 
+             */
+            bool pushing;
     };
 
     /**

@@ -339,7 +339,7 @@ void Equipment::shot(void){
 
     if (SDL_GetTicks() - type->getCannon()->couldown > cannon->tick){
         cannon->tick = SDL_GetTicks();
-        Ammunition* amm = new Ammunition(parent, angle, getX(), getY());
+        Ammunition* amm = new Ammunition(parent, angle, getX() - CAMERA.x, getY() - CAMERA.y);
 
         if (amm->load(type->getCannon()->ammunition_type)){
             cannon->ammunitions.push_back(amm);

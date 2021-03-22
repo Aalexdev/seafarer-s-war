@@ -1,4 +1,4 @@
-LOG file, init at : 19:37:55
+LOG file, init at : 18:58:39
 resetWindow(seafarers' war, 805240832, 805240832, 1080, 720, 4)
 clearWindow
 set max fps to : 60
@@ -38,6 +38,9 @@ loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/backgrounds/d
 loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/backgrounds/sea.bmp)
 SDL_SetWindowPosition(420, 180)
 SDL_SetWindowSize(1080, 720)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights.xml , 0)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/50.xml , 0)
+loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/circle/50.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations/fire.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/ammunitions.xml , 0)
@@ -93,24 +96,6 @@ Entity::reset()
 Entity::load_from_xml()
 Entity::set('thunder')
 Entity::set() : type found 'thunder'
-Equipment::Equipment()
-Equipment::setType('MR-Elpis')
-Equipment::setType() : found 'MR-Elpis'
-Equipment::Equipment()
-Equipment::setType('MR-Elpis')
-Equipment::setType() : found 'MR-Elpis'
-Equipment::Equipment()
-Equipment::setType('MR-Elpis')
-Equipment::setType() : found 'MR-Elpis'
-Equipment::Equipment()
-Equipment::setType('MR-Elpis')
-Equipment::setType() : found 'MR-Elpis'
-Equipment::Equipment()
-Equipment::setType('MR-Elpis')
-Equipment::setType() : found 'MR-Elpis'
-Equipment::Equipment()
-Equipment::setType('MR-Elpis')
-Equipment::setType() : found 'MR-Elpis'
 Equipment::Equipment()
 Equipment::setType('MR-Elpis')
 Equipment::setType() : found 'MR-Elpis'

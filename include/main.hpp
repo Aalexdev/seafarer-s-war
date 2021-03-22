@@ -63,6 +63,7 @@
     #include "api/class/equipment.hpp"
     #include "api/class/ammunition.hpp"
     #include "ui/graphics/particles.hpp"
+    #include "ui/graphics/light.hpp"
 
     /**
      * @brief Struct of 
@@ -535,12 +536,6 @@
         int r, g, b, a;
 
         /**
-         * @brief every point used for dynamique light
-         * 
-         */
-        vector<Light_Edge> lightPoints;
-
-        /**
          * @brief the ammunition type vector
          * 
          */
@@ -563,6 +558,18 @@
          * 
          */
         vector<Particles*> particles;
+
+        /**
+         * @brief type of lights
+         * 
+         */
+        vector<Light_type*> lightTypes;
+
+        /**
+         * @brief lights
+         * 
+         */
+        vector<Light*> lights;
     };
 
     /**
@@ -723,12 +730,6 @@
     void setColor(int r, int g, int b, int a);
     
     /**
-     * @brief clear and rebuild the LIGHT_POINTS vector with all collision points on the screen
-     * 
-     */
-    void updateLightPoints(void);
-    
-    /**
      * @brief mainVar constant
      * 
      */
@@ -775,24 +776,15 @@
     #define WINDOW_G        getMain()->g
     #define WINDOW_B        getMain()->b
     #define WINDOW_A        getMain()->a
-    #define LIGHT_POINTS    getMain()->lightPoints
     #define AMMUNITION_TYPE getMain()->ammunitions
     #define DELTA_TIME      getMain()->timeDelta
     #define PARTICLES_TYPE  getMain()->particles_type
     #define PARTICLES       getMain()->particles
-
-    /**
-     * @brief other
-     * 
-     */
+    #define LIGHT_TYPES     getMain()->lightTypes
+    #define LIGHTS          getMain()->lights
     #define MOUSEPOS        getMousePos()
     #define TICKS           SDL_GetTicks()
     #define DIR             getMainDir()
-
-    /**
-     * @brief window Lines
-     * 
-     */
     #define NORTH           {0, 0, WINDOW_WIDTH, 0}
     #define NORTH_EAST      {WINDOW_WIDTH, 0}
     #define EAST            {WINDOW_WIDTH-1, 0, WINDOW_WIDTH-1, WINDOW_HEIGHT}

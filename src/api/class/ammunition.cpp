@@ -166,7 +166,8 @@ Ammunition::Ammunition(Entity* parent, int angle, int x, int y) : parent(parent)
 }
 
 Ammunition::~Ammunition(){
-    particles->setDuration(0);
+    particles->setDuration(3000);
+    particles->push(false);
     unlink();
 }
 
@@ -184,6 +185,7 @@ bool Ammunition::draw(void){
         return false;
     }
 
+    SDL_Rect rect = {getX(), getY(), this->rect.w, this->rect.h};
     if (SDL_RenderCopyEx(RENDERER, type->getTexture(), NULL, &rect, angle, 0, SDL_FLIP_NONE)){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderCopyEx(), reason : " << SDL_GetError() << endl;
         return false;
@@ -222,7 +224,7 @@ bool Ammunition::update(void){
     }
 
     if (particles){
-        particles->setPos(rect.x, rect.y);
+        particles->setPos(getX(), getY());
         particles->setAngle(angle + type->getParticleType()->angle);
     }
 
@@ -249,7 +251,7 @@ bool Ammunition::load(string type_name){
             particles->setDuration(UNDEFINE);
 
             particles->setZ(parent->getZ());
-            particles->setPos(rect.x, rect.y);
+            particles->setPos(getX(), getY());
         } else {
             delete particles;
             particles = NULL;
@@ -299,17 +301,17 @@ bool existingType(string type){
 void Ammunition::drawLight(void){
     if (!type->getLight()) return;
 
-    light(type->getLight()->strength, rect.x, rect.y, type->getLight()->r, type->getLight()->g, type->getLight()->b);
-}
-
-int Ammunition::getX(void){
-    return rect.x + (rect.w / 2);
-}
-
-int Ammunition::getY(void){
-    return rect.y + (rect.h / 2);
+    light(type->getLight()->strength, getX(), getY(), type->getLight()->r, type->getLight()->g, type->getLight()->b);
 }
 
 bool Ammunition::is_delete(void){
     return should_delete;
+}
+
+int Ammunition::getX(void){
+    return rect.x + (rect.w / 2) + CAMERA.x;
+}
+
+int Ammunition::getY(void){
+    return rect.y + (rect.h / 2) + CAMERA.y;
 }

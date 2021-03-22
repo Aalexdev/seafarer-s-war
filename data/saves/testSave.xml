@@ -23,12 +23,6 @@
         <equipment name="MR-Elpis" id="1" angle="30"/>
         <equipment name="MR-Elpis" id="2" angle="30"/>
         <equipment name="MR-Elpis" id="3" angle="30"/>
-        <equipment name="MR-Elpis" id="4" angle="30"/>
-        <equipment name="MR-Elpis" id="5" angle="30"/>
-        <equipment name="MR-Elpis" id="6" angle="30"/>
-        <equipment name="MR-Elpis" id="7" angle="30"/>
-        <equipment name="MR-Elpis" id="8" angle="30"/>
-        <equipment name="MR-Elpis" id="9" angle="30"/>
     </equipments>
 </setPlayer>
 
@@ -39,4 +33,4 @@
     </equipments>
 </summonEntity>
 
-<color r="255" g="255" b="255" a="175"/>
+<color r="150" g="150" b="150" a="255"/>
