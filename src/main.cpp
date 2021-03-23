@@ -19,11 +19,15 @@ int main(int argc, char* argv[]){
 
     IS_DEBUG = false;
 
+
     TIME.now = time(0);
     TIME.ltm = localtime(&TIME.now);
     ZOOM = 1;
+    
     PLAYER = new Entity(true);
     KEYPAD = new Keypad();
+
+    
 
     cout << "files : " << filesToLoad("data\\main.xml") << endl;
     mainVar.launched = readXML("data\\main.xml");
@@ -372,13 +376,14 @@ void freeParticle(void){
 }
 
 void freeEntity(void){
-
+    if (IS_LOG_OPEN) LOG << "freeEntity()" << endl;;
     for (Entity* entity : ENTITY){
-        delete entity;
+        if (entity) delete entity;
     }
     ENTITY.clear();
 
     PLAYER->unlink();
+    if (IS_LOG_OPEN) LOG << "\tended" << endl;;
 }
 
 void freeEntity_types(void){

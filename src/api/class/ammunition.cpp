@@ -150,6 +150,7 @@ Ammunition::Ammunition(Entity* parent) : parent(parent){
 }
 
 Ammunition::Ammunition(Entity* parent, int angle, int x, int y) : parent(parent){
+    light = NULL;
     unlink();
     this->angle = angle;
     rect.x = x;
@@ -234,7 +235,6 @@ bool Ammunition::update(void){
 
 bool Ammunition::load(string type_name){
     type = find(type_name);
-
     if (!type) return false;
 
     rect.w = type->getSize().w; 

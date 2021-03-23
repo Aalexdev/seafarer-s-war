@@ -12,7 +12,7 @@ Equipment_type::Equipment_type(){
     if (IS_LOG_OPEN) LOG << "Equipment_type::Equipment_type()" << endl;
 
     texture = nullptr;
-    light = nullptr;
+    light.clear();
     cannon = nullptr;
 
     rect = {0, 0, 0, 0};
@@ -22,12 +22,7 @@ Equipment_type::~Equipment_type(){
     if (IS_LOG_OPEN) LOG << "Equipment_type::~Equipment_type()" << endl;
 
     freeTexture();
-    if (light){
-        if (light->rect) delete light->rect;
-        if (light->lightCenter) delete light->lightCenter;
-        if (light->ligthTexture) SDL_DestroyTexture(light->ligthTexture);
-        delete light;
-    }
+    light.clear();
     if (cannon) delete cannon;
 }
 
@@ -130,7 +125,7 @@ Equipment_type::Cannon* Equipment_type::getCannon(void){
     return cannon;
 }
 
-Estring Equipment_type::getLight(void){
+string Equipment_type::getLight(void){
     return light;
 }
 
@@ -183,10 +178,6 @@ bool Equipment::drawLight(void){
         }
     }
 
-    if (!light) return true;
-
-    projectedLight(angle-90, type->getLight()->range, getX(), getY(), light->r, light->g, light->b, light->a, 1000);
-
     return true;
 }
 
@@ -228,19 +219,21 @@ bool Equipment::setType(string name){
     }
 
     if (!type->getLight().empty()){
-        light = new Light;
+        light = new Light();
 
-        if (light->set(type->getLight()){
+        if (light->set(type->getLight())){
             light->setPos(getX(), getY());
 
             LIGHTS.push_back(light);
         } else {
             delete light;
+            light = NULL;
         }
     }
     if (type->getCannon()){
         cannon = new Cannon;
         cannon->tick = SDL_GetTicks();
+        cannon->particles = NULL;
     }
     
     if (IS_LOG_OPEN) LOG << "Equipment::setType() : found '" << name << "'" << endl;
@@ -249,12 +242,18 @@ bool Equipment::setType(string name){
 
 void Equipment::unlink(void){
     if (IS_LOG_OPEN) LOG << "Equipment::unlink()" << endl;
-    this->rect = {0, 0, 0, 0};
+    rect = {0, 0, 0, 0};
+
     if (light) delete light;
     light = nullptr;
-    cannon->particles->setDuration(0);
-    if (cannon) delete cannon;
+
+    if (cannon){
+        if (cannon->particles) cannon->particles->setDuration(0);
+        delete cannon;
+        cannon = NULL;
+    }
     type = nullptr;
+
 }
 
 void Equipment::setAngle(int angle){
@@ -309,6 +308,7 @@ void Equipment::shot(void){
 
     if (SDL_GetTicks() - type->getCannon()->couldown > cannon->tick){
         cannon->tick = SDL_GetTicks();
+
         Ammunition* amm = new Ammunition(parent, angle, getX() - CAMERA.x, getY() - CAMERA.y);
 
         if (amm->load(type->getCannon()->ammunition_type)){
@@ -339,5 +339,10 @@ void Equipment::update(void){
         if (MOUSEDOWN.left){
             shot();
         }
+    }
+
+    if (light){
+        light->setPos(getX(), getY());
+        light->setAngle(angle);
     }
 }

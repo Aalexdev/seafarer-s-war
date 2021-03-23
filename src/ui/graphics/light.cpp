@@ -33,9 +33,10 @@ Light_type::~Light_type(){
 }
 
 bool Light_type::load(XMLNode* node){
-    if (IS_LOG_OPEN) LOG << "Light_type::load()" << endl;
+    if (IS_LOG_OPEN) LOG << "Light_type::load()";
     if (!node){
         if (IS_ERR_OPEN) ERR << "ERROR :: Light_type::load, reason : cannot load a light type from a null xml node" << endl;
+        if (IS_LOG_OPEN) LOG << endl;
         return false;
     }
 
@@ -44,6 +45,7 @@ bool Light_type::load(XMLNode* node){
 
         if (!strcmp(attr.key, "name")){
             name = attr.value;
+            if (IS_LOG_OPEN) LOG << " : '" << name << "'" << endl;
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: light, reason : cannot reconize '" << attr.value << " light attribute" << endl;
         }
@@ -117,7 +119,10 @@ Light::~Light(){
 
 bool Light::set(string name){
     type = searchLight(name);
-    if (!type) return false;
+    if (!type){
+        if (IS_ERR_OPEN) ERR << "ERROR :: cannot found, '" << name << "' light name" << endl;
+        return false;
+    }
 
     resetSize();
     return true;

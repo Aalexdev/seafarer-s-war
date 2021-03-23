@@ -493,8 +493,9 @@ bool Entity::load_from_xml(XMLNode* node){
 }
 
 void Entity::reset(void){
+
+
     if (IS_LOG_OPEN) LOG << "Entity::reset()" << endl;
-    this->type = nullptr;
     this->z = 0;
     this->angle = 0;
 
@@ -504,18 +505,22 @@ void Entity::reset(void){
     this->acceleration = 0;
     this->turn_strength = 0;
     this->turn_speed = 0;
-
-    equipments = NULL;
-    onDeath = NULL;
+    this->type = nullptr;
+    
+    if (onDeath) delete onDeath;
 }
 
 Entity::Entity(){
     if (IS_LOG_OPEN) LOG << "Entity::Entity()" << endl;
+    equipments = nullptr;
+    onDeath = NULL;
     reset();
 }
 
 Entity::Entity(bool isPlayer){
     if (IS_LOG_OPEN) LOG << "Entity::Entity()" << endl;
+    equipments = nullptr;
+    onDeath = NULL;
     reset();
     is_player = isPlayer;
 }
@@ -674,12 +679,21 @@ bool Entity::draw(){
 }
 
 void Entity::unlink(void){
+    if (IS_LOG_OPEN) LOG << "Entity::unlink()" << endl;
     this->angle = 0;
     this->speed = 0;
 
     delete[] part;
     delete[] equipmentsP;
-    delete[] equipments;
+
+    if (equipments){
+        for (int e=0; e<type->getEquipmentSize(); e++){
+            if (equipments[e]) delete equipments[e];
+            equipments[e] = NULL;
+        }
+    }
+    delete equipments;
+    equipments = nullptr;
     
     this->type = nullptr;
 }

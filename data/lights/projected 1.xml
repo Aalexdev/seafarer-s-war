@@ -1,0 +1,6 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<light name="projected 1">
+    <texture path="res/img/lights/projected/white 35.bmp"/>
+    <center x="127" y="730"/>
+</light>
