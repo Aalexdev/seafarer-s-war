@@ -23,14 +23,17 @@ void projectedLight(int angle, int range, int x, int y, int r, int g, int b, int
 }
 
 Light_type::Light_type(){
+    if (IS_LOG_OPEN) LOG << "Light_type::Light_type()" << endl;
     texture = NULL;
 }
 
 Light_type::~Light_type(){
+    if (IS_LOG_OPEN) LOG << "~Light_type::Light_type()" << endl;
     if (texture) SDL_DestroyTexture(texture);
 }
 
 bool Light_type::load(XMLNode* node){
+    if (IS_LOG_OPEN) LOG << "Light_type::load()" << endl;
     if (!node){
         if (IS_ERR_OPEN) ERR << "ERROR :: Light_type::load, reason : cannot load a light type from a null xml node" << endl;
         return false;
@@ -120,9 +123,11 @@ bool Light::set(string name){
     return true;
 }
 
-bool Light::draw(void){
+bool Light::draw(int z){
     if (!type) return false;
+    if (z != this->z) return true;
 
+    SDL_Rect rect = {this->rect.x - type->getCenter()->x, this->rect.y - type->getCenter()->y, this->rect.w, this->rect.h};
     if (SDL_RenderCopyEx(RENDERER, type->getTexture(), NULL, &rect, angle, type->getCenter(), SDL_FLIP_NONE)){
         if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderCopyEX, reason : " << SDL_GetError() << endl;
         return false;
@@ -151,6 +156,10 @@ void Light::setAngle(int angle){
     this->angle = angle;
 }
 
+void Light::setZ(int z){
+    this->z = z;
+}
+
 Light_type* searchLight(string name){
     for (Light_type* t : LIGHT_TYPES){
         if (t->getName() == name){
@@ -160,7 +169,7 @@ Light_type* searchLight(string name){
     return nullptr;
 }
 
-void pushLight(XMLNode* node){
+void pushLight_type(XMLNode* node){
     Light_type* type = new Light_type();
 
     if (type->load(node)){
@@ -175,4 +184,8 @@ void clearLights(void){
         delete type;
     }
     LIGHT_TYPES.clear();
+}
+
+Light* newLight(void){
+    return new Light();
 }

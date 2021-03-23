@@ -180,17 +180,39 @@ void drawWidgets(void){
     }
 }
 
-
 void drawLayers(int z){
     for (Layer* lyr : LAYERS){
         if (lyr->getZ() == z){
-            for (Particles* p : PARTICLES){
-                p->drawLight(z);
+            int i=0;
+            for (Light* l : LIGHTS){
+                if (!l || !l->draw(z)){
+                    LIGHTS.erase(LIGHTS.begin() + i);
+                    if (l) delete l;
+                    continue;
+                }
+                i++;
             }
 
-            for (Entity* entity : ENTITY){
-                entity->drawLight(z);
+            i=0;
+            for (Particles* p : PARTICLES){
+                if (!p->drawLight(z)){
+                    delete p;
+                    PARTICLES.erase(PARTICLES.begin() + i);
+                    continue;
+                }
+                i++;
             }
+
+            i=0;
+            for (Entity* entity : ENTITY){
+                if (!entity->drawLight(z)){
+                    delete entity;
+                    ENTITY.erase(ENTITY.begin() + i);
+                    continue;
+                }
+                i++;
+            }
+
             if (PLAYER->is_linked()) PLAYER->drawLight(z);
             
             lyr->draw();
@@ -202,7 +224,7 @@ void drawLayers(int z){
         if (p->should_delete()){
             PARTICLES.erase(PARTICLES.begin() + i);
             if (p) delete p;
-            i--;
+            continue;
         } else {
             p->draw(z);
         }
@@ -225,8 +247,14 @@ void drawLayers(int z){
 }
 
 void drawImages(void){
+    int i=0;
     for (Image* image : IMAGES){
-        image->draw();
+        if (!image->draw()){
+            delete image;
+            IMAGES.erase(IMAGES.begin() + i);
+            continue;
+        }
+        i++;
     }
 }
 
@@ -255,7 +283,7 @@ void draw(){
 void time(){
 
     if(SDL_GetTicks() < mainVar.time.tick+1000){
-            mainVar.time._fps++;
+        mainVar.time._fps++;
 
     } else {
         mainVar.time.FPS = mainVar.time._fps;

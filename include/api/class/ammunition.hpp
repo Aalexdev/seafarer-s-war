@@ -13,6 +13,7 @@
     #include "api/class/entity.hpp"
     #include "ui/graphics/sprite.hpp"
     #include "ui/graphics/particles.hpp"
+    #include "ui/graphics/light.hpp"
 
     class Ammunition_type{
         public:
@@ -33,26 +34,6 @@
              * @return return the texture
              */
             SDL_Texture* getTexture(void);
-
-            /**
-             * @brief the light structure
-             * 
-             * /!\ soon 
-             */
-            struct Light{
-                
-                /**
-                 * @brief the strength of the light effect
-                 * 
-                 */
-                int strength;
-
-                /**
-                 * @brief color of the light
-                 * 
-                 */
-                int r, g, b;
-            };
 
             /**
              * @brief get the name of teh ammunition
@@ -83,11 +64,11 @@
             int getInitialSpeed(void);
 
             /**
-             * @brief get the light of the amunition
+             * @brief get the light name of the amunition
              * 
              * @return Light* 
              */
-            Light* getLight(void);
+            string getLight(void);
 
             /**
              * @brief Get the Damages object
@@ -157,10 +138,10 @@
             int initialSpeed;
 
             /**
-             * @brief the light emmeted by the ammunition
+             * @brief the light type name by the ammunition
              * 
              */
-            Light* light;
+            string light;
 
             /**
              * @brief the particle type name, empty if none
@@ -287,6 +268,12 @@
             bool should_delete;
 
             Particles* particles;
+
+            /**
+             * @brief the light of the ammunition
+             * 
+             */
+            Light* light;   
 
     };
     

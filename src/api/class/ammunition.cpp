@@ -46,6 +46,7 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
     }
 
     for (int c=0; c<node->children.size; c++){
+        
         XMLNode *child = XMLNode_child(node, c);
 
         if (!strcmp(child->tag, "texture")){
@@ -64,6 +65,7 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
                 }
             }
         } else if (!strcmp(child->tag, "perform")){
+            
             for (int a=0; a<child->attributes.size; a++){
                 XMLAttribute attr = child->attributes.data[a];
 
@@ -76,19 +78,12 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
                 }
             }
         } else if (!strcmp(child->tag, "light")){
-            light = new Light;
-            if (texture) SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
             for (int a=0; a<child->attributes.size; a++){
                 XMLAttribute attr = child->attributes.data[a];
 
-                if (!strcmp(attr.key, "r")){
-                    sscanf(attr.value, "%d", &light->r);
-                } else if (!strcmp(attr.key, "g")){
-                    sscanf(attr.value, "%d", &light->g);
-                } else if (!strcmp(attr.key, "b")){
-                    sscanf(attr.value, "%d", &light->b);
-                } else if (!strcmp(attr.key, "strength")){
-                    sscanf(attr.value, "%d", &light->strength);
+                if (!strcmp(attr.key, "type")){
+                    light = attr.value;
+                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
                 } else {
                     if (IS_ERR_OPEN) ERR << "WARNING :: ammunition; light, reason : cannot reconize '" << attr.key << "' light attribute" << endl;
                 }
@@ -110,7 +105,6 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
                     if (IS_ERR_OPEN) ERR << "ERROR :: ammunition; particle, reason : cannot reconize '"<< attr.key << "' particle attribute" << endl;
                 }
             }
-            cout << "post" << endl;
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: ammunition, reason : cannot reconize '" << child->tag << "' ammunition child" << endl;
         }
@@ -143,7 +137,7 @@ int Ammunition_type::getDamages(void){
     return damages;
 }
 
-Ammunition_type::Light* Ammunition_type::getLight(void){
+string Ammunition_type::getLight(void){
     return light;
 }
 
@@ -177,6 +171,9 @@ void Ammunition::unlink(void){
     speed = 0;
     angle = 0;
     particles = NULL;
+
+    if (light) delete light;
+    light = NULL;
 }
 
 bool Ammunition::draw(void){
@@ -228,6 +225,10 @@ bool Ammunition::update(void){
         particles->setAngle(angle + type->getParticleType()->angle);
     }
 
+    if (light){
+        light->setPos(getX(), getY());
+    }
+
     return is_delete();
 }
 
@@ -255,6 +256,22 @@ bool Ammunition::load(string type_name){
         } else {
             delete particles;
             particles = NULL;
+        }
+    }
+
+    if (!type->getLight().empty()){
+        light = new Light();
+        
+        if (light->set(type->getLight())){
+
+            light->setPos(getX(), getY());
+            light->setZ(parent->getZ());
+
+            LIGHTS.push_back(light);
+
+        } else {
+            delete light;
+            light = NULL;
         }
     }
 
@@ -299,9 +316,9 @@ bool existingType(string type){
 }
 
 void Ammunition::drawLight(void){
-    if (!type->getLight()) return;
+    if (type->getLight().empty()) return;
 
-    light(type->getLight()->strength, getX(), getY(), type->getLight()->r, type->getLight()->g, type->getLight()->b);
+    
 }
 
 bool Ammunition::is_delete(void){

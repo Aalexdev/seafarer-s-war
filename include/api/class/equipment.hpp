@@ -13,6 +13,8 @@
     #include "api/functions/texture.hpp"
     #include "api/class/entity.hpp"
     #include "api/class/ammunition.hpp"
+    #include "ui/graphics/particles.hpp"
+    #include "ui/graphics/light.hpp"
 
     #define UNKNOWN_AMMUNITION "unknown"
     
@@ -36,56 +38,14 @@
              * @param node the xml node
              * @return return true if loaded, false on error
              */
-            virtual bool loadXML(XMLNode* node);
+            virtual bool loadXML(XMLNode* node);  
 
             /**
-             * @brief the light struct
+             * @brief Get the Light type name
              * 
+             * @return return the light type name, use bool Light::set(type); 
              */
-            struct Light{
-                /**
-                 * @brief the power of the light
-                 * 
-                 */
-                int power;
-
-                /**
-                 * @brief the maximal range
-                 * 
-                 */
-                int range;
-
-                /**
-                 * @brief the initial color of the light
-                 * 
-                 */
-                int r, g, b, a;
-                
-                /**
-                 * @brief the texture of the light (obtionnal)
-                 * 
-                 */
-                SDL_Texture* ligthTexture = nullptr;
-
-                /**
-                 * @brief the rectangle of the lightTexture
-                 * 
-                 */
-                SDL_Rect* rect = nullptr;
-
-                /**
-                 * @brief rotationnal center of the lightTexture
-                 * 
-                 */
-                SDL_Point* lightCenter = nullptr;
-            };  
-
-            /**
-             * @brief Get the Light object
-             * 
-             * @return return the light pointer 
-             */
-            Light* getLight(void);
+            string getLight(void);
 
             /**
              * @brief the cannon struct
@@ -103,6 +63,12 @@
                  * 
                  */
                 string ammunition_type;
+
+                /**
+                 * @brief type used for particles
+                 * 
+                 */
+                string particle_type;
             };
 
             /**
@@ -184,10 +150,10 @@
             void freeTexture(void);
 
             /**
-             * @brief the light struct
+             * @brief the light type name
              * 
              */
-            Light* light;
+            string light;
 
             /**
              * @brief 
@@ -234,26 +200,6 @@
             void update(void);
 
             /**
-             * @brief the equipment struct, used  by equipment
-             * 
-             */
-            struct Light{
-                /**
-                 * @brief the actual range
-                 * 
-                 */
-                int range = 30;
-
-                /**
-                 * @brief the color of the light
-                 * 
-                 */
-                int r, g, b, a;
-
-
-            };
-
-            /**
              * @brief the cannon struct, store all cannons data
              * 
              */
@@ -269,6 +215,12 @@
                  * 
                  */
                 int tick;
+
+                /**
+                 * @brief the shoot particle animation
+                 * 
+                 */
+                Particles* particles;
             };
 
             /**
@@ -403,7 +355,7 @@
             SDL_Rect rect;
 
             /**
-             * @brief the light struct
+             * @brief the light
              * 
              */
             Light* light;

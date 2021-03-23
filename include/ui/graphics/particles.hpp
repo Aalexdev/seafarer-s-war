@@ -1,10 +1,13 @@
 #ifndef __ANIMATION__
 #define __ANIMATION__
 
-    #include "api/io/xml.hpp"
-    #include "api/functions/math.hpp"
     #include <iostream>
     #include <vector>
+    #include <string>
+
+    #include "api/io/xml.hpp"
+    #include "api/functions/math.hpp"
+    #include "ui/graphics/light.hpp"
 
     using namespace std;
 
@@ -117,24 +120,6 @@
                  */
                 SDL_Color eColor;
             };
-
-            /**
-             * @brief strue light, used if the particles type create a light effect
-             * 
-             */
-            struct Light{
-                /**
-                 * @brief the radius of the light effect
-                 * 
-                 */
-                int radius;
-
-                /**
-                 * @brief the color of the light
-                 * 
-                 */
-                int r, g, b, a;
-            };
             
             /**
              * @brief Set the Color of the particul effect
@@ -193,11 +178,11 @@
             void print(void);
 
             /**
-             * @brief get the light member of the type, null if there is not light effect
+             * @brief get the light name of the type, null if there is not light effect
              * 
-             * @return return a pointer to the light member
+             * @return return the name of the light
              */
-            Light* getLight(void);
+            string getLight(void);
 
             /**
              * @brief get the name of the particle
@@ -285,10 +270,10 @@
             int density;
 
             /**
-             * @brief light struct, null if there is not effect
+             * @brief light name, empty if there is not effect
              * 
              */
-            Light* light;
+           string light;
 
             /**
              * @brief set the type of the animation
@@ -354,6 +339,12 @@
                  * 
                  */
                 int r, g, b, a;
+
+                /**
+                 * @brief the light effect of the particles
+                 * 
+                 */
+                Light* light;
             };  
 
             /**

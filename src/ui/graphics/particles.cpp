@@ -16,11 +16,11 @@ void pushParticle_type(XMLNode* node){
 }
 
 Particles_type::Particles_type(){
-    light = NULL;
+    light.clear();
 }
 
 Particles_type::~Particles_type(){
-    if (light) delete light;
+    light.clear();
 }
 
 bool Particles_type::load(XMLNode* node){
@@ -141,21 +141,11 @@ bool Particles_type::load(XMLNode* node){
         } else if (!strcmp(child->tag, "point/")){
             setPoint();
         } else if (!strcmp(child->tag, "light")){
-            light = new Light;
-
             for (int a=0; a<child->attributes.size; a++){
                 XMLAttribute attr = child->attributes.data[a];
 
-                if (!strcmp(attr.key, "radius")){
-                    sscanf(attr.value, "%d", &light->radius);
-                } else if (!strcmp(attr.key, "r")){
-                    sscanf(attr.value, "%d", &light->r);
-                } else if (!strcmp(attr.key, "g")){
-                    sscanf(attr.value, "%d", &light->g);
-                } else if (!strcmp(attr.key, "b")){
-                    sscanf(attr.value, "%d", &light->b);
-                } else if (!strcmp(attr.key, "a")){
-                    sscanf(attr.value, "%d", &light->a);
+                if (!strcmp(attr.key, "type")){
+                    light = attr.value;
                 } else {
                     if (IS_ERR_OPEN) ERR << "WARNING :: particles; light, reason : cannot reconize '" << attr.key << "' light attribute" << endl;
                 }
@@ -165,6 +155,7 @@ bool Particles_type::load(XMLNode* node){
         }
     }
 
+    if (IS_DEBUG) print();
     return true;
 }
 
@@ -249,8 +240,8 @@ void Particles_type::print(void){
 
     cout << ", strength : " << particule_strength << endl;
 
-    if (light){
-        cout << "light :: radius : " << light->radius << ", r : " << light->r << ", g : " << light->g << ", b : " << light->b << ", a : " << light->a << endl; 
+    if (!light.empty()){
+        cout << "light :: radius : " << light << endl; 
     } else {
         cout << " - no light effect -" << endl;
     }
@@ -258,7 +249,7 @@ void Particles_type::print(void){
     cout << endl;
 }
 
-Particles_type::Light* Particles_type::getLight(void){
+string Particles_type::getLight(void){
     return light;
 }
 
@@ -342,6 +333,22 @@ void Particles::pushParticle(void){
     p->b = getB();
     p->a = getA();
 
+    p->light = nullptr;
+
+    if (!type->getLight().empty()){
+        p->light = new Light();
+
+        if (p->light->set(type->getLight())){
+            p->light->setPos(p->pos.x, pos.y);
+            p->light->setZ(z);
+
+            LIGHTS.push_back(p->light);
+        } else {
+            delete p->light;
+            p->light = NULL;
+        }
+    }
+
     int temp = (rand() % 2);
 
     if (temp == 1){
@@ -368,11 +375,6 @@ void Particles::setZ(int z){
 
 bool Particles::drawLight(int z){
     if (!type) return false;
-    if (!type->getLight()) return true;
-
-    for (Particle* p : particles){
-        light(type->getLight()->radius, p->pos.x, p->pos.y, type->getLight()->r, type->getLight()->g, type->getLight()->b);
-    }
 
     return true;
 }
@@ -388,6 +390,10 @@ bool Particles::draw(int z){
         if (p){
             if (tick - p->tick >= type->getTime()){
                 particles.erase(particles.begin() + i);
+
+                if (p->light) delete p->light;
+                p->light = nullptr;
+
                 delete p;
                 continue;
             }
@@ -457,6 +463,10 @@ bool Particles::draw(int z){
 
             p->pos.x += p->vector.x * DELTA_TIME;
             p->pos.y += p->vector.y * DELTA_TIME;
+
+            if (p->light){
+                p->light->setPos(p->pos.x, p->pos.y);
+            }
         }
 
         i++;

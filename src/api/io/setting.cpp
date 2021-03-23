@@ -453,7 +453,7 @@ bool readXML(string path){
             } else if (equal(mainNode->tag, "particle")){
                 pushParticle_type(mainNode);
             } else if (equal(mainNode->tag, "light")){
-                pushLight(mainNode);
+                pushLight_type(mainNode);
             } else {
                 if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << mainNode->tag << "' in " << path << endl;
             }

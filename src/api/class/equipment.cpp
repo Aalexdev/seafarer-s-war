@@ -84,45 +84,11 @@ bool Equipment_type::loadXML(XMLNode* node){
                 }
             }
         } else if (!strcmp(child->tag, "light")){
-            light = new Light;
             for (int a=0; a<child->attributes.size; a++){
                 XMLAttribute attr = child->attributes.data[a];
 
-                if (!strcmp(attr.key, "power")){
-                    sscanf(attr.value, "%d", &light->power);
-                } else if (!strcmp(attr.key, "range")){
-                    sscanf(attr.value, "%d", &light->range);
-                } else if (!strcmp(attr.key, "r")){
-                    sscanf(attr.value, "%d", &light->r);
-                } else if (!strcmp(attr.key, "g")){
-                    sscanf(attr.value, "%d", &light->g);
-                } else if (!strcmp(attr.key, "b")){
-                    sscanf(attr.value, "%d", &light->b);
-                } else if (!strcmp(attr.key, "a")){
-                    sscanf(attr.value, "%d", &light->a);
-                } else if (!strcmp(attr.key, "image")){
-                    light->rect = new SDL_Rect;
-                    light->lightCenter = new SDL_Point;
-                    light->ligthTexture = loadTexture(attr.value, light->rect);
-
-                    if (!light->ligthTexture){
-                        delete light->rect;
-                        delete light->lightCenter;
-                        light->rect = nullptr;
-                        light->lightCenter = nullptr;
-                    }
-                } else if (!strcmp(attr.key, "width")){
-                    if (!light->rect) if (IS_ERR_OPEN) ERR << "ERROR :: equipment; light, width, reason : cannot set the width of a the light image without load it, use image=\"path\"" << endl;
-                    sscanf(attr.value, "%d", &light->rect->w);
-                } else if (!strcmp(attr.key, "height")){
-                    if (!light->rect) if (IS_ERR_OPEN) ERR << "ERROR :: equipment; light, height, reason : cannot set the height of a the light image without load it, use image=\"path\"" << endl;
-                    sscanf(attr.value, "%d", &light->rect->h);
-                } else if (!strcmp(attr.key, "center-x")){
-                    if (!light->lightCenter) if (IS_ERR_OPEN) ERR << "ERROR :: equipment; light, height, reason : cannot set the rotationnal center of a the light image without load it, use image=\"path\"" << endl;
-                    sscanf(attr.value, "%d", &light->lightCenter->x);
-                } else if (!strcmp(attr.key, "center-y")){
-                    if (!light->lightCenter) if (IS_ERR_OPEN) ERR << "ERROR :: equipment; light, height, reason : cannot set the rotationnal center of  a the light image without load it, use image=\"path\"" << endl;
-                    sscanf(attr.value, "%d", &light->lightCenter->y);
+                if (!strcmp(attr.key, "type")){
+                    light = attr.value;
                 } else {
                     if (IS_ERR_OPEN) ERR << "WARNING :: equipment; light, reason : cannot reconize '" << attr.key << " light attribute" << endl;
                 }
@@ -160,11 +126,11 @@ void Equipment_type::freeTexture(void){
     if (texture) SDL_DestroyTexture(texture);
 }
 
-Equipment_type::Cannon* Equipment_type::getCannon(){
+Equipment_type::Cannon* Equipment_type::getCannon(void){
     return cannon;
 }
 
-Equipment_type::Light* Equipment_type::getLight(){
+Estring Equipment_type::getLight(void){
     return light;
 }
 
@@ -249,7 +215,6 @@ bool Equipment::draw(void){
             i++;
         }
     }
-
     return true;
 }
 
@@ -262,13 +227,16 @@ bool Equipment::setType(string name){
         rect = type->getRect();
     }
 
-    if (type->getLight()){
+    if (!type->getLight().empty()){
         light = new Light;
 
-        light->r = type->getLight()->r;
-        light->g = type->getLight()->g;
-        light->b = type->getLight()->b;
-        light->a = type->getLight()->a;
+        if (light->set(type->getLight()){
+            light->setPos(getX(), getY());
+
+            LIGHTS.push_back(light);
+        } else {
+            delete light;
+        }
     }
     if (type->getCannon()){
         cannon = new Cannon;
@@ -283,6 +251,8 @@ void Equipment::unlink(void){
     if (IS_LOG_OPEN) LOG << "Equipment::unlink()" << endl;
     this->rect = {0, 0, 0, 0};
     if (light) delete light;
+    light = nullptr;
+    cannon->particles->setDuration(0);
     if (cannon) delete cannon;
     type = nullptr;
 }

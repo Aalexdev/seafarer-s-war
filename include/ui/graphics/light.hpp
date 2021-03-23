@@ -121,9 +121,10 @@
             /**
              * @brief draw the light on the renderer
              * 
+             * @param z the layer's hight, will not draw if it's not the light's z member
              * @return retunr true if drawn, false on error
              */
-            bool draw(void);
+            bool draw(int z);
 
             /**
              * @brief set the position of the light
@@ -153,6 +154,13 @@
              * @param angle 
              */
             void setAngle(int angle);
+
+            /**
+             * @brief set the hight if the light
+             * 
+             * @param z the new hight
+             */
+            void setZ(int z);
         
         private:
             /**
@@ -172,10 +180,17 @@
              * 
              */
             int angle;
+
+            /**
+             * @brief the hight of the light
+             * 
+             */
+            int z;
     };
 
     Light_type* searchLight(string name);
-    void pushLight(XMLNode* node);
+    void pushLight_type(XMLNode* node);
     void clearLights(void);
+    Light* newLight(void);
 
 #endif
