@@ -326,9 +326,9 @@ bool Ammunition::is_delete(void){
 }
 
 int Ammunition::getX(void){
-    return rect.x + (rect.w / 2) + CAMERA.x;
+    return rect.x - (rect.w / 2) + CAMERA.x;
 }
 
 int Ammunition::getY(void){
-    return rect.y + (rect.h / 2) + CAMERA.y;
+    return rect.y - (rect.h / 2) + CAMERA.y;
 }

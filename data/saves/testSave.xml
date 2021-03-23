@@ -22,7 +22,7 @@
         <equipment name="MR-Elpis" id="0" angle="30"/>
         <equipment name="MR-Elpis" id="1" angle="30"/>
         <equipment name="MR-Elpis" id="2" angle="30"/>
-        <equipment name="MR-Elpis" id="3" angle="30"/>
+        <equipment name="projector" id="3" angle="30"/>
     </equipments>
 </setPlayer>
 

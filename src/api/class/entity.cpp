@@ -692,7 +692,7 @@ void Entity::unlink(void){
             equipments[e] = NULL;
         }
     }
-    delete equipments;
+    delete[] equipments;
     equipments = nullptr;
     
     this->type = nullptr;

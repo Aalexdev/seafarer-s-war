@@ -1,4 +1,4 @@
-LOG file, init at : 19:16:18
+LOG file, init at : 20:39:21
 resetWindow(seafarers' war, 805240832, 805240832, 1080, 720, 4)
 clearWindow
 set max fps to : 60
@@ -131,8 +131,8 @@ Equipment::Equipment()
 Equipment::setType('MR-Elpis')
 Equipment::setType() : found 'MR-Elpis'
 Equipment::Equipment()
-Equipment::setType('MR-Elpis')
-Equipment::setType() : found 'MR-Elpis'
+Equipment::setType('projector')
+Equipment::setType() : found 'projector'
 Entity::Entity()
 Entity::reset()
 Entity::load_from_xml()
@@ -141,6 +141,9 @@ Entity::set() : type found 'thunder'
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/game/gameUI.xml , 0)
 freeWidgets()
 pause()
+Entity::~Entity()
+Entity::unlink()
+Entity::reset()
 freeWidgets()
 ~Light_type::Light_type()
 ~Light_type::Light_type()
@@ -148,9 +151,6 @@ freeWidgets()
 ~Light_type::Light_type()
 Entity_type::~Entity_type()
 freeEntity()
-Entity::~Entity()
-Entity::unlink()
-Entity::reset()
 Entity::unlink()
 Equipment::~Equipment()
 Equipment::unlink()
