@@ -1,4 +1,4 @@
-LOG file, init at : 20:44:47
+LOG file, init at : 12:29:18
 resetWindow(seafarers' war, 805240832, 805240832, 1080, 720, 4)
 clearWindow
 set max fps to : 60
@@ -47,6 +47,10 @@ readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/15 white.xml 
 Light_type::Light_type()
 Light_type::load() : '15 white'
 loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/circle/50 white.bmp)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/5 white.xml , 0)
+Light_type::Light_type()
+Light_type::load() : '5 white'
+loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/circle/50 white.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/50 white.xml , 0)
 Light_type::Light_type()
 Light_type::load() : '50 white'
@@ -56,6 +60,7 @@ Light_type::Light_type()
 Light_type::load() : 'projected 1'
 loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/projected/white 35.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations.xml , 0)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations/cannon shot 1.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations/fire.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/ammunitions.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/ammunitions/test.xml , 0)
@@ -142,6 +147,7 @@ readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/game/gameUI.xml , 0)
 freeWidgets()
 pause()
 freeWidgets()
+~Light_type::Light_type()
 ~Light_type::Light_type()
 ~Light_type::Light_type()
 ~Light_type::Light_type()

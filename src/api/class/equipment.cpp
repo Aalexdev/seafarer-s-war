@@ -105,6 +105,8 @@ bool Equipment_type::loadXML(XMLNode* node){
                             cannon->ammunition_type.clear();
                         }
                     }
+                } else if (!strcmp(attr.key, "particles")){
+                    cannon->particle_type = attr.value;
                 } else {
                     if (IS_ERR_OPEN) ERR << "WARNING :: equipment; cannon, reason : cannot reconize '" << attr.key << " cannon attribute" << endl;
                 }
@@ -218,11 +220,13 @@ bool Equipment::setType(string name){
         rect = type->getRect();
     }
 
+    light = NULL;
     if (!type->getLight().empty()){
         light = new Light();
 
         if (light->set(type->getLight())){
             light->setPos(getX(), getY());
+            light->setZ(parent->getZ());
 
             LIGHTS.push_back(light);
         } else {
@@ -233,7 +237,22 @@ bool Equipment::setType(string name){
     if (type->getCannon()){
         cannon = new Cannon;
         cannon->tick = SDL_GetTicks();
-        cannon->particles = NULL;
+        cannon->particles = nullptr;
+
+        if (!type->getCannon()->particle_type.empty()){
+            cannon->particles = new Particles();
+
+            if (cannon->particles->set(type->getCannon()->particle_type)){
+                PARTICLES.push_back(cannon->particles);
+                cannon->particles->setPos(getX(), getY());
+                cannon->particles->push(false);
+                cannon->particles->setRange(30);
+                cannon->particles->setZ(parent->getZ());
+            } else {
+                delete cannon->particles;
+                cannon->particles = nullptr;
+            }
+        }
     }
     
     if (IS_LOG_OPEN) LOG << "Equipment::setType() : found '" << name << "'" << endl;
@@ -313,6 +332,12 @@ void Equipment::shot(void){
 
         if (amm->load(type->getCannon()->ammunition_type)){
             cannon->ammunitions.push_back(amm);
+
+            if (cannon->particles){
+                cannon->particles->setPos(getX(), getY());
+                cannon->particles->setAngle(angle-75);
+                cannon->particles->push(true);
+            }
         } else {
             delete amm;
         }
@@ -327,13 +352,17 @@ void Equipment::update(void){
                 if (!amm->update()){
                     cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
                     delete amm;
-                    i--;
+                    continue;
                 }
             } else {
                 cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
-                i--;
+                continue;
             }
             i++;
+        }
+
+        if (cannon->particles){
+            cannon->particles->push(false);
         }
 
         if (MOUSEDOWN.left){
