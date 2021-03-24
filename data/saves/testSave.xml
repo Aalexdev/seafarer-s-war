@@ -24,6 +24,10 @@
         <equipment name="MR-Elpis" id="2" angle="30"/>
         <equipment name="projector" id="3" angle="30"/>
     </equipments>
+
+    <lights>
+        <light type="50 white" x="25" y="56"/>
+    </lights>
 </setPlayer>
 
 <summonEntity type="thunder" x="200" y="0" height="0" angle="0">

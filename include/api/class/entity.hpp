@@ -54,7 +54,9 @@
     #include "api/functions/texture.hpp"
     #include "api/functions/math.hpp"
     #include "api/class/equipment.hpp"
-    
+    #include "ui/graphics/light.hpp"
+    #include "ui/graphics/particles.hpp"
+
 
     struct Entity_point{
         int x, y;
@@ -688,6 +690,65 @@
              * 
              */
             bool should_del;
+
+            /**
+             * @brief the entity's object struct
+             * 
+             */
+            struct objectAttribute{
+                int dist;
+                int angle;
+            };
+
+            /**
+             * @brief particles of the entity
+             * 
+             */
+            vector<Particles*> particles;
+
+            /**
+             * @brief points of the particle
+             * 
+             */
+            vector<objectAttribute*> particles_point;
+
+            /**
+             * @brief lights of the entity
+             * 
+             */
+            vector<Light*> lights;
+
+            /**
+             * @brief points of the particle
+             * 
+             */
+            vector<objectAttribute*> lights_points;
+
+            /**
+             * @brief update particles's position from the pos and the angle of the entity
+             * 
+             */
+            void setParticlesPos(void);
+
+            /**
+             * @brief update lights's position from the position and the angle of the entity
+             * 
+             */
+            void setLightsPos(void);
+
+            /**
+             * @brief get the centered x from the map
+             * 
+             * @return int 
+             */
+            int getCenteredX(void);
+
+            /**
+             * @brief get the centered y from the map
+             * 
+             * @return int 
+             */
+            int getCenteredY(void);
     };
 
 #endif

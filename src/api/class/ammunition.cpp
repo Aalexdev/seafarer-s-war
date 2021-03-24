@@ -55,7 +55,6 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
 
                 if (!strcmp(attr.key, "texture")){
                     texture = loadTexture(attr.value, &rect);
-                    if (texture) SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MUL);
                 } else if (!strcmp(attr.key, "w")){
                     sscanf(attr.value, "%d", &rect.w);
                 } else if (!strcmp(attr.key, "h")){
@@ -83,7 +82,6 @@ bool Ammunition_type::loadFrom_XML(XMLNode* node){
 
                 if (!strcmp(attr.key, "type")){
                     light = attr.value;
-                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
                 } else {
                     if (IS_ERR_OPEN) ERR << "WARNING :: ammunition; light, reason : cannot reconize '" << attr.key << "' light attribute" << endl;
                 }

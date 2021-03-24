@@ -337,6 +337,7 @@ void freeWindow(void){
 
 void freeWidgets(void){
     if (IS_LOG_OPEN) LOG << "freeWidgets()" << endl;
+    
     for (Text* text : WIDGETS.texts){
         if (text) delete text;
     }

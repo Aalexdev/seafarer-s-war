@@ -3,6 +3,5 @@
 <ammunition name="test" type="standar">
     <texture texture="res/img/projectiles/test.bmp" w="2" h="10"/>
     <perform damages="100" initial-speed="20"/>
-    <light type="50 white"/>
     <particle type="red fire 1" angle="90" range="25"/>
 </ammunition>

@@ -483,6 +483,99 @@ bool Entity::load_from_xml(XMLNode* node){
                     if (IS_ERR_OPEN) ERR << "WARNIGN :: summonEntity; equipments, reason : cannot set more equipment than the type has (" << e << ">" << type->getEquipmentSize() << endl;
                 }
             }
+        } else if (!strcmp(child->tag, "particles")){
+            for (int p=0; p<child->children.size; p++){
+                XMLNode* particles_node = XMLNode_child(child, p);
+
+                if (!strcmp(particles_node->tag, "particle")){
+                    Particles* particles = new Particles();
+                    objectAttribute* oa = new objectAttribute;
+
+                    SDL_Point p = {0, 0};
+
+                    for (int a=0; a<particles_node->attributes.size; a++){
+                        XMLAttribute attr = particles_node->attributes.data[a];
+
+                        if (!strcmp(attr.key, "type")){
+                            if (!particles->set(attr.value)){
+                                delete particles;
+                                delete oa;
+                                particles = nullptr;
+                                break;
+                            }
+                        } else if (!strcmp(attr.key, "angle")){
+                            int angle;
+                            sscanf(attr.value, "%d", &angle);
+                            particles->setAngle(angle);
+                        } else if (!strcmp(attr.key, "range")){
+                            int range;
+                            sscanf(attr.value, "%d", &range);
+                            particles->setRange(range);
+                        } else if (!strcmp(attr.key, "x")){
+                            sscanf(attr.value, "%d", &p.x);
+                        } else if (!strcmp(attr.key, "y")){
+                            sscanf(attr.value, "%d", &p.y);
+                        } else {
+                            if (IS_ERR_OPEN) ERR << "WARNING :: summonEntity; particles; particle, reason : cannot reconize '" << attr.key << "' particle attribute" << endl;
+                        }
+                    }
+
+                    if (particles){
+                        oa->angle = getAngleM(rect.w / 2, rect.h / 2, p.x, p.y) + 90;
+                        oa->dist = getDistanceM(p.x, p.y, rect.w / 2, rect.h / 2);
+
+                        this->particles.push_back(particles);
+                        particles_point.push_back(oa);
+                        PARTICLES.push_back(particles);
+                    }
+
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: summonEntity; particles, reason : cannot reconize '" << particles_node->tag << "' particles child" << endl;
+                }
+            }
+        } else if (!strcmp(child->tag, "lights")){
+            for (int p=0; p<child->children.size; p++){
+                XMLNode* light_node = XMLNode_child(child, p);
+
+                if (!strcmp(light_node->tag, "light")){
+                    Light* light = new Light();
+                    objectAttribute* oa = new objectAttribute;
+
+                    SDL_Point p = {0, 0};
+
+                    for (int a=0; a<light_node->attributes.size; a++){
+                        XMLAttribute attr = light_node->attributes.data[a];
+
+                        if (!strcmp(attr.key, "type")){
+                            if (!light->set(attr.value)){
+                                delete light;
+                                delete oa;
+                                light = nullptr;
+                                break;
+                            }
+                        } else if (!strcmp(attr.key, "x")){
+                            sscanf(attr.value, "%d", &p.x);
+                        } else if (!strcmp(attr.key, "y")){
+                            sscanf(attr.value, "%d", &p.y);
+                        } else {
+                            if (IS_ERR_OPEN) ERR << "WARNING :: summonEntity; lights; light, reason : cannot reconize '" << attr.key << "' particle attribute" << endl;
+                        }
+                    }
+
+                    if (light){
+                        oa->angle = getAngleM(rect.w / 2, rect.h / 2, p.x, p.y) + 90;
+                        oa->dist = getDistanceM(p.x, p.y, rect.w / 2, rect.h / 2);
+
+                        this->lights.push_back(light);
+                        lights_points.push_back(oa);
+                        LIGHTS.push_back(light);
+
+                    }
+
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: summonEntity; lights, reason : cannot reconize '" << light_node->tag << "' particles child" << endl;
+                }
+            }
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: Entity::load_from_xml, reason : cannot reconize '" << child->tag << "' summonEntity child" << endl;
         }
@@ -508,6 +601,24 @@ void Entity::reset(void){
     this->type = nullptr;
     
     if (onDeath) delete onDeath;
+
+    for (int i=0; i<particles.size(); i++){
+        delete particles[i];
+        delete particles_point[i];
+        particles_point[i] = nullptr;
+        particles[i] = nullptr;
+    }
+    particles.clear();
+    particles_point.clear();
+
+    for (int i=0; i<lights.size(); i++){
+        delete lights[i];
+        delete lights_points[i];
+        lights[i] = nullptr;
+        lights_points[i] = nullptr;
+    }
+    lights.clear();
+    lights_points.clear();
 }
 
 Entity::Entity(){
@@ -645,6 +756,9 @@ void Entity::update(){
         }
 
         updateEquipments();
+        setParticlesPos();
+        setLightsPos();
+
     } else {
         z = (float)((SDL_GetTicks() - onDeath->tick) * (float)type->getDeath()->z) / (float)type->getDeath()->time;
     }
@@ -849,4 +963,29 @@ void Entity::kill(void){
 
 bool Entity::should_delete(void){
     return (health <= 0 && (int)z == type->getDeath()->z);
+}
+
+void Entity::setParticlesPos(void){
+    for (int i=0; i<particles.size(); i++){
+        int x, y;
+        setAngleM(&x, &y, particles_point[i]->dist, particles_point[i]->angle + angle);
+        particles[i]->setPos(x + getCenteredX(), y + getCenteredY());
+    }
+}
+
+void Entity::setLightsPos(void){
+    for (int i=0; i<lights.size(); i++){
+        int x, y;
+        setAngleM(&x, &y, lights_points[i]->dist, lights_points[i]->angle + angle);
+        lights[i]->setPos(x + getCenteredX(), y + getCenteredY());
+        lights[i]->setZ(z);
+    }
+}
+
+int Entity::getCenteredX(void){
+    return rect.x + (rect.w / 2) + CAMERA.x;
+}
+
+int Entity::getCenteredY(void){
+    return rect.y + (rect.h / 2) + CAMERA.y;
 }
