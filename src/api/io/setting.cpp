@@ -443,13 +443,7 @@ bool readXML(string path){
                     }
                 }
             } else if (equal(mainNode->tag, "ammunition")){
-                Ammunition_type* a = new Ammunition_type();
-
-                if (a->loadFrom_XML(mainNode)){
-                    AMMUNITION_TYPE.push_back(a);
-                } else {
-                    delete a;
-                }
+                new_Ammunition_type(mainNode);
             } else if (equal(mainNode->tag, "particle")){
                 pushParticle_type(mainNode);
             } else if (equal(mainNode->tag, "light")){

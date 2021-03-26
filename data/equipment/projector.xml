@@ -3,5 +3,5 @@
 <equipment name="projector">
     <texture path="res/img/equipment/projector.bmp"/>
     <center x="4" y="4"/>
-    <light type="projected 1"/>
+    <light type="large projected white"/>
 </equipment>

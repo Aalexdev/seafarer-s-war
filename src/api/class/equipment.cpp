@@ -98,13 +98,6 @@ bool Equipment_type::loadXML(XMLNode* node){
                     sscanf(attr.value, "%d", &cannon->couldown);
                 } else if (!strcmp(attr.key, "ammunition-type")){
                     cannon->ammunition_type = attr.value;
-
-                    if (cannon->ammunition_type != UNKNOWN_AMMUNITION){
-                        if (!existingType(cannon->ammunition_type)){
-                            if (IS_ERR_OPEN) ERR << "WARNING :: equipment; cannon; ammunition-type, reason : cannot reconize '" << attr.value << "' type of ammunition, use unknown to use they all" << endl;
-                            cannon->ammunition_type.clear();
-                        }
-                    }
                 } else if (!strcmp(attr.key, "particles")){
                     cannon->particle_type = attr.value;
                 } else {
@@ -174,12 +167,6 @@ Equipment::~Equipment(){
 
 bool Equipment::drawLight(void){
 
-    if (cannon){
-        for (Ammunition *a : cannon->ammunitions){
-            a->drawLight();
-        }
-    }
-
     return true;
 }
 
@@ -196,18 +183,6 @@ bool Equipment::draw(void){
         return false;
     }
     
-    if (cannon){
-        int i=0;
-        for (Ammunition* amm : cannon->ammunitions){
-            if (amm){
-                if (!amm->draw()) return false;
-            } else {
-                cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
-                i--;
-            }
-            i++;
-        }
-    }
     return true;
 }
 
@@ -268,6 +243,11 @@ void Equipment::unlink(void){
 
     if (cannon){
         if (cannon->particles) cannon->particles->setDuration(0);
+
+        for (Ammunition* amm : cannon->ammunitions){
+            amm->pop();
+        }
+
         delete cannon;
         cannon = NULL;
     }
@@ -328,50 +308,31 @@ void Equipment::shot(void){
     if (SDL_GetTicks() - type->getCannon()->couldown > cannon->tick){
         cannon->tick = SDL_GetTicks();
 
-        Ammunition* amm = new Ammunition(parent, angle, getX() - CAMERA.x, getY() - CAMERA.y);
+        Ammunition* amm = push_Ammunition(type->getCannon()->ammunition_type);
 
-        if (amm->load(type->getCannon()->ammunition_type)){
+        if (amm){
+            amm->x(getX());
+            amm->y(getY());
+            amm->z(parent->getZ());
+
+            amm->angle(angle-90);
+            amm->strength(100);
+
             cannon->ammunitions.push_back(amm);
-
-            if (cannon->particles){
-                cannon->particles->setPos(getX(), getY());
-                cannon->particles->setAngle(angle-75);
-                cannon->particles->push(true);
-            }
-        } else {
-            delete amm;
         }
     }
 }
 
 void Equipment::update(void){
-    if (cannon){
-        int i=0;
-        for (Ammunition* amm : cannon->ammunitions){
-            if (amm){
-                if (!amm->update()){
-                    cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
-                    delete amm;
-                    continue;
-                }
-            } else {
-                cannon->ammunitions.erase(cannon->ammunitions.begin() + i);
-                continue;
-            }
-            i++;
-        }
-
-        if (cannon->particles){
-            cannon->particles->push(false);
-        }
-
-        if (MOUSEDOWN.left){
-            shot();
-        }
-    }
-
+    
     if (light){
         light->setPos(getX(), getY());
         light->setAngle(angle);
+    }
+
+    if (cannon){
+        if (MOUSEBTN.left){
+            shot();
+        }
     }
 }

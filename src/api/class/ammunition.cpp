@@ -1,332 +1,260 @@
-#include "api/class/ammunition.hpp"
+#include "api/class/Ammunition.hpp"
 #include "main.hpp"
-#include "ui/graphics/light.hpp"
 
-#include <string.h>
+#include <cmath>
+#include <math.h>
 
-Ammunition_type::Ammunition_type(){
-    if (IS_LOG_OPEN) LOG << "Ammunition_type::Ammunition_type()" << endl;
-    texture = nullptr;
-    damages = 0;
-    initialSpeed = 10;
-
-    type = "unknown";
-    name = "unknown";
-    particle_type = NULL;
-}
-
-Ammunition_type::~Ammunition_type(){
-    if (IS_LOG_OPEN) LOG << "Ammunition_type::~Ammunition_type()" << endl;
-    if (texture) SDL_DestroyTexture(texture);
-
-    name.clear();
-    type.clear();
-
-    if (particle_type) delete particle_type;
-    particle_type = NULL;
-}
-
-bool Ammunition_type::loadFrom_XML(XMLNode* node){
-    if (IS_LOG_OPEN) LOG << "Ammunition_type::loadFrom_XML()" << endl;
-    if (!node){
-        if (IS_ERR_OPEN) ERR << "ERROR :: Ammunition_type::loadFrom_XML, reason : cannot load an ammunition from a null XML node" << endl;
-        return false;
-    }
-
-    for (int a=0; a<node->attributes.size; a++){
-        XMLAttribute attr = node->attributes.data[a];
-
-        if (!strcmp(attr.key, "name")){
-            name = attr.value;
-        } else if (!strcmp(attr.key, "type")){
-            type = attr.value;
-        } else {
-            if (IS_ERR_OPEN) ERR << "WARNING :: ammunition, reason : cannot reconize '" << attr.key << "' ammunition attribute" << endl;
-        }
-    }
-
-    for (int c=0; c<node->children.size; c++){
-        
-        XMLNode *child = XMLNode_child(node, c);
-
-        if (!strcmp(child->tag, "texture")){
-            for (int a=0; a<child->attributes.size; a++){
-                XMLAttribute attr = child->attributes.data[a];
-
-                if (!strcmp(attr.key, "texture")){
-                    texture = loadTexture(attr.value, &rect);
-                } else if (!strcmp(attr.key, "w")){
-                    sscanf(attr.value, "%d", &rect.w);
-                } else if (!strcmp(attr.key, "h")){
-                    sscanf(attr.value, "%d", &rect.h);
-                } else {
-                    if (IS_ERR_OPEN) ERR << "WARNIG :: ammunition; texture, reason : cannot reconize '" << attr.key << "' texture attribute" << endl;
-                }
-            }
-        } else if (!strcmp(child->tag, "perform")){
-            
-            for (int a=0; a<child->attributes.size; a++){
-                XMLAttribute attr = child->attributes.data[a];
-
-                if (!strcmp(attr.key, "damages")){
-                    sscanf(attr.value, "%d", &damages);
-                } else if (!strcmp(attr.key, "initial-speed")){
-                    sscanf(attr.value, "%d", &initialSpeed);
-                } else {
-                    if (IS_ERR_OPEN) ERR << "WARNING :: ammunition; perform, reason :  cannot reconize '" << attr.key << "' perform attribute" << endl;
-                }
-            }
-        } else if (!strcmp(child->tag, "light")){
-            for (int a=0; a<child->attributes.size; a++){
-                XMLAttribute attr = child->attributes.data[a];
-
-                if (!strcmp(attr.key, "type")){
-                    light = attr.value;
-                } else {
-                    if (IS_ERR_OPEN) ERR << "WARNING :: ammunition; light, reason : cannot reconize '" << attr.key << "' light attribute" << endl;
-                }
-            }
-        }  else if (!strcmp(child->tag, "particle")){
-            particle_type = new Particle;
-
-
-            for (int a=0; a<child->attributes.size; a++){
-                XMLAttribute attr = child->attributes.data[a];
-
-                if (!strcmp(attr.key, "type")){
-                    particle_type->name = attr.value;
-                } else if (!strcmp(attr.key, "angle")){
-                    sscanf(attr.value, "%d", &particle_type->angle);
-                } else if (!strcmp(attr.key, "range")){
-                    sscanf(attr.value, "%d", &particle_type->range);
-                } else {
-                    if (IS_ERR_OPEN) ERR << "ERROR :: ammunition; particle, reason : cannot reconize '"<< attr.key << "' particle attribute" << endl;
-                }
-            }
-        } else {
-            if (IS_ERR_OPEN) ERR << "WARNING :: ammunition, reason : cannot reconize '" << child->tag << "' ammunition child" << endl;
-        }
-    }
-
-    return true;
-}
-
-SDL_Texture* Ammunition_type::getTexture(void){
-    return texture;
-}
-
-string Ammunition_type::getName(void){
-    return name;
-}
-
-string Ammunition_type::getType(void){
-    return type;
-}
-
-SDL_Rect Ammunition_type::getSize(void){
-    return (SDL_Rect){0, 0, rect.w, rect.h};
-}
-
-int Ammunition_type::getInitialSpeed(void){
-    return initialSpeed;
-}
-
-int Ammunition_type::getDamages(void){
-    return damages;
-}
-
-string Ammunition_type::getLight(void){
-    return light;
-}
-
-Ammunition_type::Particle* Ammunition_type::getParticleType(void){
-    return particle_type;
-}
-
-Ammunition::Ammunition(Entity* parent) : parent(parent){
-    unlink();
-}
-
-Ammunition::Ammunition(Entity* parent, int angle, int x, int y) : parent(parent){
-    light = NULL;
-    unlink();
-    this->angle = angle;
-    rect.x = x;
-    rect.y = y;
-    spoint.x = x;
-    spoint.y = y;
-    should_delete = true;
+Ammunition::Ammunition(){
+    _type = nullptr;
+    _dist = 0;
+    _speed = 0;
+    _pop = false;
 }
 
 Ammunition::~Ammunition(){
-    particles->setDuration(3000);
-    particles->push(false);
-    unlink();
+    _type = nullptr;
 }
 
-void Ammunition::unlink(void){
-    type = nullptr;
-    rect = {0, 0, 0, 0};
-    speed = 0;
-    angle = 0;
-    particles = NULL;
+bool Ammunition::set(string name){
+    _type = search_Ammunition_type(name);
+    if (!_type && IS_ERR_OPEN) ERR << "ERROR :: cannot reconize '" << name << "' ammunition type name" << endl;
+    else get_type_attributes();
+    return _type;
+}
 
-    if (light) delete light;
-    light = NULL;
+bool Ammunition::set(int id){
+    _type = search_Ammunition_type(id);
+    return _type;
+}
+
+void Ammunition::set(Ammunition_type* type){
+    _type = type;
+}
+
+bool Ammunition::linked(void){
+    return _type;
+}
+
+float Ammunition::speed(void){
+    return _speed;
+}
+
+void Ammunition::speed(float speed){
+    _speed = speed;
+}
+
+void Ammunition::update_speed(void){
+    if (_mass && _strength){
+        _speed = _strength / _mass;
+    } else {
+        _speed = 0;
+    }
+}
+
+void Ammunition::update_pos(void){
+    _rect.x += cosf(_angle*M_PI/180.0f) * (_speed * DELTA_TIME);
+    _rect.y += sinf(_angle*M_PI/180.0f) * (_speed * DELTA_TIME);
+    _dist += _speed * DELTA_TIME;
+}
+
+void Ammunition::update_collisions(void){
+
+}
+
+int Ammunition::angle(void){
+    return _angle;
+}
+
+void Ammunition::angle(int angle){
+    _angle = angle;
+}
+
+Ammunition_type* Ammunition::type(void){
+    return _type;
+}
+
+void Ammunition::get_type_attributes(void){
+    if (!linked()) return;
+
+    _rect = _type->size();
+    _layer_target = _type->target_layer();
+    _up_down_speed = _type->up_down_speed();
+    _strength = _type->strength();
+    _mass = _type->mass();
+}
+
+SDL_Rect Ammunition::rect(void){
+    return _rect;
+}
+
+SDL_Rect* Ammunition::rect_ptr(void){
+    return &_rect;
+}
+
+float Ammunition::dist(void){
+    return _dist;
+}
+
+void Ammunition::dist(float dist){
+    _dist = dist;
+}
+
+float Ammunition::strength(void){
+    return _strength;
+}
+
+void Ammunition::strength(float strength){
+    _strength = strength;
+}
+
+float Ammunition::mass(void){
+    return _mass;
+}
+
+void Ammunition::mass(float mass){
+    _mass = mass;
+}
+
+bool Ammunition::should_delete(void){
+    if (!_type) return true;
+    if (_pop) return true;
+
+    if (_type->layer_target_type() == AMMUNITION_TYPE_TARGET_NONE) return false;
+    if (_type->layer_target_type() == AMMUNITION_TYPE_TARGET_EQUAL) return floor(_z) == _type->target_layer();
+    if (_type->layer_target_type() == AMMUNITION_TYPE_TARGET_LESS) return _z < _type->target_layer();
+    if (_type->layer_target_type() == AMMUNITION_TYPE_TARGET_GREATER) return _z > _type->target_layer();
+
+    return _dist >= AMMUNITION_MAX_DIST;
+}
+
+int Ammunition::x(void){
+    return _rect.x + (_rect.w / 2) + CAMERA.x; 
+}
+
+int Ammunition::y(void){
+    return _rect.y + (_rect.h / 2) + CAMERA.y; 
+}
+
+float Ammunition::z(void){
+    return _z;
+}
+
+void Ammunition::pop(void){
+    _pop = true;
 }
 
 bool Ammunition::draw(void){
-    if (!linked()){
-        if (IS_ERR_OPEN) ERR << "ERROR :: Ammunition::draw, reason : cannot draw an unlinked ammunition" << endl;
+    if (!_type) return false;
+
+    if (SDL_RenderCopyEx(RENDERER, _type->texture(), NULL, rect_ptr(), _angle+90, _type->center_ptr(), SDL_FLIP_NONE)){
+        if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderCopyEx, reason : " << SDL_GetError() << endl;
         return false;
-    }
-
-    SDL_Rect rect = {getX(), getY(), this->rect.w, this->rect.h};
-    if (SDL_RenderCopyEx(RENDERER, type->getTexture(), NULL, &rect, angle, 0, SDL_FLIP_NONE)){
-        if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderCopyEx(), reason : " << SDL_GetError() << endl;
-        return false;
-    }
-
-    return is_delete();
-}
-
-bool Ammunition::update(void){
-    if (!linked()){
-        if (IS_ERR_OPEN) ERR << "ERROR :: Ammunition::update, reason : cannot update an unlinked ammunition" << endl;
-        return false;
-    }
-
-    int x, y;
-    setAngleM(&x, &y, speed, angle-90);
-    rect.x += x;
-    rect.y += y;
-
-    if (getDistanceM(rect.x, rect.y, spoint.x, spoint.y) > 1000){
-        return false;
-    }
-    
-    for (Entity* e : ENTITY){
-        if (e != parent && e->in_screen() && e->PointInside(getX(), getY())){
-            e->setHealth(type->getDamages());
-            should_delete = false;
-        }
-    }
-
-    if (parent != PLAYER){
-        if (PLAYER->PointInside(getX(), getY())){
-            PLAYER->setHealth(type->getDamages());
-            should_delete = false;
-        }
-    }
-
-    if (particles){
-        particles->setPos(getX(), getY());
-        particles->setAngle(angle + type->getParticleType()->angle);
-    }
-
-    if (light){
-        light->setPos(getX(), getY());
-    }
-
-    return is_delete();
-}
-
-bool Ammunition::load(string type_name){
-    type = find(type_name);
-    if (!type) return false;
-
-    rect.w = type->getSize().w; 
-    rect.h = type->getSize().h; 
-    speed = type->getInitialSpeed();
-
-    if (type->getParticleType()){
-        particles = new Particles();
-
-        if (particles->set(type->getParticleType()->name)){
-            PARTICLES.push_back(particles);
-        
-            particles->setAngle(type->getParticleType()->angle);
-            particles->setRange(type->getParticleType()->range);
-            particles->setDuration(UNDEFINE);
-
-            particles->setZ(parent->getZ());
-            particles->setPos(getX(), getY());
-        } else {
-            delete particles;
-            particles = NULL;
-        }
-    }
-
-    if (!type->getLight().empty()){
-        light = new Light();
-        
-        if (light->set(type->getLight())){
-
-            light->setPos(getX(), getY());
-            light->setZ(parent->getZ());
-
-            LIGHTS.push_back(light);
-
-        } else {
-            delete light;
-            light = NULL;
-        }
     }
 
     return true;
 }
 
-bool Ammunition::linked(void){
-    return type;
+void Ammunition::x(int x){
+    _rect.x = x;
 }
 
-Ammunition_type* find(string name){
-    
-    for (Ammunition_type* a : AMMUNITION_TYPE){
-        if (a->getName() == name){
-            return a;
-        }
+void Ammunition::y(int y){
+    _rect.y = y;
+}
+
+void Ammunition::z(float z){
+    _z = z;
+}
+
+Ammunition* push_Ammunition(string name){
+    Ammunition* amm = new Ammunition();
+
+    if (amm->set(name)){
+        AMMUNITIONS.push_back(amm);
+    } else {
+        delete amm;
+        amm = nullptr;
     }
 
-    if (IS_ERR_OPEN) ERR << "ERROR :: cannot find '" << name << "' ammunition name" << endl;
-    return NULL;
+    return amm;
 }
 
-vector<Ammunition_type*> searchType(string type){
-    vector<Ammunition_type*> ammunitions;
-    
-    for (Ammunition_type* a : AMMUNITION_TYPE){
-        if (a->getType() == type){
-            ammunitions.push_back(a);
+int update_ammunitions(void* ptr){
+    int i=0;
+    for (Ammunition* amm : AMMUNITIONS){
+        if (amm->should_delete()){
+            delete amm;
+            amm = nullptr;
+            AMMUNITIONS.erase(AMMUNITIONS.begin() + i);
+            continue;
         }
+
+        amm->update_speed();
+        amm->update_pos();
+        amm->update_collisions();
+
+        i++;
     }
 
-    return ammunitions;
+    return 1;
 }
 
-bool existingType(string type){
-    for (Ammunition_type* a : AMMUNITION_TYPE){
-        if (a->getName() == type){
-            return true;
+int draw_ammunitions(int z){
+
+    int i=0;
+    for (Ammunition* amm : AMMUNITIONS){
+        if ((int)amm->z() == z){
+            if (!amm->draw()){
+                delete amm;
+                amm = nullptr;
+                AMMUNITIONS.erase(AMMUNITIONS.begin() + i);
+                continue;
+            }
         }
+        i++;
+    }
+    return 1;
+}
+
+void clear_ammunitions(void){
+    for (Ammunition* amm : AMMUNITIONS){
+        delete amm;
+    }
+    AMMUNITIONS.clear();
+}
+
+Ammunition* operator<<(Ammunition& amm, string type_name){
+    amm.set(type_name);
+    return &amm;
+}
+
+Ammunition* operator<<(Ammunition& amm, int type_id){
+    amm.set(type_id);
+    return &amm;
+}
+
+Ammunition* operator<<(Ammunition& amm, Ammunition_type* type){
+    amm.set(type);
+    return &amm;
+}
+
+bool operator==(Ammunition& amm, Ammunition_type* type){
+    if (amm.linked()){
+        return amm.type() == type;
     }
     return false;
 }
 
-void Ammunition::drawLight(void){
-    if (type->getLight().empty()) return;
-
-    
+bool operator==(Ammunition& amm, string type_name){
+    if (amm.linked()){
+        return amm.type()->name() == type_name;
+    }
+    return false;
 }
 
-bool Ammunition::is_delete(void){
-    return should_delete;
-}
-
-int Ammunition::getX(void){
-    return rect.x - (rect.w / 2) + CAMERA.x;
-}
-
-int Ammunition::getY(void){
-    return rect.y - (rect.h / 2) + CAMERA.y;
+bool operator==(Ammunition& amm, int type_id){
+    if (amm.linked()){
+        return amm.type()->id() == type_id;
+    }
+    return false;
 }

@@ -698,6 +698,7 @@
             struct objectAttribute{
                 int dist;
                 int angle;
+                int objectAngle;
             };
 
             /**

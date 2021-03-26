@@ -1,154 +1,11 @@
-#ifndef __MUNITION__
-#define __MUNITION__
+#ifndef __AMMUNITION__
+#define __AMMUNITION__
 
-    #include <iostream>
-    #include <SDL2/SDL.h>
-
-    using namespace std;
-
-    class Ammunition_type;
     class Ammunition;
 
-    #include "api/io/xml.hpp"
-    #include "api/class/entity.hpp"
-    #include "ui/graphics/sprite.hpp"
-    #include "ui/graphics/particles.hpp"
-    #include "ui/graphics/light.hpp"
+    #include "api/types/Ammunition_type.hpp"
 
-    class Ammunition_type{
-        public:
-            Ammunition_type();
-            ~Ammunition_type();
-
-            /**
-             * @brief load the type from a xml node
-             * 
-             * @param node the xml node
-             * @return return true if load, false on error
-             */
-            bool loadFrom_XML(XMLNode* node);
-
-            /**
-             * @brief get the texture of the ammunition type
-             * 
-             * @return return the texture
-             */
-            SDL_Texture* getTexture(void);
-
-            /**
-             * @brief get the name of teh ammunition
-             * 
-             * @return return the name 
-             */
-            string getName(void);
-
-            /**
-             * @brief get the type of the ammunition
-             * 
-             * @return return the type
-             */
-            string getType(void);
-
-            /**
-             * @brief get the size of the texture
-             * 
-             * @return return a rect
-             */
-            SDL_Rect getSize(void);
-
-            /**
-             * @brief get the initial speed
-             * 
-             * @return int 
-             */
-            int getInitialSpeed(void);
-
-            /**
-             * @brief get the light name of the amunition
-             * 
-             * @return Light* 
-             */
-            string getLight(void);
-
-            /**
-             * @brief Get the Damages object
-             * 
-             * @return int 
-             */
-            int getDamages(void);
-
-            struct Particle{
-                /**
-                 * @brief the name if the particle
-                 * 
-                 */
-                string name;
-
-                /**
-                 * @brief teh angle, in degres
-                 * 
-                 */
-                int angle;
-
-                /**
-                 * @brief the range of the animation
-                 * 
-                 */
-                int range;
-            };
-
-            /**
-             * @brief get the name of the partcile type
-             * 
-             * @return return a string, empty if the type has no particle 
-             */
-            Particle* getParticleType(void);
-
-        private:
-            string name;
-
-            /**
-             * @brief a type name, used to select a from equipment
-             * 
-             */
-            string type;
-
-            /**
-             * @brief the texture of the ammunition
-             * 
-             */
-            SDL_Texture* texture;
-
-            /**
-             * @brief the rect of the ammunition's texture
-             * 
-             */
-            SDL_Rect rect;
-
-            /**
-             * @brief damages of the ammunition
-             * 
-             */
-            int damages;
-
-            /**
-             * @brief the speed at the ouput of the cannon
-             * 
-             */
-            int initialSpeed;
-
-            /**
-             * @brief the light type name by the ammunition
-             * 
-             */
-            string light;
-
-            /**
-             * @brief the particle type name, empty if none
-             * 
-             */
-            Particle* particle_type;
-    };
+    #define AMMUNITION_MAX_DIST 3000
 
     class Ammunition{
         public:
@@ -156,149 +13,301 @@
              * @brief Construct a new Ammunition object
              * 
              */
-            Ammunition(Entity* parent);
-
-            /**
-             * @brief Construct a new Ammunition object
-             * 
-             * @param angle the angle of the ammunition
-             */
-            Ammunition(Entity* parent, int angle, int x, int y);
+            Ammunition();
 
             /**
              * @brief Destroy the Ammunition object
              * 
              */
             ~Ammunition();
-
+        
             /**
-             * @brief load type the ammunition from a type name
+             * @brief set the ammunition's type from a name
              * 
-             * @param type_name the name of the type
-             * @return return true if loaded, false on error
+             * @param name the ammunition_type's name
+             * @return return true if loaded, false on error 
              */
-            bool load(string type_name);
+            bool set(string name);
 
             /**
-             * @brief update the ammunition vars and collisions
+             * @brief set the ammunition's type from an id
+             * 
+             * @param id the ammunition_typs's id
+             * @return retunr true if loaded, false on error
+             */
+            bool set(int id);
+
+            /**
+             * @brief set the ammunition's type from a ammunitionètype pointer
+             * 
+             * @param type the type
+             */
+            void set(Ammunition_type* type);
+            
+            /**
+             * @brief if the ammunition is linked with a type
+             * 
+             * @return retunr true if linked, false if not
+             */
+            bool linked(void);
+
+            /**
+             * @brief get the speed of the ammunition
+             * 
+             * @return float 
+             */
+            float speed(void);
+
+            /**
+             * @brief set the speed of the ammunition
+             * 
+             * @param speed the new speed of the ammunition
+             */
+            void speed(float speed);
+
+            /**
+             * @brief update the speed of the ammunition
              * 
              */
-            bool update(void);
+            void update_speed(void);
 
             /**
-             * @brief draw the ammunition on the screen
+             * @brief update the position of the ammunition
+             * 
+             */
+            void update_pos(void);
+
+            /**
+             * @brief update the collision if the ammunition with entitys
+             * 
+             */
+            void update_collisions(void);
+
+            /**
+             * @brief get the angle of the ammunition
+             * 
+             * @return int 
+             */
+            int angle(void);
+
+            /**
+             * @brief set the angle of the ammunition
+             * 
+             * @param angle the new angle of the ammunition
+             */
+            void angle(int angle);
+
+            /**
+             * @brief get the type of the ammunition
+             * 
+             * @return Ammunition_type* 
+             */
+            Ammunition_type* type(void);
+
+            /**
+             * @brief put type attributes into the ammunition
+             * 
+             */
+            void get_type_attributes(void);
+
+            /**
+             * @brief get the ammunition's rect
+             * 
+             * @return SDL_Rect 
+             */
+            SDL_Rect rect(void);
+
+            /**
+             * @brief get a pointer to the ammunition's rect
+             * 
+             * @return SDL_Rect* 
+             */
+            SDL_Rect* rect_ptr(void);
+
+            /**
+             * @brief get the distance made by the ammunition
+             * 
+             * @return float 
+             */
+            float dist(void);
+
+            /**
+             * @brief set the diance
+             * 
+             * @param dist the new distance
+             */
+            void dist(float dist);
+
+            /**
+             * @brief get the strength of the ammunition
+             * 
+             * @return float 
+             */
+            float strength(void);
+
+            /**
+             * @brief set the strength of the ammunition
+             * 
+             * @param strength the new strength
+             */
+            void strength(float strength);
+
+            /**
+             * @brief get the mass of the ammunition
+             * 
+             * @return float 
+             */
+            float mass(void);
+
+            /**
+             * @brief set the mass of the ammunition
+             * 
+             * @param mass the new mass
+             */
+            void mass(float mass);
+
+            /**
+             * @brief get if the ammunition should be delete
+             * 
+             * @return return trus if it is, false if not
+             */
+            bool should_delete(void);
+
+            /**
+             * @brief get the X axis of the ammunition, on the map
+             * 
+             * @return int 
+             */
+            int x(void);
+
+            /**
+             * @brief get the Y axis of the ammunition, on the map
+             * 
+             * @return int 
+             */
+            int y(void);
+
+            /**
+             * @brief get the Z axis of the ammunition
+             * 
+             * @return int 
+             */
+            float z(void);
+
+            /**
+             * @brief set the X axis
+             * 
+             * @param x the new x
+             */
+            void x(int x);
+
+            /**
+             * @brief set the Y axis
+             * 
+             * @param y the new y
+             */
+            void y(int y);
+
+            /**
+             * @brief set the z value
+             * 
+             * @param z the new z
+             */
+            void z(float z);
+
+            /**
+             * @brief draw the ammunition type's texture on the renderer
              * 
              * @return return true if drawn, false on error
              */
             bool draw(void);
 
             /**
-             * @brief get if the ammunition is linked with a type
+             * @brief delete the ammunition and erease it from the amminition list
              * 
-             * @return return true if linked, false otherwise 
              */
-            bool linked(void);
+            void pop(void);
 
-            /**
-             * @brief draw the light effect (if activ)
-             * 
-             */
-            void drawLight(void);
-
-            /**
-             * @brief return true if the ammunition should be deleted
-             * 
-             * @return true 
-             * @return false 
-             */
-            bool is_delete(void);   
-        
         private:
             /**
-             * @brief the ârent of the ammunition
+             * @brief the type if the ammunition
              * 
              */
-            Entity* parent;
+            Ammunition_type* _type;
 
             /**
-             * @brief the type of the ammunition
+             * @brief the speed of the ammunition, decrease in the time (in px per ms)
              * 
              */
-            Ammunition_type* type;
+            float _speed;
 
             /**
-             * @brief the vector of the ammunition
+             * @brief the strength of the ammunition
              * 
              */
-            int angle;
+            float _strength;
 
             /**
-             * @brief the actual speed of the ammunition
+             * @brief the mass of the ammunition
              * 
              */
-            int speed;
+            float _mass;
 
             /**
-             * @brief the rectangle of the ammunition
+             * @brief the actual angle of the ammunition
              * 
              */
-            SDL_Rect rect;
+            int _angle;
 
             /**
-             * @brief delete linked value with the type
+             * @brief the targeting layer
              * 
              */
-            void unlink(void);
+            int _layer_target;
 
             /**
-             * @brief the point where the ammunition was launched
+             * @brief the up/down speed
              * 
              */
-            SDL_Point spoint;
-
-
-            int getX(void);
-
-            int getY(void);
+            float _up_down_speed;
 
             /**
-             * @brief 
+             * @brief store the position and the size of the ammunition
              * 
              */
-            bool should_delete;
-
-            Particles* particles;
+            SDL_Rect _rect;
 
             /**
-             * @brief the light of the ammunition
+             * @brief the distance made by the ammunition from the lauching
              * 
              */
-            Light* light;   
+            float _dist;
 
+            /**
+             * @brief the z axis
+             * 
+             */
+            float _z;
+
+            /**
+             * @brief the pop value, erease the ammunition whene it's true
+             * 
+             */
+            bool _pop;
     };
-    
-    /**
-     * @brief return ammuniation type with the input name
-     * 
-     * @param name searching name
-     * @return return the founded ammunition, NULL if not exist 
-     */
-    Ammunition_type* find(string name);
-    
-    /**
-     * @brief get a vector filled of every ammunition types with the input type
-     * 
-     * @param type the searching type
-     * @return vector<Ammunition_type*> 
-     */
-    vector<Ammunition_type*> searchType(string type);
 
-    /**
-     * @brief get if the input type is used by a ammunition type
-     * 
-     * @param type the 
-     * @return return true if used, false otherwise
-     */
-    bool existingType(string type);
+    Ammunition* operator<<(Ammunition& amm, string type_name);
+    Ammunition* operator<<(Ammunition& amm, int type_id);
+    Ammunition* operator<<(Ammunition& amm, Ammunition_type* type);
+
+    bool operator==(Ammunition& amm, Ammunition_type* type);
+    bool operator==(Ammunition& amm, string type_name);
+    bool operator==(Ammunition& amm, int type_id);
+
+    Ammunition* push_Ammunition(string name);
+
+    int update_ammunitions(void* ptr);
+    int draw_ammunitions(int z);
+    void clear_ammunitions(void);
 
 #endif

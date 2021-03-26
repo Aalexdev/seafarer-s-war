@@ -61,7 +61,8 @@
     #include "api/class/entity.hpp"
     #include "api/class/island.hpp"
     #include "api/class/equipment.hpp"
-    #include "api/class/ammunition.hpp"
+    #include "api/class/Ammunition.hpp"
+    #include "api/types/Ammunition_type.hpp"
     #include "ui/graphics/particles.hpp"
     #include "ui/graphics/light.hpp"
 
@@ -539,7 +540,7 @@
          * @brief the ammunition type vector
          * 
          */
-        vector<Ammunition_type*> ammunitions; 
+        vector<Ammunition_type*> ammunitions_type; 
         
         /**
          * @brief the total time beetween two frame
@@ -570,6 +571,12 @@
          * 
          */
         vector<Light*> lights;
+
+        /**
+         * @brief ammunitions
+         * 
+         */
+        vector<Ammunition*> ammunitions;
     };
 
     /**
@@ -776,7 +783,8 @@
     #define WINDOW_G        getMain()->g
     #define WINDOW_B        getMain()->b
     #define WINDOW_A        getMain()->a
-    #define AMMUNITION_TYPE getMain()->ammunitions
+    #define AMMUNITION_TYPE getMain()->ammunitions_type
+    #define AMMUNITIONS     getMain()->ammunitions
     #define DELTA_TIME      getMain()->timeDelta
     #define PARTICLES_TYPE  getMain()->particles_type
     #define PARTICLES       getMain()->particles

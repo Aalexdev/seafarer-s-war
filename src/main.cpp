@@ -19,7 +19,6 @@ int main(int argc, char* argv[]){
 
     IS_DEBUG = false;
 
-
     TIME.now = time(0);
     TIME.ltm = localtime(&TIME.now);
     ZOOM = 1;
@@ -27,9 +26,6 @@ int main(int argc, char* argv[]){
     PLAYER = new Entity(true);
     KEYPAD = new Keypad();
 
-    
-
-    cout << "files : " << filesToLoad("data\\main.xml") << endl;
     mainVar.launched = readXML("data\\main.xml");
 
 
@@ -53,7 +49,7 @@ int main(int argc, char* argv[]){
 void event(){
     SDL_Event e;
 
-    if (SDL_PollEvent(&e)){
+    while (SDL_PollEvent(&e)){
         switch (e.type){
 
             case SDL_QUIT:
@@ -117,16 +113,34 @@ void event(){
 }
 
 void updateWidgets(void){
+    int i=0;
     for (TextButton* btn : WIDGETS.textButtons){
-        if (btn) btn->update();
+        if (btn){
+            btn->update();
+            i++;
+        } else {
+            WIDGETS.textButtons.erase(WIDGETS.textButtons.begin() + i);
+        }
     }
 
+    i=0;
     for (ImageButton* btn : WIDGETS.imageButtons){
-        if (btn) btn->update();
+        if (btn){
+            btn->update();
+            i++;
+        } else {
+            WIDGETS.imageButtons.erase(WIDGETS.imageButtons.begin() + i);
+        }
     }
 
+    i=0;
     for (SpriteButton* btn : WIDGETS.spriteButtons){
-        if (btn) btn->update();
+        if (btn){
+            btn->update();
+            i++;
+        } else {
+            WIDGETS.spriteButtons.erase(WIDGETS.spriteButtons.begin() + i);
+        }
     }
 }
 
@@ -140,10 +154,25 @@ void resetMouse(void){
     MOUSEDOWN.right = false;
 }
 
+int updateParticles(void* ptr){
+    int i=0;
+    for (Particles* p : PARTICLES){
+        if (!p || p->should_delete()){
+            PARTICLES.erase(PARTICLES.begin() + i);
+            if (p) delete p;
+            p = nullptr;
+            continue;
+        }
+        i++;
+    }
+    return 0;
+}
+
 void update(){
     int exec = SDL_GetTicks();
 
     updateWidgets();
+    update_ammunitions((void*)NULL);
 
     if (!PAUSE){
         int i = 0;
@@ -151,7 +180,7 @@ void update(){
             if (entity->should_delete()){
                 ENTITY.erase(ENTITY.begin() + i);
                 delete entity;
-                i--;
+                continue;
             } else {
                 entity->update();
             }
@@ -170,67 +199,124 @@ void update(){
 }
 
 void drawWidgets(void){
+    int i=0;
     for (Text* text : WIDGETS.texts){
-        if (text) text->draw();
+        if (!text || !text->draw()){
+            WIDGETS.texts.erase(WIDGETS.texts.begin() + i);
+            if (text) delete text;
+            text = NULL;
+            continue;
+        }
+        i++;
     }
+
+    i=0;
     for (TextButton* btn : WIDGETS.textButtons){
-        if (btn) btn->draw();
+        if (!btn || !btn->draw()){
+            WIDGETS.textButtons.erase(WIDGETS.textButtons.begin() + i);
+            if (btn) delete btn;
+            btn = NULL;
+            continue;
+        }
+        i++;
     }
+
+    i=0;
     for (ImageButton* btn : WIDGETS.imageButtons){
-        if (btn) btn->draw();
+        if (!btn || !btn->draw()){
+            WIDGETS.imageButtons.erase(WIDGETS.imageButtons.begin() + i);
+            if (btn) delete btn;
+            btn = NULL;
+            continue;
+        }
+        i++;
     }
+
+    i=0;
     for (SpriteButton* btn : WIDGETS.spriteButtons){
-        if (btn) btn->drawButton();
+        if (!btn || !btn->draw()){
+            WIDGETS.spriteButtons.erase(WIDGETS.spriteButtons.begin() + i);
+            if (btn) delete btn;
+            btn = NULL;
+            continue;
+        }
+        i++;
     }
 }
 
 void drawLayers(int z){
+    int lr=0;
+
     for (Layer* lyr : LAYERS){
-        if (lyr->getZ() == z){
-            int i=0;
-            for (Light* l : LIGHTS){
-                if (!l || !l->draw(z)){
-                    LIGHTS.erase(LIGHTS.begin() + i);
-                    if (l) delete l;
+        if (lyr){
+            if (lyr->getZ() == z){
+                int i=0;
+                for (Light* l : LIGHTS){
+                    if (!l || !l->draw(z)){
+                        LIGHTS.erase(LIGHTS.begin() + i);
+                        if (l) delete l;
+                        continue;
+                    }
+                    i++;
+                }
+
+                
+                i=0;
+                for (Particles* p : PARTICLES){
+                    if (!p || !p->drawLight(z)){
+                        if (p) delete p;
+                        PARTICLES.erase(PARTICLES.begin() + i);
+                        continue;
+                    }
+                    i++;
+                }
+                
+
+                i=0;
+                for (Entity* entity : ENTITY){
+                    if (!entity->drawLight(z)){
+                        delete entity;
+                        ENTITY.erase(ENTITY.begin() + i);
+                        continue;
+                    }
+                    i++;
+                }
+
+                if (PLAYER->is_linked()) PLAYER->drawLight(z);
+                
+                if (!lyr->draw()){
+                    LAYERS.erase(LAYERS.begin() + lr);
+                    delete lyr;
+                    lyr = NULL;
                     continue;
                 }
-                i++;
             }
-
-            i=0;
-            for (Particles* p : PARTICLES){
-                if (!p->drawLight(z)){
-                    delete p;
-                    PARTICLES.erase(PARTICLES.begin() + i);
-                    continue;
-                }
-                i++;
-            }
-
-            i=0;
-            for (Entity* entity : ENTITY){
-                if (!entity->drawLight(z)){
-                    delete entity;
-                    ENTITY.erase(ENTITY.begin() + i);
-                    continue;
-                }
-                i++;
-            }
-
-            if (PLAYER->is_linked()) PLAYER->drawLight(z);
-            
-            lyr->draw();
+        } else {
+            LAYERS.erase(LAYERS.begin() + lr);
+            if (lyr) delete lyr;
+            lyr = NULL;
+            continue;
         }
+        lr++;
     }
 
+    
     int i=0;
     for (Particles* p : PARTICLES){
-        if (p->should_delete()){
+        if (!p){
             PARTICLES.erase(PARTICLES.begin() + i);
-            if (p) delete p;
+            continue;
+        } else if (p->should_delete()){
+            PARTICLES.erase(PARTICLES.begin() + i);
+            delete p;
+            p = nullptr;
             continue;
         } else {
-            p->draw(z);
+            if (!p->draw(z)){
+                PARTICLES.erase(PARTICLES.begin() + i);
+                delete p;
+                continue;
+            }
         }
         i++;
     }
@@ -247,7 +333,10 @@ void drawLayers(int z){
         }
     }
 
+    draw_ammunitions(z);
+
     if (PLAYER->getZ() == z && PLAYER->is_linked()) PLAYER->draw();
+
 }
 
 void drawImages(void){
@@ -264,6 +353,7 @@ void drawImages(void){
 
 void draw(){
     int exec = SDL_GetTicks();
+
     SDL_SetRenderDrawColor(RENDERER, WINDOW_R, WINDOW_G, WINDOW_B, WINDOW_A);
     SDL_SetRenderDrawBlendMode(RENDERER, SDL_BLENDMODE_NONE);
 
@@ -273,7 +363,7 @@ void draw(){
         return;
     }
     
-    for (int i=-256; i<256; i++){ 
+    for (int i=-11; i<11; i++){ 
         drawLayers(i);
     }
 
@@ -292,7 +382,7 @@ void time(){
     } else {
         mainVar.time.FPS = mainVar.time._fps;
 
-        printf("FPS : %d\n", mainVar.time.FPS);
+        //printf("FPS : %d\n", mainVar.time.FPS);
 
         mainVar.time.tick = SDL_GetTicks();
         mainVar.time._fps=0;
@@ -317,6 +407,7 @@ void freeFont(void){
         if (MAINVAR->font.font){
             if (IS_LOG_OPEN) LOG << "TTF_CloseFont()" << endl;
             TTF_CloseFont(MAINVAR->font.font);
+            MAINVAR->font.font = NULL;
         }
 
         if (IS_LOG_OPEN) LOG << "TTF_Quit()" << endl;
@@ -337,29 +428,34 @@ void freeWindow(void){
 
 void freeWidgets(void){
     if (IS_LOG_OPEN) LOG << "freeWidgets()" << endl;
-    
+
     for (Text* text : WIDGETS.texts){
         if (text) delete text;
+        text = NULL;
     }
     WIDGETS.texts.clear();
 
     for (TextButton* btn : WIDGETS.textButtons){
         if (btn) delete btn;
+        btn = NULL;
     }
     WIDGETS.textButtons.clear();
 
     for (ImageButton* btn : WIDGETS.imageButtons){
         if (btn) delete btn;
+        btn = NULL;
     }
     WIDGETS.imageButtons.clear();
 
     for (SpriteButton* btn : WIDGETS.spriteButtons){
         if (btn) delete btn;
+        btn = NULL;
     }
     WIDGETS.spriteButtons.clear();
 
     for (Image* image : IMAGES){
         delete image;
+        image = NULL;
     }
     IMAGES.clear();
 }
@@ -414,6 +510,7 @@ void destroy(void){
 
     for (Layer* lyr : LAYERS){
         delete lyr;
+        lyr = NULL;
     }
     LAYERS.clear();
 
@@ -421,7 +518,8 @@ void destroy(void){
     freeEntity_types();
     freeEntity();
     freeEquipments();
-    freeAmmunitions_type();
+    clear_ammunitions();
+    clear_Ammunition_type();
     
     delete KEYPAD;
     delete PLAYER;

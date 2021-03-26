@@ -12,11 +12,10 @@
 
     #include "api/functions/texture.hpp"
     #include "api/class/entity.hpp"
-    #include "api/class/ammunition.hpp"
     #include "ui/graphics/particles.hpp"
     #include "ui/graphics/light.hpp"
+    #include "api/class/Ammunition.hpp"
 
-    #define UNKNOWN_AMMUNITION "unknown"
     
     class Equipment_type{
         public:

@@ -384,6 +384,12 @@
             bool draw(int z);
 
             /**
+             * @brief update particles 
+             * 
+             */
+            void update(void);
+
+            /**
              * @brief set the type of the particles from a string
              * 
              * @param type_name the name of the type

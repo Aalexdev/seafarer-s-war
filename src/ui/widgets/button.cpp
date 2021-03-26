@@ -3,6 +3,8 @@
 
 bool ButtonClass::exec(void){
     if (IS_LOG_OPEN) LOG << "ButtonClass::exec()" << endl;
+
+    if (!this) return true;
     if (this->cmd.empty()){
         if (IS_ERR_OPEN) ERR << "ERROR :: ButtonClass::exec, reason : cannot execute a empty file path" << endl;
         return false;

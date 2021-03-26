@@ -23,11 +23,23 @@
         <equipment name="MR-Elpis" id="1" angle="30"/>
         <equipment name="MR-Elpis" id="2" angle="30"/>
         <equipment name="projector" id="3" angle="30"/>
+        <equipment name="MR-Elpis" id="4" angle="30"/>
+        <equipment name="MR-Elpis" id="5" angle="30"/>
+        <equipment name="MR-Elpis" id="6" angle="30"/>
+        <equipment name="MR-Elpis" id="7" angle="30"/>
+        <equipment name="MR-Elpis" id="8" angle="30"/>
+        <equipment name="MR-Elpis" id="9" angle="30"/>
     </equipments>
 
     <lights>
-        <light type="50 white" x="25" y="56"/>
+        <light type="15 white" x="16" y="53"/>
+        <light type="15 white" x="16" y="88"/>
+        <light type="15 white" x="16" y="110"/>
     </lights>
+
+    <particles>
+        <particle type="smoke 1" angle="90" range="40" x="17" y="151"/>
+    </particles>
 </setPlayer>
 
 <summonEntity type="thunder" x="200" y="0" height="0" angle="0">
@@ -35,6 +47,13 @@
 
     <equipments>
     </equipments>
+
+    <lights>
+        <light type="15 white" x="16" y="53"/>
+        <light type="15 white" x="16" y="88"/>
+        <light type="15 white" x="16" y="110"/>
+    </lights>
+
 </summonEntity>
 
-<color r="150" g="150" b="150" a="255"/>
+<color r="0" g="0" b="0" a="255"/>

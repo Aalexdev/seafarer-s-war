@@ -1,0 +1,10 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<particle name="smoke 1" strength="0.03" density="5" time="725">
+    <color>
+        <start r="0" g="0" b="0" a="255"/>
+        <end r="0" g="0" b="0" a="0"/>
+    </color>
+
+    <point/>
+</particle>

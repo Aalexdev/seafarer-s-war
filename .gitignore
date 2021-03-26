@@ -1,13 +1,23 @@
 
+# executable and binary files
 *.exe
-
 *.o
+
+# librarys
 
 *.dll
 *.a
 *.la
 
+# lib header file
+
+SDL/
+
+# folders
+
 .vscode/*
-bin/*
-lib/*
-.obj/*
+.github/*
+
+# windows
+
+*.ini

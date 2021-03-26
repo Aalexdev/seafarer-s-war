@@ -1,7 +1,6 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
-<ammunition name="test" type="standar">
-    <texture texture="res/img/projectiles/test.bmp" w="2" h="10"/>
-    <perform damages="100" initial-speed="20"/>
-    <particle type="red fire 1" angle="90" range="25"/>
+<ammunition name="test">
+    <texture path="res/img/projectiles/test.bmp" w="2" h="10"/>
+    <perform mass="100" strength="20" target-layer="0" up-down-speed="0.03"/>
 </ammunition>

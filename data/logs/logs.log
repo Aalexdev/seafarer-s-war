@@ -1,4 +1,4 @@
-LOG file, init at : 13:58:46
+LOG file, init at : 15:10:25
 resetWindow(seafarers' war, 805240832, 805240832, 1080, 720, 4)
 clearWindow
 set max fps to : 60
@@ -39,6 +39,10 @@ loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/backgrounds/s
 SDL_SetWindowPosition(420, 180)
 SDL_SetWindowSize(1080, 720)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights.xml , 0)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/15 green.xml , 0)
+Light_type::Light_type()
+Light_type::load() : '15 green'
+loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/circle/50 green.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/15 red.xml , 0)
 Light_type::Light_type()
 Light_type::load() : '15 red'
@@ -47,6 +51,10 @@ readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/15 white.xml 
 Light_type::Light_type()
 Light_type::load() : '15 white'
 loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/circle/50 white.bmp)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/5 red.xml , 0)
+Light_type::Light_type()
+Light_type::load() : '5 red'
+loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/circle/50 red.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/5 white.xml , 0)
 Light_type::Light_type()
 Light_type::load() : '5 white'
@@ -55,17 +63,25 @@ readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/50 white.xml 
 Light_type::Light_type()
 Light_type::load() : '50 white'
 loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/circle/50 white.bmp)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/large projected.xml , 0)
+Light_type::Light_type()
+Light_type::load() : 'large projected white'
+loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/projected/white large.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/projected 1.xml , 0)
+Light_type::Light_type()
+Light_type::load() : 'projected 1'
+loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/projected/white 35.bmp)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/lights/projected 2.xml , 0)
 Light_type::Light_type()
 Light_type::load() : 'projected 1'
 loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/lights/projected/white 35.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations/cannon shot 1.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations/fire.xml , 0)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/animations/smoke 1.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/ammunitions.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/ammunitions/test.xml , 0)
-Ammunition_type::Ammunition_type()
-Ammunition_type::loadFrom_XML()
+new_Ammunition_type
 loadTexture(C:\Users\aalex\programation\cpp\seafarer's war\res/img/projectiles/test.bmp)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/events.xml , 0)
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/entity.xml , 0)
@@ -138,6 +154,24 @@ Equipment::setType() : found 'MR-Elpis'
 Equipment::Equipment()
 Equipment::setType('projector')
 Equipment::setType() : found 'projector'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
+Equipment::Equipment()
+Equipment::setType('MR-Elpis')
+Equipment::setType() : found 'MR-Elpis'
 Entity::Entity()
 Entity::reset()
 Entity::load_from_xml()
@@ -147,6 +181,10 @@ readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/game/gameUI.xml , 0)
 freeWidgets()
 pause()
 freeWidgets()
+~Light_type::Light_type()
+~Light_type::Light_type()
+~Light_type::Light_type()
+~Light_type::Light_type()
 ~Light_type::Light_type()
 ~Light_type::Light_type()
 ~Light_type::Light_type()
@@ -166,10 +204,21 @@ Equipment::~Equipment()
 Equipment::unlink()
 Equipment::~Equipment()
 Equipment::unlink()
+Equipment::~Equipment()
+Equipment::unlink()
+Equipment::~Equipment()
+Equipment::unlink()
+Equipment::~Equipment()
+Equipment::unlink()
+Equipment::~Equipment()
+Equipment::unlink()
+Equipment::~Equipment()
+Equipment::unlink()
+Equipment::~Equipment()
+Equipment::unlink()
 	ended
 Equipment_type::~Equipment_type()
 Equipment_type::~Equipment_type()
-Ammunition_type::~Ammunition_type()
 Entity::~Entity()
 Entity::unlink()
 Entity::reset()

@@ -507,6 +507,7 @@ bool Entity::load_from_xml(XMLNode* node){
                             int angle;
                             sscanf(attr.value, "%d", &angle);
                             particles->setAngle(angle);
+                            oa->objectAngle = angle;
                         } else if (!strcmp(attr.key, "range")){
                             int range;
                             sscanf(attr.value, "%d", &range);
@@ -521,12 +522,16 @@ bool Entity::load_from_xml(XMLNode* node){
                     }
 
                     if (particles){
-                        oa->angle = getAngleM(rect.w / 2, rect.h / 2, p.x, p.y) + 90;
+                        oa->angle = getAngleM(rect.w / 2, rect.h / 2, p.x, p.y) - 90;
                         oa->dist = getDistanceM(p.x, p.y, rect.w / 2, rect.h / 2);
 
                         this->particles.push_back(particles);
                         particles_point.push_back(oa);
+
                         PARTICLES.push_back(particles);
+
+                        particles->push(true);
+                        particles->setDuration(UNDEFINE);
                     }
 
                 } else {
@@ -557,19 +562,20 @@ bool Entity::load_from_xml(XMLNode* node){
                             sscanf(attr.value, "%d", &p.x);
                         } else if (!strcmp(attr.key, "y")){
                             sscanf(attr.value, "%d", &p.y);
+                        } else if (!strcmp(attr.key, "angle")){
+                            sscanf(attr.value, "%d", &oa->objectAngle);
                         } else {
                             if (IS_ERR_OPEN) ERR << "WARNING :: summonEntity; lights; light, reason : cannot reconize '" << attr.key << "' particle attribute" << endl;
                         }
                     }
 
                     if (light){
-                        oa->angle = getAngleM(rect.w / 2, rect.h / 2, p.x, p.y) + 90;
+                        oa->angle = getAngleM(rect.w / 2, rect.h / 2, p.x, p.y) - 90;
                         oa->dist = getDistanceM(p.x, p.y, rect.w / 2, rect.h / 2);
 
                         this->lights.push_back(light);
                         lights_points.push_back(oa);
                         LIGHTS.push_back(light);
-
                     }
 
                 } else {
@@ -716,6 +722,9 @@ void Entity::update(){
             }
         }
 
+        setParticlesPos();
+        setLightsPos();
+        updateEquipments();
 
         if (this->speed!=0){
             this->is_mouving = true;
@@ -755,9 +764,6 @@ void Entity::update(){
             }
         }
 
-        updateEquipments();
-        setParticlesPos();
-        setLightsPos();
 
     } else {
         z = (float)((SDL_GetTicks() - onDeath->tick) * (float)type->getDeath()->z) / (float)type->getDeath()->time;
@@ -967,9 +973,18 @@ bool Entity::should_delete(void){
 
 void Entity::setParticlesPos(void){
     for (int i=0; i<particles.size(); i++){
-        int x, y;
-        setAngleM(&x, &y, particles_point[i]->dist, particles_point[i]->angle + angle);
-        particles[i]->setPos(x + getCenteredX(), y + getCenteredY());
+
+        if (particles[i]){
+            int x, y;
+            setAngleM(&x, &y, particles_point[i]->dist, particles_point[i]->angle + angle);
+            particles[i]->setPos(x + rect.x + (rect.w / 2), y + rect.y + (rect.h / 2));
+            particles[i]->setAngle(particles_point[i]->objectAngle + angle);
+            particles[i]->setZ(z);
+
+        } else {
+            particles.erase(particles.begin() + i);
+            i--;
+        }
     }
 }
 
@@ -979,6 +994,7 @@ void Entity::setLightsPos(void){
         setAngleM(&x, &y, lights_points[i]->dist, lights_points[i]->angle + angle);
         lights[i]->setPos(x + getCenteredX(), y + getCenteredY());
         lights[i]->setZ(z);
+        lights[i]->setAngle(lights_points[i]->objectAngle + angle);
     }
 }
 

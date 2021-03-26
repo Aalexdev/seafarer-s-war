@@ -1,0 +1,5 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+
+<light name="15 green">
+    <texture path="res/img/lights/circle/50 green.bmp" w="15" h="15"/>
+</light>
