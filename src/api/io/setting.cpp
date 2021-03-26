@@ -3,6 +3,7 @@
 
 #include "ui/main_window.hpp"
 #include "api/io/io.hpp"
+#include "api/io/save.hpp"
 
 bool equal(char* a, const char* b){
     if (!strcmp(a, b))
@@ -448,6 +449,14 @@ bool readXML(string path){
                 pushParticle_type(mainNode);
             } else if (equal(mainNode->tag, "light")){
                 pushLight_type(mainNode);
+            } else if (equal(mainNode->tag, "save")){
+                for (int a=0; a<mainNode->attributes.size; a++){
+                    XMLAttribute attr = mainNode->attributes.data[a];
+
+                    if (!strcmp(attr.key, "path")){
+                        saveXML(attr.value);
+                    }
+                }
             } else {
                 if (IS_ERR_OPEN) ERR << "WARNING :: readXML, reason : cannot reconize '" << mainNode->tag << "' in " << path << endl;
             }

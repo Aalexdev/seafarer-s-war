@@ -55,6 +55,14 @@ void Ammunition::update_pos(void){
     _rect.x += cosf(_angle*M_PI/180.0f) * (_speed * DELTA_TIME);
     _rect.y += sinf(_angle*M_PI/180.0f) * (_speed * DELTA_TIME);
     _dist += _speed * DELTA_TIME;
+
+    if (_z > _layer_target){
+        _z -= _up_down_speed;
+    } else if (_z < _layer_target){
+        _z += _up_down_speed;
+    }
+
+    //cout << _z << endl;
 }
 
 void Ammunition::update_collisions(void){
@@ -203,7 +211,7 @@ int draw_ammunitions(int z){
 
     int i=0;
     for (Ammunition* amm : AMMUNITIONS){
-        if ((int)amm->z() == z){
+        if (floor(amm->z()) == z){
             if (!amm->draw()){
                 delete amm;
                 amm = nullptr;

@@ -2,5 +2,5 @@
 
 <ammunition name="test">
     <texture path="res/img/projectiles/test.bmp" w="2" h="10"/>
-    <perform mass="100" strength="20" target-layer="0" up-down-speed="0.03"/>
+    <perform mass="100" strength="20" target-layer="0" up-down-speed="0.05"/>
 </ammunition>

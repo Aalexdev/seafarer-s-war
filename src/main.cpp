@@ -333,9 +333,9 @@ void drawLayers(int z){
         }
     }
 
-    draw_ammunitions(z);
-
     if (PLAYER->getZ() == z && PLAYER->is_linked()) PLAYER->draw();
+    
+    draw_ammunitions(z);
 
 }
 

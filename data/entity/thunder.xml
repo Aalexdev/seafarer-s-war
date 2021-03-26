@@ -28,4 +28,5 @@
     </equipments>
 
     <OnDeath layer="-3" time="5000"/>
+    <layer max="0" min="-3"/>
 </entity>

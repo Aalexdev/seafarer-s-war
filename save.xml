@@ -1,0 +1,36 @@
+<?xml version="0.1.0" encoding="utf-8"?>
+<color r="150" g="150" b="150" a="150"/>
+<clearEntitys/>
+
+<setPlayer type="thunder" x="0" y="0" height="0" angle="40">
+	<part health="10"/>
+	<equipments>
+		<equipment name="MR-Elpis" id="0" angle="164"/>
+		<equipment name="MR-Elpis" id="1" angle="100"/>
+		<equipment name="MR-Elpis" id="2" angle="156"/>
+		<equipment name="projector" id="3" angle="150"/>
+		<equipment name="MR-Elpis" id="4" angle="146"/>
+		<equipment name="MR-Elpis" id="5" angle="143"/>
+		<equipment name="MR-Elpis" id="6" angle="123"/>
+		<equipment name="MR-Elpis" id="7" angle="124"/>
+		<equipment name="MR-Elpis" id="8" angle="111"/>
+		<equipment name="MR-Elpis" id="9" angle="114"/>
+	</equipments>
+	<events>
+		<keypad>
+			<key tag="W" out="engineUp"/>
+			<key tag="S" out="engineDown"/>
+			<key tag="A" out="turnLeft"/>
+			<key tag="D" out="turnRight"/>
+			<key tag="Down" out="layerDown"/>
+			<key tag="Up" out="layerUp"/>
+		</keypad>
+	</events>
+</setPlayer>
+
+<summonEntity type="thunder" x="200" y="0" height="0" angle="0">
+	<part health="10000"/>
+	<equipments>
+	</equipments>
+</summonEntity>
+

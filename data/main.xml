@@ -26,7 +26,7 @@
         <image path="res/img/backgrounds/darksea.bmp" alpha="255"/>
     </layer>
     <layer name="sea" angle="90" delay="50" speed="2" height="0">
-        <image path="res/img/backgrounds/sea.bmp" alpha="150"/>
+        <image path="res/img/backgrounds/sea.bmp" alpha="255"/>
     </layer>
 
 </layers>

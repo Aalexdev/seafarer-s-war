@@ -523,6 +523,17 @@
              */
             bool should_delete(void);
 
+            /**
+             * @brief Get the Health object
+             * 
+             * @return int 
+             */
+            int getHealth(void);
+
+            Equipment** getEquipments(int *l);
+
+            vector<Light*> getLights(void);
+
         private:
 
             /**

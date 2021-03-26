@@ -1005,3 +1005,16 @@ int Entity::getCenteredX(void){
 int Entity::getCenteredY(void){
     return rect.y + (rect.h / 2) + CAMERA.y;
 }
+
+int Entity::getHealth(void){
+    return health;
+}
+
+Equipment** Entity::getEquipments(int* l){
+    (*l) = type->getEquipmentSize();
+    return equipments;
+}
+
+vector<Light*> Entity::getLights(void){
+    return lights;
+}

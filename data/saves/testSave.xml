@@ -56,4 +56,6 @@
 
 </summonEntity>
 
-<color r="0" g="0" b="0" a="255"/>
+<color r="150" g="150" b="150" a="150"/>
+
+<save path="save.xml"/>

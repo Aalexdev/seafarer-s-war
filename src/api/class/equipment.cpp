@@ -336,3 +336,11 @@ void Equipment::update(void){
         }
     }
 }
+
+Equipment_type* Equipment::getType(void){
+    return type;
+}
+
+int Equipment::getAngle(void){
+    return angle;
+}

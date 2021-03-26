@@ -1,5 +1,5 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
 <clearWidgets/>
-<read path="data/saves/testSave.xml"/>
+<read path="save.xml"/>
 <read path="data/game/gameUI.xml"/>

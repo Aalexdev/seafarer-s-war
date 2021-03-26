@@ -332,6 +332,20 @@
              * 
              */
             void shot(void);
+
+            /**
+             * @brief Get the Type object
+             * 
+             * @return Equipment_type* 
+             */
+            Equipment_type* getType(void);
+
+            /**
+             * @brief Get the Angle object
+             * 
+             * @return int 
+             */
+            int getAngle(void);
             
         
         private:
