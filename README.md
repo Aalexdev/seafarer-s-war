@@ -13,7 +13,8 @@ librarys :
 
 SDL2,
 SDL2_ttf,
-SDL2_gfx
+SDL2_gfx,
+tinyxml
 
 developpers :
 
