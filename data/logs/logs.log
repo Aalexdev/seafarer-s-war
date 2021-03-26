@@ -1,4 +1,4 @@
-LOG file, init at : 18:42:0
+LOG file, init at : 22:35:47
 resetWindow(seafarers' war, 805240832, 805240832, 1080, 720, 4)
 clearWindow
 set max fps to : 60
@@ -128,7 +128,7 @@ Equipment::setType() : found 'projector'
 ButtonClass::exec()
 readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/menus/play.xml , 0)
 freeWidgets()
-readXML(C:\Users\aalex\programation\cpp\seafarer's war\save.xml , 0)
+readXML(C:\Users\aalex\programation\cpp\seafarer's war\data/saves/testSave.xml , 0)
 freeEntity()
 Entity::~Entity()
 Entity::unlink()

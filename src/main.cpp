@@ -28,7 +28,6 @@ int main(int argc, char* argv[]){
 
     mainVar.launched = readXML("data\\main.xml");
 
-
     while (mainVar.launched){
 
         TIME.startTick = SDL_GetTicks();
@@ -154,25 +153,12 @@ void resetMouse(void){
     MOUSEDOWN.right = false;
 }
 
-int updateParticles(void* ptr){
-    int i=0;
-    for (Particles* p : PARTICLES){
-        if (!p || p->should_delete()){
-            PARTICLES.erase(PARTICLES.begin() + i);
-            if (p) delete p;
-            p = nullptr;
-            continue;
-        }
-        i++;
-    }
-    return 0;
-}
-
 void update(){
     int exec = SDL_GetTicks();
 
     updateWidgets();
     update_ammunitions((void*)NULL);
+    update_particles((void*)NULL);
 
     if (!PAUSE){
         int i = 0;
@@ -336,7 +322,7 @@ void drawLayers(int z){
     if (PLAYER->getZ() == z && PLAYER->is_linked()) PLAYER->draw();
     
     draw_ammunitions(z);
-
+    draw_particles(z);
 }
 
 void drawImages(void){
@@ -520,6 +506,8 @@ void destroy(void){
     freeEquipments();
     clear_ammunitions();
     clear_Ammunition_type();
+    clear_particles();
+    clear_particlesType();
     
     delete KEYPAD;
     delete PLAYER;

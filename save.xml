@@ -5,16 +5,16 @@
 <setPlayer type="thunder" x="0" y="0" height="0" angle="40">
 	<part health="10"/>
 	<equipments>
-		<equipment name="MR-Elpis" id="0" angle="164"/>
+		<equipment name="MR-Elpis" id="0" angle="159"/>
 		<equipment name="MR-Elpis" id="1" angle="100"/>
-		<equipment name="MR-Elpis" id="2" angle="156"/>
-		<equipment name="projector" id="3" angle="150"/>
-		<equipment name="MR-Elpis" id="4" angle="146"/>
-		<equipment name="MR-Elpis" id="5" angle="143"/>
-		<equipment name="MR-Elpis" id="6" angle="123"/>
-		<equipment name="MR-Elpis" id="7" angle="124"/>
+		<equipment name="MR-Elpis" id="2" angle="151"/>
+		<equipment name="projector" id="3" angle="148"/>
+		<equipment name="MR-Elpis" id="4" angle="143"/>
+		<equipment name="MR-Elpis" id="5" angle="141"/>
+		<equipment name="MR-Elpis" id="6" angle="121"/>
+		<equipment name="MR-Elpis" id="7" angle="122"/>
 		<equipment name="MR-Elpis" id="8" angle="111"/>
-		<equipment name="MR-Elpis" id="9" angle="114"/>
+		<equipment name="MR-Elpis" id="9" angle="113"/>
 	</equipments>
 	<events>
 		<keypad>
