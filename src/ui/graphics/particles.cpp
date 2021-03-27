@@ -6,280 +6,176 @@
 #include "main.hpp"
 
 Particles::Particles(){
-    unlink();
+    _type = nullptr;
+    _pushing = true;
+    _del = false;
+    _ticks = SDL_GetTicks();
+    _duration = 0;
+    _particles_duration = 500;
 }
 
 Particles::~Particles(){
-    unlink();
+    if (IS_LOG_OPEN) LOG << "Particles::~Particles()" << endl;
+    _type = nullptr;
 }
 
-void Particles::unlink(void){
-    type = nullptr;
-
-    for (Particle* p : particles){
-        if (p){
-            if (p->light) delete p->light;
-            delete p;
-        }
-        p = nullptr;
-    }
-
-    particles.clear();
-    pos.x = 0;
-    pos.y = 0;
+Particles_type* Particles::type(void){
+    return _type;
 }
 
-bool Particles::set(string type_name){
-    type = searchParticle(type_name);
-    pushing = true;
-    return type;
+void Particles::type(Particles_type* type){
+    _type = type;
 }
 
-void Particles::pushParticle(void){
-    if (!type) return;
-
-    Particle *p = new Particle;
-    p->tick = SDL_GetTicks();
-    p->vector.x = cosf(getRandAngle() * (M_PI / 180.0f)) * type->getStrength();
-    p->vector.y = sinf(getRandAngle() * (M_PI / 180.0f)) * type->getStrength();
-
-    p->pos.x = pos.x;
-    p->pos.y = pos.y;
-
-    p->r = getR();
-    p->g = getG();
-    p->b = getB();
-    p->a = getA();
-
-    p->light = nullptr;
-
-    /*
-    if (!type->getLight().empty()){
-        p->light = new Light();
-
-        if (p->light->set(type->getLight())){
-            p->light->setPos(p->pos.x, pos.y);
-            p->light->setZ(z);
-
-            LIGHTS.push_back(p->light);
-        } else {
-            delete p->light;
-            p->light = NULL;
-        }
-    }
-    */
-
-    particles.push_back(p);
+bool Particles::type(string type_name){
+    _type = search_particle_type(type_name);
+    return _type;
 }
 
-void Particles::setPos(int x, int y){
-    pos.x = x;
-    pos.y = y;
+vector<Particle*> Particles::particles(void){
+    return _particles;
 }
 
-int Particles::getZ(void){
-    return z;
+void Particles::push(void){
+    Particle* p = create_Particle();
+
+    p->angle(_angle);
+    p->range(_range);
+    p->pos(_pos);
+    p->create_random_vectorf(1);
+    p->duration(500);
+    p->color(_type->get_random_color());
+
+    _particles.push_back(p);
 }
 
-void Particles::setZ(int z){
-    this->z = z;
+float Particles::radius(void){
+    return _radius;
 }
 
-bool Particles::drawLight(int z){
-    if (!type) return false;
-
-    return true;
+void Particles::radius(float radius){
+    _radius = radius;
 }
 
-bool Particles::draw(int z){
-    if (!type) return false;
-    if (this->z != z) return true;
-
-    int tick = SDL_GetTicks();
-    int i = 0;
-
-    for (Particle* p : particles){
-        switch (type->getStyle()){
-            
-            case Particles_type::Particle_circle:
-                if (type->getStyleType()->circle.filled){
-                    if (filledCircleRGBA(RENDERER, p->pos.x + CAMERA.x, p->pos.y + CAMERA.y, type->getStyleType()->circle.radius, p->r, p->g, p->b, p->a)){
-                        if (IS_ERR_OPEN) ERR << "ERROR :: filledCircleRGBA, reason : " << SDL_GetError() << endl;
-                        return false;
-                    }
-                } else {
-                    if (circleRGBA(RENDERER, p->pos.x + CAMERA.x, p->pos.y + CAMERA.y, type->getStyleType()->circle.radius, p->r, p->g, p->b, p->a)){
-                        if (IS_ERR_OPEN) ERR << "ERROR :: circleRGBA, reason : " << SDL_GetError() << endl;
-                        return false;
-                    }
-                }
-                break;
-            
-            case Particles_type::Particle_ellipse:
-                if (type->getStyleType()->ellipse.filled){
-                    if (filledEllipseRGBA(RENDERER, p->pos.x + CAMERA.x, p->pos.y + CAMERA.y, type->getStyleType()->ellipse.Vradius, type->getStyleType()->ellipse.Hradius, p->r, p->g, p->b, p->a)){
-                        if (IS_ERR_OPEN) ERR << "ERROR :: filledEllipseRGBA, reason : " << SDL_GetError() << endl;
-                        return false;
-                    }
-                } else {
-                    if (ellipseRGBA(RENDERER, p->pos.x + CAMERA.x, p->pos.y + CAMERA.y, type->getStyleType()->ellipse.Vradius, type->getStyleType()->ellipse.Hradius, p->r, p->g, p->b, p->a)){
-                        if (IS_ERR_OPEN) ERR << "ERROR :: ellipseRGBA, reason : " << SDL_GetError() << endl;
-                        return false;
-                    }
-                }
-                break;
-            
-            case Particles_type::Particle_point:
-                SDL_SetRenderDrawColor(RENDERER, p->r, p->g, p->b, p->a);
-                if (SDL_RenderDrawPoint(RENDERER, p->pos.x + CAMERA.x, p->pos.y + CAMERA.y)){
-                    if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderDrawPoint, reason : " << SDL_GetError() << endl;
-                    return false;
-                }
-                break;
-            
-            case Particles_type::Particle_square:
-                SDL_Rect rect;
-                
-                rect.x = p->pos.x - (type->getStyleType()->square.width / 2) + CAMERA.x;
-                rect.y = p->pos.y - (type->getStyleType()->square.width / 2) + CAMERA.y;
-                rect.w = type->getStyleType()->square.width;
-                rect.h = type->getStyleType()->square.width;
-
-                if (type->getStyleType()->square.filled){
-                    if (SDL_RenderDrawRect(RENDERER, &rect)){
-                        if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderDrawRect, reason : " << SDL_GetError() << endl;
-                        return false;
-                    }
-                } else {
-                    if (SDL_RenderFillRect(RENDERER, &rect)){
-                        if (IS_ERR_OPEN) ERR << "ERROR :: SDL_RenderDrawRect, reason : " << SDL_GetError() << endl;
-                        return false;
-                    }
-                }
-                break;
-            
-            default:
-                break;
-        }
-    }
-    return true;
+int Particles::angle(void){
+    return _angle;
 }
 
-int Particles::getRandAngle(void){
-    return (rand() % range) + (angle - range/2);
+void Particles::angle(int angle){
+    _angle = angle;
 }
 
-int Particles::getR(void){
-    int def = max(type->getEndColor().r, type->getStartColor().r) - min(type->getEndColor().r, type->getStartColor().r);
-    if (abs(def)) return rand() % def + min(type->getEndColor().r, type->getStartColor().r);
-    return 0;
+int Particles::range(void){
+    return _range;
 }
 
-int Particles::getG(void){
-    int def = max(type->getEndColor().g, type->getStartColor().g) - min(type->getEndColor().g, type->getStartColor().g);
-    if (abs(def)) return rand() % def + min(type->getEndColor().g, type->getStartColor().g);
-    return 0;
+void Particles::range(int range){
+    _range = range;
 }
 
-int Particles::getB(void){
-    int def = max(type->getEndColor().b, type->getStartColor().b) - min(type->getEndColor().b, type->getStartColor().b);
-    if (abs(def)) return rand() % def + min(type->getEndColor().b, type->getStartColor().b);
-    return 0;
+SDL_Point Particles::pos(void){
+    return _pos;
 }
 
-int Particles::getA(void){
-    int def = max(type->getEndColor().a, type->getStartColor().a) - min(type->getEndColor().a, type->getStartColor().a);
-    if (abs(def)) return rand() % def + min(type->getEndColor().a, type->getStartColor().a);
-    return 0;
+void Particles::pos(SDL_Point pos){
+    _pos = pos;
 }
 
-void Particles::setRange(int range){
-    this->range = range;
+float Particles::density(void){
+    return _density;
 }
 
-void Particles::setAngle(int angle){
-    this->angle = angle;
-}
-
-void Particles::setDuration(int duration){
-    if (duration != UNDEFINE) tick = SDL_GetTicks() + duration;
-    else tick = UNDEFINE;
-}
-
-bool Particles::should_delete(void){
-    if (tick != UNDEFINE) return (SDL_GetTicks() >= tick);
-    return false;
-}
-
-void Particles::pushParticles(void){
-    if (pushing){
-        for (int i=0; i<type->getDensity(); i++){
-            pushParticle();
-        }
-    }
-}
-
-void Particles::push(bool push){
-    pushing = push;
+void Particles::density(float density){
+    _density = density;
 }
 
 void Particles::update(void){
     int i=0;
-    for (Particle* p : particles){
-        if (p){
-            if (tick - p->tick >= type->getTime()){
-                particles.erase(particles.begin() + i);
-
-                //if (p->light) delete p->light;
-                p->light = nullptr;
-                delete p;
-                continue;
-            }
-        
-            p->pos.x += p->vector.x * DELTA_TIME;
-            p->pos.y += p->vector.y * DELTA_TIME;
-
-            if (p->light){
-                p->light->setPos(p->pos.x + CAMERA.x, p->pos.y + CAMERA.y);
-            }
-
-        } else {
-            particles.erase(particles.begin() + i);
+    for (Particle* p : _particles){
+        if (p->del()){
             delete p;
+            _particles.erase(_particles.begin() + i);
+            p = nullptr;
             continue;
         }
+        p->update();
 
         i++;
     }
-    
-    pushParticles();
+
+
+    if (_pushing){
+        for (int i=0; i<(_density * (float)DELTA_TIME); i++){
+            push();
+        }
+    }
+
+    if (_duration == PARTICLES_DUARTION_EMPTY){
+        _del = _particles.empty();
+    } else if (_duration != PARTICLES_DURATION_UNLIMITED){
+        _del = (SDL_GetTicks() - _ticks > _duration);
+    }
 }
 
-Particles_type* Particles::getType(void){
-    return type;
+bool Particles::draw(int z){
+    if (_z == z){
+        for (Particle* p : _particles){
+            if (!p->draw()) return false;
+        }
+    }
+    return true;
 }
 
-Particles* operator<<(Particles* p, string name){
-    if (!p) return nullptr;
-    p->set(name);
+int Particles::z(void){
+    return _z;
+}
+
+void Particles::z(int z){
+    _z = z;
+}
+
+void Particles::pushing(bool pushing){
+    _pushing = pushing;
+}
+
+bool Particles::del(void){
+    return _del;
+}
+
+int Particles::duration(void){
+    return _duration;
+}
+
+void Particles::duration(int duration){
+    _duration = duration;
+}
+
+int Particles::particles_duration(void){
+    return _particles_duration;
+}
+
+void Particles::particles_duration(int duration){
+    _particles_duration = duration;
+}
+
+// ------------------------------
+
+Particles* create_particle(void){
+    if (IS_LOG_OPEN) LOG << "create_particle()" << endl;
+    Particles* p = new Particles();
+    PARTICLES.push_back(p);
     return p;
 }
 
-bool operator==(Particles* p, string name){
-    return p->getType()->getName() == name;
-}
-
 int update_particles(void* ptr){
-    
     int i=0;
     for (Particles* p : PARTICLES){
-        if (p->should_delete()){
+        if (p->del()){
             delete p;
             p = nullptr;
             PARTICLES.erase(PARTICLES.begin() + i);
             continue;
         }
-
         p->update();
         i++;
     }
@@ -289,7 +185,10 @@ int update_particles(void* ptr){
 
 void draw_particles(int z){
     for (Particles* p : PARTICLES){
-        p->draw(z);
+        if (!p->draw(z)){
+            MAINVAR->launched = false;
+            break;
+        }
     }
 }
 

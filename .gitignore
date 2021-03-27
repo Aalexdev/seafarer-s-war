@@ -9,10 +9,6 @@
 *.a
 *.la
 
-# lib header file
-
-SDL/
-
 # folders
 
 .vscode/*
@@ -21,3 +17,8 @@ SDL/
 # windows
 
 *.ini
+
+
+# tests
+
+save.xml

@@ -32,9 +32,6 @@
     </equipments>
 
     <lights>
-        <light type="15 white" x="16" y="53"/>
-        <light type="15 white" x="16" y="88"/>
-        <light type="15 white" x="16" y="110"/>
     </lights>
 
     <particles>
@@ -49,9 +46,6 @@
     </equipments>
 
     <lights>
-        <light type="15 white" x="16" y="53"/>
-        <light type="15 white" x="16" y="88"/>
-        <light type="15 white" x="16" y="110"/>
     </lights>
 
 </summonEntity>

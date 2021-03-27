@@ -9,6 +9,7 @@ Ammunition::Ammunition(){
     _dist = 0;
     _speed = 0;
     _pop = false;
+    _particles = nullptr;
 }
 
 Ammunition::~Ammunition(){

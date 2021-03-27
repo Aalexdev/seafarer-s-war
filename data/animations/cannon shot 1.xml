@@ -1,10 +1,19 @@
 <?xml version="0.1.0" encoding="utf-8"?>
 
-<particle name="cannon shot 1" strength="0.2" density="15" time="255">
-    <color>
-        <start r="255" g="0" b="0" a="255"/>
-        <end r="50" g="0" b="0" a="200"/>
-    </color>
+<particle name="cannon shot 1">
+    <colors> 
+        <color r="251" g="194" b="32" a="255"/>
+        <color r="254" g="155" b="45" a="255"/>
+        <color r="236" g="101" b="36" a="255"/>
+        <color r="233" g="95" b="34" a="255"/>
+        <color r="197" g="21" b="8" a="255"/>
+        <color r="97" g="0" b="0" a="255"/>
+        <color r="72" g="0" b="0" a="255"/>
+        <color r="47" g="0" b="0" a="255"/>
+        <color r="35" g="0" b="0" a="255"/>
+        <color r="15" g="0" b="0" a="255"/>
+        <color r="0" g="0" b="0" a="255"/>
+    </colors>
 
     <point/>
 </particle>

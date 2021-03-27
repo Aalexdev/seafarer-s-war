@@ -2,8 +2,11 @@
 #define __PARTICLES_TYPE__
 
     #include "api/io/xml.hpp"
-    #include "api/functions/math.hpp"
-    #include "ui/graphics/light.hpp"
+
+    #include <SDL2/SDL.h>
+    #include <iostream>
+    #include <vector>
+    using namespace std;
 
     class Particles_type{
         public:
@@ -18,285 +21,86 @@
              * 
              */
             ~Particles_type();
-            
+
             /**
-             * @brief loadthe effect type from a XML node
+             * @brief load the particles type form a xml Node
              * 
              * @param node the xml node
-             * @return return true if loaded, false on error
+             * @return true if loaded, false on error
              */
             bool load(XMLNode* node);
 
-            struct Particle_Circle{
-                /**
-                 * @brief the radius of the circle
-                 * 
-                 */
-                int radius;
-
-                /**
-                 * @brief if true, it will draw filled circle, empty if not
-                 * 
-                 */
-                bool filled;
-            };
-
-            struct Particle_Square{
-                /**
-                 * @brief the width of the square
-                 * 
-                 */
-                int width;
-
-                /**
-                 * @brief if true, it will draw filled square, empty if not
-                 * 
-                 */
-                bool filled;
-            };
-
-            struct Particle_Point{
-
-            };
-
-            struct Particle_Ellipse{
-                /**
-                 * @brief the horisontal radius of the particle
-                 * 
-                 */
-                int Hradius;
-
-                /**
-                 * @brief the vertical radius of the particle
-                 * 
-                 */
-                int Vradius;
-
-                /**
-                 * @brief if true, it will draw filled ellipse, empty if not
-                 * 
-                 */
-                bool filled;
-            };
+            /**
+             * @brief get the name of the type
+             * 
+             * @return string 
+             */
+            string name(void);
 
             /**
-             * @brief the style of the particle
+             * @brief set the type's name
              * 
+             * @param name the new name of the type
              */
-            union Particle_style{
-                Particle_Circle circle;
-                Particle_Square square;
-                Particle_Ellipse ellipse;
-                Particle_Point point;
-            };
-
-            enum Particle_Style{
-                Particle_circle,
-                Particle_square,
-                Particle_ellipse,
-                Particle_point
-            };
+            void name(string name);
 
             /**
-             * @brief the degraded
+             * @brief get color of the particle
              * 
+             * @return vector<SDL_Color*> 
              */
-            struct Degraded{
-                /**
-                 * @brief the starting color
-                 * 
-                 */
-                SDL_Color sColor;
-
-                /**
-                 * @brief the ending color
-                 * 
-                 */
-                SDL_Color eColor;
-            };
-            
-            /**
-             * @brief Set the Color of the particul effect
-             * 
-             * @param sColor the starting color
-             * @param eColor the ending color
-             */
-            void setColor(SDL_Color sColor, SDL_Color eColor);
+            vector<SDL_Color*> colors(void);
 
             /**
-             * @brief Set the starting color
+             * @brief get a random color from the colors vector
              * 
-             * @param color the color (rgba)
+             * @return SDL_Color 
              */
-            void setStartingColor(SDL_Color color);
-
-            /**
-             * @brief set the ending color
-             * 
-             * @param color the color (rgba)
-             */
-            void setEndingColor(SDL_Color color);
-
-            /**
-             * @brief set the time of the particle
-             * 
-             * @param time the time
-             */
-            void setTime(int time);
-
-            /**
-             * @brief get the time of the particle
-             * 
-             * @return return the time
-             */
-            int getTime(void);
-
-            /**
-             * @brief set the strength of parcticules
-             * 
-             * @param strength the new strength
-             */
-            void setStrength(float strength);
-            
-            /**
-             * @brief get the strength of the particles
-             * 
-             * @return return the srtength
-             */
-            float getStrength(void);
-
-            /**
-             * @brief print animation parameters into the the termial
-             * 
-             */
-            void print(void);
-
-            /**
-             * @brief get the light name of the type, null if there is not light effect
-             * 
-             * @return return the name of the light
-             */
-            string getLight(void);
-
-            /**
-             * @brief get the name of the particle
-             * 
-             * @return return the name
-             */
-            string getName(void);
-
-            /**
-             * @brief get the style type of the particle animation
-             * 
-             * @return retrun the particle animation
-             */
-            Particle_Style getStyle(void);
-
-            /**
-             * @brief get the style struct of the particle animation
-             * 
-             * @return return the particle animation struct
-             */
-            Particle_style* getStyleType(void);
-
-            /**
-             * @brief get the particle color at the start
-             * 
-             * @return return a color 
-             */
-            SDL_Color getStartColor(void);
-
-            /**
-             * @brief get the particle color at the end
-             * 
-             * @return retur a color 
-             */
-            SDL_Color getEndColor(void);
-
-            /**
-             * @brief get the density of the particle type
-             * 
-             * @return return an int
-             */
-            int getDensity(void);
+            SDL_Color get_random_color(void);
 
         private:
             /**
-             * @brief the name of the animation
+             * @brief the name of the particle
              * 
              */
-            string name;
+            string _name;
 
             /**
-             * @brief the color of particules
+             * @brief color of the type
              * 
              */
-            Degraded color;
-
+            vector<SDL_Color*> _colors;
+            
             /**
-             * @brief the style of the particle
+             * @brief push a new color into the colors vector from a xml node
              * 
+             * @param color_node the xml color node
              */
-            Particle_style style;
-
-            /**
-             * @brief the type of style
-             * 
-             */
-            Particle_Style style_type;
-
-            /**
-             * @brief the time for every particles
-             * 
-             */
-            int point_time;
-
-            /**
-             * @brief the strength of particules
-             * 
-             */
-            float particule_strength;
-
-            /**
-             * @brief the delay between every particle push
-             * 
-             */
-            int density;
-
-            /**
-             * @brief light name, empty if there is not effect
-             * 
-             */
-           string light;
-
-            /**
-             * @brief set the type of the animation
-             * 
-             */
-            void setCircle(void);
-            void setPoint(void);
-            void setSquare(void);
-            void setEllipse(void);
-
+            void pushColor(XMLNode* color_node);
     };
-
-    bool operator==(Particles_type* type, string name);
+    
+    /**
+     * @brief get a particles_type from a name
+     * 
+     * @param name the name of the particle
+     * @return Particles_type* 
+     */
+    Particles_type* search_particle_type(string name);
 
     /**
-     * @brief push a new particle type from a xml node
+     * @brief push a particle type into the particles_type vector and load it from a xml node
      * 
      * @param node the xml node
      */
-    void pushParticle_type(XMLNode* node);
+    void push_particle_type(XMLNode* node);
     
     /**
-     * @brief search in every particles type
+     * @brief clear the particles_type vector
      * 
-     * @param name the name
-     * @return return the type if found, NULL if not found
      */
-    Particles_type* searchParticle(string name);
+    void clear_particles_type(void);
 
-    void clear_particlesType(void);
+    // operators
+    bool operator==(Particles_type* t, string name);
 
 #endif

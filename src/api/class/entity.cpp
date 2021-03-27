@@ -488,7 +488,7 @@ bool Entity::load_from_xml(XMLNode* node){
                 XMLNode* particles_node = XMLNode_child(child, p);
 
                 if (!strcmp(particles_node->tag, "particle")){
-                    Particles* particles = new Particles();
+                    Particles* particles = create_particle();
                     objectAttribute* oa = new objectAttribute;
 
                     SDL_Point p = {0, 0};
@@ -497,7 +497,7 @@ bool Entity::load_from_xml(XMLNode* node){
                         XMLAttribute attr = particles_node->attributes.data[a];
 
                         if (!strcmp(attr.key, "type")){
-                            if (!particles->set(attr.value)){
+                            if (!particles->type(attr.value)){
                                 delete particles;
                                 delete oa;
                                 particles = nullptr;
@@ -506,12 +506,12 @@ bool Entity::load_from_xml(XMLNode* node){
                         } else if (!strcmp(attr.key, "angle")){
                             int angle;
                             sscanf(attr.value, "%d", &angle);
-                            particles->setAngle(angle);
+                            particles->angle(angle);
                             oa->objectAngle = angle;
                         } else if (!strcmp(attr.key, "range")){
                             int range;
                             sscanf(attr.value, "%d", &range);
-                            particles->setRange(range);
+                            particles->range(range);
                         } else if (!strcmp(attr.key, "x")){
                             sscanf(attr.value, "%d", &p.x);
                         } else if (!strcmp(attr.key, "y")){
@@ -528,10 +528,8 @@ bool Entity::load_from_xml(XMLNode* node){
                         this->particles.push_back(particles);
                         particles_point.push_back(oa);
 
-                        PARTICLES.push_back(particles);
-
-                        particles->push(true);
-                        particles->setDuration(UNDEFINE);
+                        particles->pushing(true);
+                        particles->duration(PARTICLES_DURATION_UNLIMITED);
                     }
 
                 } else {
@@ -592,8 +590,6 @@ bool Entity::load_from_xml(XMLNode* node){
 }
 
 void Entity::reset(void){
-
-
     if (IS_LOG_OPEN) LOG << "Entity::reset()" << endl;
     this->z = 0;
     this->angle = 0;
@@ -609,14 +605,14 @@ void Entity::reset(void){
     if (onDeath) delete onDeath;
 
     for (int i=0; i<particles.size(); i++){
-        delete particles[i];
         delete particles_point[i];
+        particles[i]->duration(0);
         particles_point[i] = nullptr;
-        particles[i] = nullptr;
     }
     particles.clear();
     particles_point.clear();
 
+    /*
     for (int i=0; i<lights.size(); i++){
         delete lights[i];
         delete lights_points[i];
@@ -625,6 +621,7 @@ void Entity::reset(void){
     }
     lights.clear();
     lights_points.clear();
+    */
 }
 
 Entity::Entity(){
@@ -977,9 +974,9 @@ void Entity::setParticlesPos(void){
         if (particles[i]){
             int x, y;
             setAngleM(&x, &y, particles_point[i]->dist, particles_point[i]->angle + angle);
-            particles[i]->setPos(x + rect.x + (rect.w / 2), y + rect.y + (rect.h / 2));
-            particles[i]->setAngle(particles_point[i]->objectAngle + angle);
-            particles[i]->setZ(z);
+            particles[i]->pos({x + rect.x + (rect.w / 2), y + rect.y + (rect.h / 2)});
+            particles[i]->angle(particles_point[i]->objectAngle + angle);
+            particles[i]->z(z);
 
         } else {
             particles.erase(particles.begin() + i);

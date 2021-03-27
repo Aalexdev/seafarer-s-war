@@ -6,8 +6,12 @@
     #include <string>
 
     #include "ui/graphics/particles_type.hpp"
+    #include "ui/graphics/particle.hpp"
 
     using namespace std;
+
+    #define PARTICLES_DURATION_UNLIMITED 92738273
+    #define PARTICLES_DUARTION_EMPTY 92783762 
     
     class Particles{
         public:
@@ -24,240 +28,263 @@
             ~Particles();
 
             /**
-             * @brief the particule struct
+             * @brief get the type of the particle
              * 
+             * @return Particles_type* 
              */
-            struct Particle{
-                /**
-                 * @brief the vector of the particle
-                 * 
-                 */
-                SDL_FPoint vector;
-
-                /**
-                 * @brief the position of the screen of the particle
-                 * 
-                 */
-                SDL_FPoint pos;
-
-                /**
-                 * @brief the tick
-                 * 
-                 */
-                int tick;
-                
-                enum Sub_Particle{
-                    Particle_subX,
-                    Particle_subY
-                };
-
-                /**
-                 * @brief on update, it will sub the x value of the vector or the y value
-                 * 
-                 */
-                Sub_Particle sub;
-
-                /**
-                 * @brief the color of the particle
-                 * 
-                 */
-                int r, g, b, a;
-
-                /**
-                 * @brief the light effect of the particles
-                 * 
-                 */
-                Light* light;
-            };  
+            Particles_type* type(void);
 
             /**
-             * @brief push a praticle into the particle vector
+             * @brief set the type of the particles
              * 
+             * @param type the new type
              */
-            void pushParticle(void);
+            void type(Particles_type* type);
 
             /**
-             * @brief get the Z axis of the animation
+             * @brief set the particles's type from a name
              * 
-             * @return retur the Z axis
+             * @param type_name the type's name
+             * @return true if found, false if not
              */
-            int getZ(void);
+            bool type(string type_name);
 
             /**
-             * @brief set the Z axis of the animation
+             * @brief get the particles vector
              * 
-             * @param z the new Z axis
+             * @return vector<Particle*> 
              */
-            void setZ(int z);
+            vector<Particle*> particles(void);
 
             /**
-             * @brief draw lights effects of the animation
+             * @brief push a new Particle in the particles vector
              * 
-             * @param z the actual height of the layer
-             * @return return true if drawn, false on error
              */
-            bool drawLight(int z);
+            void push(void);        
 
             /**
-             * @brief draw particles of the animation
+             * @brief get the radius of particles
              * 
-             * @param z the actual height of the layer
-             * @return return true if draw, false on error
+             * @return float 
              */
-            bool draw(int z);
+            float radius(void);
 
             /**
-             * @brief update particles 
+             * @brief set the particles's radius
+             * 
+             * @param radius the new radius
+             */
+            void radius(float radius);
+
+            /**
+             * @brief get the particles angle
+             * 
+             * @return int 
+             */
+            int angle(void);
+
+            /**
+             * @brief set the particles angle
+             * 
+             * @param angle the new angle
+             */
+            void angle(int angle);
+
+            /**
+             * @brief get the particles range
+             * 
+             * @return int 
+             */
+            int range(void);
+
+            /**
+             * @brief set the particles range
+             * 
+             * @param range the new range
+             */
+            void range(int range);
+
+            /**
+             * @brief get the positon of the particles
+             * 
+             * @return SDL_Point 
+             */
+            SDL_Point pos(void);
+
+            /**
+             * @brief set the position of the particle
+             * 
+             * @param pos the new position
+             */
+            void pos(SDL_Point pos);
+
+            /**
+             * @brief get the density of the particle
+             * 
+             * @return float 
+             */
+            float density(void);
+
+            /**
+             * @brief set the density if the particle
+             * 
+             * @param density the new density
+             */
+            void density(float density);
+
+            /**
+             * @brief update the particle
              * 
              */
             void update(void);
 
             /**
-             * @brief set the type of the particles from a string
+             * @brief draw particles on the renderer
              * 
-             * @param type_name the name of the type
-             * @return return true if type found, false on error 
+             * @return trueif drawn, false on error
              */
-            bool set(string type_name);
+            bool draw(int z);
 
             /**
-             * @brief set the position of the particle
+             * @brief get the Z axis
              * 
-             * @param x the x axis 
-             * @param y the y axis
+             * @return int 
              */
-            void setPos(int x, int y);
+            int z(void);
 
             /**
-             * @brief set the range of the particle
+             * @brief set the z axis
              * 
-             * @param range the ew range, in degres
+             * @param z the new z
              */
-            void setRange(int range);
+            void z(int z);
 
             /**
-             * @brief set the angle of the particle
+             * @brief set the pushing member, if it's false, it's wont push particles
              * 
-             * @param angle teh new angle
+             * @param pushing the push var
              */
-            void setAngle(int angle);
+            void pushing(bool pushing);
+
+            /**
+             * @brief get if the particles had to be delete
+             * 
+             * @return true if it is, false if not
+             */
+            bool del(void);
+
+            /**
+             * @brief get the duration of the particle
+             * 
+             * @return int 
+             */
+            int duration(void);
 
             /**
              * @brief set the duration of the particle
              * 
-             * @param duration the duration
+             * @param duration the new duration
              */
-            void setDuration(int duration);
+            void duration(int duration);
 
             /**
-             * @brief get if the paricle should be delete
+             * @brief get the duration of particles
              * 
-             * @return return true if should be delete, false if not
+             * @return int 
              */
-            bool should_delete(void);
+            int particles_duration(void);
 
             /**
-             * @brief set the push member, push particles only if it's true
+             * @brief set the duration of particles
              * 
-             * @param push 
+             * @param duration the new duration
              */
-            void push(bool push);
-
-            /**
-             * @brief Get the Type object
-             * 
-             * @return Particles_type* 
-             */
-            Particles_type* getType(void);
+            void particles_duration(int duration);
 
         private:
             /**
-             * @brief the linked type of the particles
+             * @brief the type of the particle
              * 
              */
-            Particles_type* type;
+            Particles_type* _type;
 
             /**
-             * @brief particles of the animation
+             * @brief the vector of particles
              * 
              */
-            vector<Particle*> particles;
+            vector<Particle*> _particles;
 
             /**
-             * @brief the z axis of the animation
+             * @brief the particles's vector max
              * 
              */
-            int z;
+            float _radius;
 
             /**
-             * @brief the angle of the particles
+             * @brief the angle of particles
              * 
              */
-            int angle;
+            int _angle;
 
             /**
-             * @brief the range
+             * @brief the range of particles
              * 
              */
-            int range;
+            int _range;
 
             /**
              * @brief the position of the particle
              * 
              */
-            SDL_Point pos;
+            SDL_Point _pos;
 
             /**
-             * @brief unlink the particle from a type
+             * @brief the density of the particles, particles pushed per miliseconds
              * 
              */
-            void unlink(void);
+            float _density;
 
             /**
-             * @brief get a random angle between angle - (range/2) and angle + (range/2)
-             * 
-             * @return return an angle
-             */
-            int getRandAngle(void);
-
-            /**
-             * @brief get a rabdom color canal
-             * 
-             * @return return an int between 0 and 255 
-             */
-            int getR(void);
-            int getG(void);
-            int getB(void);
-            int getA(void);
-
-            /**
-             * @brief colors used to get a degraded
+             * @brief the z axis of the particle
              * 
              */
-            SDL_Color colorIndex;
-
-            /**
-             * @brief the tick of the particle, will be destroyed whene SDL_GetTicks() is greater or equal to tick
-             * 
-             */
-            int tick;
-
-            /**
-             * @brief push particles inn the vector
-             * 
-             */
-            void pushParticles(void);
+            int _z;
 
             /**
              * @brief push particles only if it's true
+             *
+             */
+            bool _pushing;
+
+            /**
+             * @brief the duarition of the particle, in miliseconds
              * 
              */
-            bool pushing;
+            int _duration;
+
+            /**
+             * @brief ticks att the init of the particle
+             * 
+             */
+            int _ticks;
+
+            /**
+             * @brief 
+             * 
+             */
+            bool _del;
+
+            /**
+             * @brief the duration of particles
+             * 
+             */
+            int _particles_duration;
     };
 
     Particles* operator<<(Particles* p, string name);
     bool operator==(Particles* p, string name);
 
+    Particles* create_particle(void);
     int update_particles(void* ptr);
     void draw_particles(int z);
     void clear_particles(void);

@@ -446,7 +446,7 @@ bool readXML(string path){
             } else if (equal(mainNode->tag, "ammunition")){
                 new_Ammunition_type(mainNode);
             } else if (equal(mainNode->tag, "particle")){
-                pushParticle_type(mainNode);
+                push_particle_type(mainNode);
             } else if (equal(mainNode->tag, "light")){
                 pushLight_type(mainNode);
             } else if (equal(mainNode->tag, "save")){

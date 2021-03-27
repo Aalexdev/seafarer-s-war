@@ -1,4 +1,4 @@
-#include "api/class/Ammunition_type.hpp"
+#include "api/types/Ammunition_type.hpp"
 #include "main.hpp"
 
 #ifndef NONE_LAYER_TARGET
@@ -79,6 +79,16 @@ bool Ammunition_type::load(XMLNode* node){
                     if (IS_ERR_OPEN) ERR << "WARNING :: ammunition; perform, reason : cannot reconize '" << attr.key << "' perform attribute" << endl;
                 }
             }
+        } else if (!strcmp(child->tag, "particles")){
+            for (int a=0; a<child->attributes.size; a++){
+                XMLAttribute attr = child->attributes.data[a];
+
+                if (!strcmp(attr.key, "type")){
+                    _particle_type = attr.value;
+                } else {
+                    if (IS_ERR_OPEN) ERR << "WARNING :: ammunition, particles, reason : cannot reconize '" << attr.key << "' particles attribute" << endl;
+                }
+            }
         } else {
             if (IS_ERR_OPEN) ERR << "WARNING :: ammunition, reason : cannot reconize '" << child->tag << "' ammunition child" << endl;
         }
@@ -149,6 +159,14 @@ void Ammunition_type::name(string name){
     if (!search_Ammunition_type(name)){
         _name = name;
     }
+}
+
+string Ammunition_type::particles_type(void){
+    return _particle_type;
+}
+
+void Ammunition_type::particules_type(string type){
+    _particle_type = type;
 }
 
 bool operator<<(Ammunition_type type, XMLNode* node){

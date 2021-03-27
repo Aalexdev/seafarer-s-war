@@ -3,5 +3,5 @@
 <equipment name="MR-Elpis">
     <texture path="res/img/equipment/cannons/MR-Elpis.bmp" />
     <center x="2" y="11"/>
-    <cannon couldown="0" ammunition-type="test"/>
+    <cannon couldown="0" ammunition-type="test" particles="cannon shot 1"/>
 </equipment>

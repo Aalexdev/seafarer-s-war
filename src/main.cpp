@@ -158,7 +158,7 @@ void update(){
 
     updateWidgets();
     update_ammunitions((void*)NULL);
-    update_particles((void*)NULL);
+    SDL_Thread* particle = SDL_CreateThread(update_particles, "particles", (void*)NULL);
 
     if (!PAUSE){
         int i = 0;
@@ -181,6 +181,7 @@ void update(){
     }
     
     resetMouse();
+    SDL_WaitThread(particle, NULL);
     mainVar.time.updateExecT = SDL_GetTicks() - exec;
 }
 
@@ -246,18 +247,6 @@ void drawLayers(int z){
                     i++;
                 }
 
-                
-                i=0;
-                for (Particles* p : PARTICLES){
-                    if (!p || !p->drawLight(z)){
-                        if (p) delete p;
-                        PARTICLES.erase(PARTICLES.begin() + i);
-                        continue;
-                    }
-                    i++;
-                }
-                
-
                 i=0;
                 for (Entity* entity : ENTITY){
                     if (!entity->drawLight(z)){
@@ -286,28 +275,7 @@ void drawLayers(int z){
         lr++;
     }
 
-    
     int i=0;
-    for (Particles* p : PARTICLES){
-        if (!p){
-            PARTICLES.erase(PARTICLES.begin() + i);
-            continue;
-        } else if (p->should_delete()){
-            PARTICLES.erase(PARTICLES.begin() + i);
-            delete p;
-            p = nullptr;
-            continue;
-        } else {
-            if (!p->draw(z)){
-                PARTICLES.erase(PARTICLES.begin() + i);
-                delete p;
-                continue;
-            }
-        }
-        i++;
-    }
-
-    i=0;
     for (Entity* entity : ENTITY){
         if (entity->getZ() == z){
             if (!entity->draw()){
@@ -507,13 +475,15 @@ void destroy(void){
     clear_ammunitions();
     clear_Ammunition_type();
     clear_particles();
-    clear_particlesType();
+    clear_particles_type();
     
     delete KEYPAD;
     delete PLAYER;
 
     freeFont();
     freeWindow();
+
+    if (IS_LOG_OPEN) LOG << "\n\t-= exit =-" << endl;
 
     if (IS_LOG_OPEN) LOG.close();
     if (IS_ERR_OPEN) ERR.close();

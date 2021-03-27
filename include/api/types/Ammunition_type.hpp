@@ -158,6 +158,19 @@
              */
             void mass(float mass);
 
+            /**
+             * @brief get the particle type's name
+             * 
+             * @return string 
+             */
+            string particles_type(void);
+
+            /**
+             * @brief set the particle type
+             * 
+             * @param type 
+             */
+            void particules_type(string type);
 
         private:
             /**
@@ -219,6 +232,12 @@
              * 
              */
             float _up_down_speed;
+
+            /**
+             * @brief the name of the particle type, empty if not effect
+             * 
+             */
+            string _particle_type;
     };
     
     bool operator<<(Ammunition_type type, XMLNode* node);

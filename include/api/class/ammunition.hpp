@@ -294,6 +294,12 @@
              * 
              */
             bool _pop;
+
+            /**
+             * @brief the particle pointer
+             * 
+             */
+            Particles* _particles;
     };
 
     Ammunition* operator<<(Ammunition& amm, string type_name);

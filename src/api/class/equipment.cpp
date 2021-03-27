@@ -209,23 +209,21 @@ bool Equipment::setType(string name){
             light = NULL;
         }
     }
+
     if (type->getCannon()){
         cannon = new Cannon;
         cannon->tick = SDL_GetTicks();
         cannon->particles = nullptr;
 
         if (!type->getCannon()->particle_type.empty()){
-            cannon->particles = new Particles();
-
-            if (cannon->particles->set(type->getCannon()->particle_type)){
-                PARTICLES.push_back(cannon->particles);
-                cannon->particles->setPos(getX(), getY());
-                cannon->particles->push(false);
-                cannon->particles->setRange(30);
-                cannon->particles->setZ(parent->getZ());
-            } else {
-                delete cannon->particles;
-                cannon->particles = nullptr;
+            cannon->particles = create_particle();
+            if (cannon->particles->type(type->getCannon()->particle_type)){
+                cannon->particles->pos({getX(), getY()});
+                cannon->particles->pushing(true);
+                cannon->particles->range(30);
+                cannon->particles->z(parent->getZ());
+                cannon->particles->duration(PARTICLES_DURATION_UNLIMITED);
+                cannon->particles->density(0.16);
             }
         }
     }
@@ -242,7 +240,7 @@ void Equipment::unlink(void){
     light = nullptr;
 
     if (cannon){
-        if (cannon->particles) cannon->particles->setDuration(0);
+        if (cannon->particles) cannon->particles->duration(0);
 
         for (Ammunition* amm : cannon->ammunitions){
             amm->pop();
@@ -320,6 +318,14 @@ void Equipment::shot(void){
 
             cannon->ammunitions.push_back(amm);
         }
+
+        
+        if (cannon->particles){
+            cannon->particles->range(30);
+            cannon->particles->angle(angle);
+            cannon->particles->pos({getX() - CAMERA.x, getY() - CAMERA.y});
+            cannon->particles->pushing(true);
+        }
     }
 }
 
@@ -331,6 +337,9 @@ void Equipment::update(void){
     }
 
     if (cannon){
+
+        if (cannon->particles) cannon->particles->pushing(false);
+        
         if (MOUSEBTN.left){
             shot();
         }
